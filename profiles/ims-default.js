@@ -11,7 +11,6 @@ const modules = [
   import("../src/core/ui.js"),
   import("../src/core/location-hash.js"),
   import("../src/core/l10n.js"),
-  import("../src/w3c/defaults.js"),
   import("../src/core/style.js"),
   import("../src/ims/style.js"),
   // Check configuration
@@ -20,7 +19,6 @@ const modules = [
   import("../src/ims/compute.js"),
   // Process transcludes
   import("../src/ims/transclude.js"),
-  import("../src/w3c/l10n.js"),
   // Don't use github
   // import("../src/core/github.js"),
   import("../src/core/data-include.js"),
@@ -28,10 +26,6 @@ const modules = [
   import("../src/core/reindent.js"),
   // Make sure markdown abstract has an id
   import("../src/core/id-headers.js"),
-  import("../src/core/title.js"),
-  import("../src/w3c/level.js"),
-  import("../src/w3c/group.js"),
-  import("../src/w3c/headers.js"),
   // Check for abstract
   import("../src/ims/abstract.js"),
   // Add introductory class to abstract
