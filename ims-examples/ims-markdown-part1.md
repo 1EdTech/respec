@@ -13,6 +13,8 @@ This is the abstract text.
 
 ## Introduction {#intro}
 
+Please see [Using Markdown with ReSpec](https://github.com/w3c/respec/wiki/markdown) for more examples of using markdown in ReSpec documents.
+
 This is the introduction text. The section has a custom <code>id="intro"</code>.
 
 <pre class="example" title="How to override generated id in markdown">
