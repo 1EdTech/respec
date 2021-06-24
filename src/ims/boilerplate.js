@@ -5,6 +5,7 @@
  */
 
 import { html } from "../core/import-maps.js";
+import { pub } from "../core/pubsubhub.js";
 
 export const name = "ims/boilerplate";
 
@@ -34,6 +35,30 @@ function getStatusString(conf) {
       // ims/config.js will issue error for unknown values
       return `Unknown <code>specStatus: "${conf.specStatus}"</code>`;
   }
+}
+
+function showLink(link) {
+  if (!link.key) {
+    const msg =
+      "Found a link without `key` attribute in the configuration. See dev console.";
+    pub("warn", msg);
+    console.warn("warn", msg, link);
+    return;
+  }
+  return html`
+    <tr class="${link.class ? link.class : null}">
+      <td>${link.key}:</td>
+      ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
+    </tr>
+  `;
+}
+
+function showLinkData(data) {
+  return html` <td class="${data.class ? data.class : null}">
+    ${data.href
+      ? html`<a href="${data.href}">${data.value || data.href}</a>`
+      : data.value}
+  </td>`;
 }
 
 /**
@@ -104,6 +129,7 @@ export async function run(conf) {
                 </tr>`
             : null
         }
+        ${conf.otherLinks ? conf.otherLinks.map(showLink) : ""}
       </tbody>
     </table>`;
 
