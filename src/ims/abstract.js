@@ -17,7 +17,7 @@ export async function run() {
     );
     // insert a temp abstract
     const tempAbstract = toHTMLNode(
-      "<section id='abstract' class='introductory remove'><h2>h</h2></section>"
+      "<section id='abstract' class='introductory remove'><h2>Abstract</h2></section>"
     );
     document.body.prepend(tempAbstract);
   }
