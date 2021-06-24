@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+    <meta charset='utf-8'>
+    <!-- default online location of the IMS respec js lib: -->
+    <script src='https://purl.imsglobal.org/spec/respec-ims-default.js' async class='remove'></script> 
+    <!-- local alternative: --> 
+    <!-- <script src='../../profiles/ims-default.js' async class="remove"></script> -->
+    <script src='./shared/local-biblio.js' class='remove'></script>    
+    <script src='./shared/contributors.js' class='remove'></script>
+    <script class='remove'>
+      var respecConfig = {
+        specTitle: "Example Specification",
+        shortName: "example",        
+        specStatus: "IMS Candidate Final",
+        specDate: "November 16th, 2017",
+        specVersion: "1.1",
+        specNature: "normative",
+        specType: "spec",
+        contributors: _contributors,                
+        localBiblio: _localBiblio,
+        //override the default online location of fixup.js: 
+        //overrideFixupLocation : "../js/fixup.js",        
+        //override the default online location of ims-base.css: 
+        //overrideCSSLocation : "../css/ims-base.css";        
+        //override the default online location of ims-biblio.js: 
+        //overrideIMSbiblioLocation : "...";                        
+        //disable fetching of ims-biblio.js by setting to true:
+        //disableFetchIMSbiblio: true        
+        //remove body scripts and/or inline CSS 
+        cleanBodyScripts: true,
+        cleanBodyCSS: true,
+      };
+    </script>
+  </head>
+  <body>
+    <script class="transclude" src="shared/abstract.js" data-id="t1"></script>
+    
+      <section>
+        <h2>Overview</h2>
+        <section class="informative">
+          <h3>Design Goals and Rationale</h3>
+          
+          <p>The Design Goals and Rationale describes in detail (as compared to
+          the abstract) what the specification aims to accomplish, and functions
+          as a prelude to the use cases section.</p>
+
+          <p>Ut mattis urna et tortor fermentum commodo. Sed vehicula enim at
+          diam pulvinar suscipit. Fusce lobortis mollis purus, a fringilla purus
+          congue non. Proin lectus lacus, accumsan nec malesuada id, blandit in
+          erat. Aliquam blandit a tellus ac facilisis. Sed mi neque, accumsan
+          vulputate felis sed, facilisis hendrerit est. Nullam ultrices non
+          libero sed tristique. Proin tempor, quam vitae consequat congue, est
+          sapien pharetra odio, sed rhoncus metus sem in turpis.</p>
+
+          <figure class="graphic">
+              <img src="img/eTconceptual.jpg" alt="Diagram of the eT logical model, 
+              containing the following elements: ...">
+              <figcaption>Conceptual diagram of the Extended Transcript logical 
+                model</figcaption>
+          </figure>    
+
+          <p>The lefthand side of the diagram contains the Issuer (the educational 
+            institution or organization providing the eT), the Person (the learner), 
+            and Records that indicate status and outcome information, along with 
+            other relevant metadata about the learner's achievements or progress.</p>
+
+          <p>The righthand side of the diagram are the academic and co-curricular 
+            entities, collectively known as the Transcript Entities. These entities 
+            describe the types of programs, courses, competencies, etc. that are 
+            relevant to the learner’s activities at that institution.</p>
+          
+        </section>
+        <section class="informative" id="usecases">                  
+          <h3>Use cases</h3>        
+          <p>The following use cases are supported by this specification:</p>
+          
+          <table class="usecase" id="uc02">
+            <tbody>
+              <tr>
+        				<td colspan="2"><p>1. Setting Link Level Credentials (Basic Launch)</p></td>
+			        </tr>
+              <tr>
+                <td><p>Description:</p></td>
+				        <td><p>An instructor authors an LTI link and sets the key/password for that link.</p></td>
+			        </tr>
+              <tr>
+                <td><p>Actors:</p></td>
+				        <td>
+                  <ul><li>Instructor</li><li>Tool Provider (TP)</li></ul>
+				        </td>
+			        </tr>
+              <tr>
+                <td><p>Preconditions:</p></td>
+  				      <td>
+  					      <p>None</p>
+  				      </td>
+			        </tr>
+              <tr>
+                <td><p>Basic Flow of Events:</p></td>
+				        <td>
+					        <ol>
+                    <li><em>Exchange Link Level Credentials</em>. The Instructor 
+                      contacts the <a>TP</a> to obtain access to a provider tool or content. 
+                      The TP provides the Instructor with (1) an LTI launch URL or 
+                      XML snippet for the content or tool, (2) a key that will be 
+                      used to access this content/tool, and (3) a secret associated 
+                      with the key. The LTI specification does not prescribe any 
+                      mechanism for this exchange.&nbsp;</li>
+  					        <li><em>Persist Link Level Credentials in the <a>TC</a> system</em>. 
+                      The Instructor enters the three values (URL or XML snippet, 
+                      Key, Secret) into an LTI authoring dialog in the TC system.</li>
+                  </ol>
+				        </td>
+			        </tr>
+              <tr>
+              <td>Success Conditions:</td>
+              <td><p>Mauris felis quam, volutpat non viverra eget, feugiat ac quam. 
+                Donec bibendum turpis vel ex mattis, at aliquam nunc malesuada. Ut 
+                fermentum scelerisque tortor ut auctor. Morbi elit dolor, hendrerit 
+                nec vehicula ut, faucibus et metus. </p></td>
+              </tr>
+              <tr>
+              <td>Exception Conditions:</td>	
+              <td>
+                <ol>
+                  <li>Suspendisse congue tortor at libero feugiat dignissim.</li>
+                  <li>Sed eget nunc semper, efficitur nibh vel, sagittis felis.</li>
+                  <li>Vestibulum imperdiet lacus sit amet risus porttitor ultricies.</li>
+                </ol>
+              </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <table class="usecase" id="uc03">
+            <tbody>
+              <tr>
+                <td colspan="2"><p>2. Managing Credentials for LTI Links Imported 
+                  from a Cartridge</p></td>
+              </tr>
+              <tr>
+                <td><p>Description:</p></td>
+                <td><p>An Instructor imports a Common Cartridge containing LTI 
+                  link descriptors into their context, and users use the content.</p></td>
+              </tr>
+              <tr>
+                <td><p>Actors:</p></td>
+                <td>
+                  <ul>
+                  <li>Instructor</p>
+                  <li>TC User (typically a Student or Instructor)</p>
+                  </ul>  
+                </td>
+              </tr>
+              <tr>
+                <td><p>Preconditions:</p></td>
+                <td>
+                  <p>A cartridge creator has authored a Common Cartridge that 
+                    contains one or more LTI Link descriptors. These descriptors 
+                    specify the launch URL(s) and other data associated with the
+                     links, but they do not contain keys or secrets.</p>
+                  <p>In accordance with Use Case LTIv1p1-01, the TC Administrator 
+                    has set the domain credentials to particular TP(s) that are 
+                    referenced in the cartridge.</p>
+                </td>
+              </tr>
+              <tr>
+                <td><p>Basic Flow of Events:</p></td>
+                <td>
+                  <ol>
+                  <li><em>Import the cartridge</em>. The Instructor obtains the 
+                    Common Cartridge and imports it into a learning context within 
+                    the TC system.</p>
+                  <li><em>Use domain credentials during Tool Launch</em>. When a 
+                    TC User launches an LTI link imported from the Common Cartridge, 
+                    the TC signs the launch request using the pre-configured 
+                    credentials associated with the TP address.&nbsp; In particular, 
+                    as long as the TC-wide credentials are already installed, 
+                    the Instructor does not need to take any further action to 
+                    secure the launch request beyond importing a cartridge.</p>
+                  </ol>
+                </td>
+              </tr>
+              <tr>
+                <td><p>Alternative Flows:</p></td>
+                <td>
+                  <p><strong>A. Domain Credentials are not predefined</strong></p>
+                  <p>If the domain credentials are not predefined within the TC 
+                    system (i.e., the preconditions to this use case are not satisfied) 
+                    then at Step 2 the launch requests will not be signed. In 
+                    this case, the TC may (at its discretion) refuse to allow the 
+                    Tool Launch to proceed. If an unsigned tool launch does occur, 
+                    the TP may (at its discretion) refuse to honor the request. 
+                    To correct such launch failures, it is possible to add domain 
+                    or link level credentials (in accordance with Use Cases LTIv1p1-01 
+                    and LTIv1p1-02 respectively) after the cartridge has been imported.</p>
+                </td>
+              </tr>
+              <tr>
+              <td>Success Conditions:</td>
+              <td><p>Mauris felis quam, volutpat non viverra eget, feugiat ac quam. 
+                Donec bibendum turpis vel ex mattis, at aliquam nunc malesuada. Ut 
+                fermentum scelerisque tortor ut auctor. Morbi elit dolor, hendrerit 
+                nec vehicula ut, faucibus et metus. </p></td>
+              </tr>
+              <tr>
+              <td>Exception Conditions:</td>	
+              <td>
+                <ol>
+                  <li>Suspendisse congue tortor at libero feugiat dignissim.</li>
+                  <li>Sed eget nunc semper, efficitur nibh vel, sagittis felis.</li>
+                  <li>Vestibulum imperdiet lacus sit amet risus porttitor ultricies.</li>
+                </ol>
+              </td>
+              </tr>
+            </tbody>
+          </table>
+          
+        </section>
+        <section id="terminology">
+          <h3>Terminology</h3>
+          <!-- add each term as a dt/dd pair with attrs as below; then use <a> in when referencing back to a term -->
+          <!-- use data-sort to automatically sort the terms -->
+          <dl class="termlist" data-sort id="terms">
+            <dt><dfn data-lt="absolute IRIs">absolute IRI</dfn></dt><dd> An <a
+                data-cite="RFC3987#section-1.3" class="externalDFN">absolute IRI</a> is defined
+                in [[!RFC3987]] containing a <em>scheme</em> along with a <em>path</em> and
+                optional <em>query</em> and fragment segments.</dd> 
+            <dt><dfn data-lt="base
+                IRIs">base IRI</dfn></dt><dd> The <a>base IRI</a> is an <a>absolute IRI</a>
+                established in the context, or is based on the JSON-LD document
+                location. The <a>base IRI</a> is used to turn <a>relative IRIs</a> into
+                <a>absolute IRIs</a>.</dd>
+            <dt><dfn data-lt="relative IRIs">relative IRI</dfn></dt>
+            <dd>A relative IRI is an IRI that is relative to some other <a>absolute IRI</a>.</dd>
+            
+            <dt><dfn data-lt="TC">Tool Consumer</dfn></dt>
+            <dd>What we traditionally think of as the "Learning Management System" 
+            (LMS) is referred to as the "Tool Consumer" (TC) as it "consumes" the tool.</dd>
+            <dt><dfn data-lt="TP">Tool Provider</dfn></dt>
+            <dd>The external tool or content is called the "Tool Provider" (TP) as 
+            it "provides" the tool for use in the <a>Tool Consumer</a>.   
+            Example Tool Providers might include an externally hosted testing 
+            system or a server that contains externally hosted premium content. </dd>
+              
+          </dl>  
+        </section>  
+        <section id="conformance">
+          <h3>Conformance Statements</h3>
+          <!-- RFC 2119 text is inserted at the top of this section.
+              If you want, add additional paragraphs below this comment.
+          -->                   
+          <p>Vivamus et nisi sit amet ipsum ultricies laoreet.
+          Maecenas varius pulvinar tincidunt.</p>
+        </section>
+        <section id="documentset">
+          <h3>Document Set</h3>
+          <!-- a complete list of documents in the Specification document set. 
+          May include both normative and informative references. All documents 
+          referenced here also occur in the bibliography-->
+          <section>
+            <h4>Normative Documents</h4>
+            <dl>
+            <dt>Conformance and Certification guide</dt>
+            <dd>The conformance and certification guide
+            that accompanies this specification [[!EXAMPLE-CERT]] defines 
+            the requirements for example service consumers and providers. 
+            Facilisis hendrerit est. Nullam ultrices non libero sed tristique.
+            Proin tempor, quam vitae consequat congue, est sapien pharetra odio,
+            sed rhoncus metus sem in turpis. </dd>
+            <dt>JSON Schema</dt>
+            <dd>The JSON [[!EXAMPLE-JSONSCH]] schema is provided hendrerit est. 
+            Proin tempor, quam vitae consequat congue, est sapien pharetra odio,
+            sed rhoncus metus sem in turpis. </dd>
+            <dt>Errata</dt>
+            <dd>The errata [[!EXAMPLE-ERRATA]] details any erratum registered for
+              this version of this specification since its publication.</dd>            
+            </dl>
+          </section>  
+          <section class="informative">
+            <h4>Informative Documents</h4>
+            <dl>
+            <dt>Implementation Guide</dt> <dd>The implementation guide
+            that accompanies this specification [[EXAMPLE-IMPL]] contains
+            informtative guidance on facilisis hendrerit est. Nullam ultrices 
+            non libero sed tristique. Proin tempor, quam vitae consequat congue, 
+            est sapien pharetra odio, sed rhoncus metus sem in turpis. </dd>            
+            </dl>
+            <dl>
+            <dt>OpenAPI Swagger View</dt> 
+            <dd>A browseable view of the OpenAPI definition is available at...</dd>            
+            </dl>
+          </section>  
+        </section>
+      </section>
+
+      <section>
+        <h2>Data Model</h2>
+        <section id="entity">
+            <h3>The Caliper Entity</h3>
+            <figure class="graphic">
+                <img src="img/caliper-entities-v2.png" alt="Diagram of the available
+                Caliper entities, containing the following elements: ...">
+                <figcaption>Caliper Entities and their subtypes</figcaption>
+            </figure> 
+            <p>A Caliper Entity is a generic type that represents objects that 
+              participate in learning-related activities. A variety of Entity 
+              subtypes have been defined in order to better describe people, 
+              groups, organizations, digital content, courses, software 
+              applications, and other objects that constitute the "stuff" of a 
+              Caliper Event. Each Entity is provisioned with a modest set of 
+              properties or attributes that support discovery and description.</p>
+            <section>
+                <h4>Properties</h4>                
+                <p>Like an Event, an Entity is considered semi-structured data 
+                  consisting of an unordered set of key:value pairs. The base set 
+                  of Entity properties is listed below. Properties whose disposition
+                  is set to Required MUST be specified in the Entity payload.</p> 
+                  <table class="data">
+                  <thead>
+                  <tr>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Disposition</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>id</td>
+                    <td>IRI</td>
+                    <td>A valid IRI [[!RFC3987]] MUST be specified. The IRI 
+                      MUST be unique and persistent. 
+                    <td>Required</td>
+                    </tr>
+                  <tr>
+                    <td>dateCreated</td>
+                    <td>DateTime</td>
+                    <td>An [[!ISO8601]] date and time value expressed with 
+                      millisecond precision that describes when the 
+                      <a href="#entity">Entity</a> was created. The value MUST 
+                      be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set
+                      to UTC with no offset specified.</td>
+                    <td>Optional</td>
+                 </tr>
+                 <tbody>
+               </table>
+                  
+                  <p>Custom attributes not described by the model MAY be included 
+                    but MUST be added to the extensions property as a map of 
+                    key:value pairs. Properties with a value of null or empty 
+                    SHOULD be excluded prior to serialization.</p>
+            </section
+            
+            
+            
+        </section>  
+
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+      </section>
+    </section>
+      <section class="appendix informative">
+        <h2>Examples</h2>
+        <section>
+          <h3>Single Accreditor</h3>
+          <figure class="example">
+<pre><code>
+  {
+    "extensions:IssuerAccreditation": {
+      "@context":"https://openbadgespec.org/extensions/issuerAccreditationExtension/context.json",
+      "type": ["Extension", "extensions:IssuerAccreditation"],
+      "name": "Higher Learning Commission",
+      "contactInstructions": "Visit website to request an institutional status and requirements report",
+      "url": "http://hlcommission.org",
+      "address": {
+        "streetAddress": "230 South LaSalle Street, Suite 7-500",
+        "addressLocality": "Chicago",
+        "addressRegion": "IL",
+        "postalCode": "60604-1411"
+      }
+  }              
+</code></pre>       
+          <figcaption>Example of single accreditor</figcaption>   
+          </figure>
+        </section>
+        <section>
+          <h3>Two Accreditors</h3>
+          <figure class="example">
+<pre><code>
+  {
+    "extensions:IssuerAccreditation": [{
+      "@context":"https://openbadgespec.org/extensions/issuerAccreditationExtension/context.json",
+      "type": ["Extension", "extensions:IssuerAccreditation"],
+      "name": "Northwest Commission on Colleges and Universities",
+      "contactInstructions": "Call or email the Commission Office",
+      "url": "http://www.nwccu.org/index.htm",
+      "address": {
+        "streetAddress": "8060 165th Ave. NE, Suite 100",
+        "addressLocality": "Redmond",
+        "addressRegion": "WA",
+        "postalCode": "98052"
+  }
+</code></pre>        
+        <figcaption>Example of multiple accreditors</figcaption>
+        </figure>
+        </section>
+      </section>
+      
+      <section class="appendix informative" id="revisionhistory">
+        <h2>Revision History</h2>
+        
+        <section>
+          <h3>Version History</h3>
+          <table title="Revision History" class="data"
+            summary="Publication history and revision details for this specification.">
+            <thead>
+              <tr><th>Version No.</th><th>Release Date</th><th>Comments</th></tr>
+            </thead>
+              <tbody>
+                  <tr>
+                      <td>IMS Candidate Final 1.0 [[EXAMPLE10]]</td>
+                      <td>January 20th, 2015</td>
+                      <td>The original release. This declares the standard ready for public adoption.</td>
+                  </tr>
+                  <tr>
+                      <td>IMS Candidate Final 1.1</td>
+                      <td>November 16th, 2017</td>
+                      <td>The second Final Release. This document.</td>
+                  </tr>
+              </tbody>
+          </table>
+         </section>
+         <section>
+           <h3>Changes in this version</h3>
+           <p>Changes in this version of Example Specification are detailed below.</p>
+           
+           <table class="data">
+              <thead>
+              <tr>
+              <th>Profile</th>
+              <th >Status</th>
+              <th>Disposition</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+              <td>AssessmentItem Profile</td>
+              <td>Removed</td>
+              <td>Considered redundant. <a href="#assessmentItemEvent">AssessmentItemEvent</a> has been relocated to the <a href="#assessmentProfile">Assessment Profile</a>.</td>
+              </tr>
+              <tr>
+              <td><a href="#basicProfile">Basic Profile</a></td>
+              <td >New</td>
+              <td>Utilize the generic <a href="#event">Event</a> for describing learning or supporting activities that have yet to be modeled by Caliper.</td>
+              </tr>
+              <tr>
+              <td><a href="#forumProfile">Forum Profile</a></td>
+              <td >New</td>
+              <td>Models learners and others participating in online forum communities.</td>
+              </tr>
+              <tr>
+              <td><a href="#gradingProfile">Grading Profile</a></td>
+              <td >New</td>
+              <td>Replaces <a href="#outcomeProfile">Outcome Profile</a>.  Adds <a href="#score">Score</a>.</td>
+              </tr>
+              <tr>
+              <td>Outcome Profile</td>
+              <td >Removed</td>
+              <td>Replaced by <a href="#gradingProfile">Grading Profile</a>.</td>
+              </tr>
+              <tr>
+              <td><a href="#readingProfile">Reading Profile</a></td>
+              <td >Revised</td>
+              <td><a href="#readingEvent">ReadingEvent</a> has been deprecated and targeted for removal while <a href="#navigationEvent">NavigationEvent</a> and <a href="#viewEvent">ViewEvent</a> have been added to the profile. <a href="#epubChapter">EpubChapter</a>, <a href="#epubPart">EpubPart</a>, <a href="#epubSubChapter">EpubSubChapter</a>, <a href="#epubVolume">EpubVolume</a> have been deprecated in favor of <a href="#document">Document</a>, <a href="#chapter">Chapter</a> and <a href="#page">Page</a>.</td>
+              </tr>
+              <tr>
+              <td><a href="#toolUseProfile">Tool Use Profile</a></td>
+              <td >New</td>
+              <td>A light-weight profile that models an intended interaction between a <a href="#person">Person</a> and a <a href="#softwareApplication">SoftwareApplication</a>.</td>
+              </tr></tbody></table>
+        </section>   
+
+        
+        
+    <!-- a footer is inserted by the script -->
+  </body>
+</html>
