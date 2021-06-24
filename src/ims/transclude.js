@@ -25,7 +25,7 @@ export async function run() {
 
   let transclude = document.querySelector("script.transclude");
 
-  while (transclude != null) {
+  while (transclude !== null) {
     if (!transclude.hasAttribute("data-id")) {
       pub("error", "transclude script element without data-id attribute");
       break;
