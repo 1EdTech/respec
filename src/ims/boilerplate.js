@@ -22,7 +22,7 @@ function getStatusString(conf) {
     return "This is an informative IMS Global document that may be revised at any time.";
   }
   if (conf.specType === "proposal") {
-    return "This is proposal that may be revised at any time.";
+    return "This is a proposal that may be revised at any time.";
   }
   // specStatus: See ims/config.js for known values
   switch (conf.specStatus) {
