@@ -21,8 +21,13 @@ function getStatusString(conf) {
   if (conf.specType === "doc") {
     return "This is an informative IMS Global document that may be revised at any time.";
   }
+  if (conf.specType === "proposal") {
+    return "This is a proposal that may be revised at any time.";
+  }
   // specStatus: See ims/config.js for known values
   switch (conf.specStatus) {
+    case "Proposal":
+      return "This document is for review and comment by IMS Contributing Members.";
     case "IMS Base Document":
       return "This document is for review and comment by IMS Contributing Members.";
     case "IMS Candidate Final":
@@ -83,7 +88,7 @@ export async function run(conf) {
 
   header.appendChild(headerTop);
 
-  if (conf.specType !== "doc") {
+  if (conf.specType !== "doc" && conf.specType !== "proposal") {
     const release = html`<div class="subtitle">
       ${conf.specStatus}<br />Spec Version ${conf.specVersion}
     </div>`;
@@ -140,7 +145,7 @@ export async function run(conf) {
       </tbody>
     </table>`;
 
-  if (conf.specType !== "doc") {
+  if (conf.specType !== "doc" && conf.specType !== "proposal") {
     header.appendChild(versionTable);
   } else {
     const genericDocTable = html` <table
@@ -162,61 +167,20 @@ export async function run(conf) {
     header.appendChild(genericDocTable);
   }
 
-  const ipr = html`<div id="ipr">
-    <h2>IPR and Distribution Notice</h2>
+  const copyright = html`<div id="cpr">
     <p>
-      Recipients of this document are requested to submit, with their comments,
-      notification of any relevant patent claims or other intellectual property
-      rights of which they may be aware that might be infringed by any
-      implementation of the specification set forth in this document, and to
-      provide supporting documentation.
+      © ${new Date().getFullYear()} IMS Global Learning Consortium, Inc. All
+      Rights Reserved.
     </p>
     <p>
-      IMS takes no position regarding the validity or scope of any intellectual
-      property or other rights that might be claimed to pertain to the
-      implementation or use of the technology described in this document or the
-      extent to which any license under such rights might or might not be
-      available; neither does it represent that it has made any effort to
-      identify any such rights. Information on IMS's procedures with respect to
-      rights in IMS specifications can be found at the IMS Intellectual Property
-      Rights web page:
-      <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">
-        http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf</a
-      >.
+      Trademark information:
+      <a href="http://www.imsglobal.org/copyright.html"
+        >http://www.imsglobal.org/copyright.html
+      </a>
     </p>
   </div>`;
-  header.appendChild(ipr);
 
-  if (conf.iprs) {
-    header.appendChild(html`<p>
-      The following participating organizations have made explicit license
-      commitments to this specification:
-    </p>`);
-    let iprTable = `<table>
-      <thead>
-        <tr>
-          <th>Org name</th>
-          <th>Date election made</th>
-          <th>Necessary claims</th>
-          <th>Type</th>
-        </th>
-      </thead>
-      <tbody>`;
-    conf.iprs.forEach(element => {
-      iprTable += `<tr>
-          <td>${element.company}</td>
-          <td>${element.electionDate}</td>
-          <td>${element.necessaryClaims}</td>
-          <td>${element.type}</td>
-        </tr>`;
-    });
-    iprTable += `</tbody></table>`;
-    const iprTableElement = document.createElement("div");
-    iprTableElement.innerHTML = iprTable;
-    header.appendChild(iprTableElement);
-  }
-
-  const disclosure = html` <div id="disclosure">
+  const disclosure = html`<div id="disclosure">
     <p>
       Use of this specification to develop products or services is governed by
       the license with IMS found on the IMS website:
@@ -243,29 +207,86 @@ export async function run(conf) {
     </p>
     <p>
       Public contributions, comments and questions can be posted here:
-      <a
-        href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources"
-      >
-        http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources</a
-      >.
-    </p>
-  </div>`;
-  header.appendChild(disclosure);
-
-  const copyright = html`<div id="cpr">
-    <p>
-      © ${new Date().getFullYear()} IMS Global Learning Consortium, Inc. All
-      Rights Reserved.
-    </p>
-    <p>
-      Trademark information:
-      <a href="http://www.imsglobal.org/copyright.html"
-        >http://www.imsglobal.org/copyright.html</a
-      >
+      <a href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources">
+        http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources
+      </a>.
     </p>
   </div>`;
 
-  header.appendChild(copyright);
+  const ipr = html`<div id="ipr">
+    <h2>IPR and Distribution Notice</h2>
+    <p>
+      Recipients of this document are requested to submit, with their comments,
+      notification of any relevant patent claims or other intellectual property
+      rights of which they may be aware that might be infringed by any
+      implementation of the specification set forth in this document, and to
+      provide supporting documentation.
+    </p>
+    <p>
+      IMS takes no position regarding the validity or scope of any intellectual
+      property or other rights that might be claimed to pertain implementation
+      or use of the technology described in this document or the extent to which
+      any license under such rights might or might not be available; neither
+      does it represent that it has made any effort to identify any such rights.
+      Information on IMS's procedures with respect to rights in IMS
+      specifications can be found at the IMS Intellectual Property Rights
+      webpage:
+      <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">
+        http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf
+      </a>.
+    </p>
+  </div>`;
+
+  const proposal = html`<div id="proposal">
+    <h2>Proposals</h2>
+    <p>
+      Proposals are made available for the purposes of Project Group / Task
+      Force only and should not be distributed outside of the IMS Contributing
+      Membership without the express written consent of IMS GLC. Provision of
+      any work documents outside of the project group/ task force will revoke
+      all privileges as an Invited Guest. Any documents provided
+      non-participants will be done by IMS GLC only on the IMS GLC public
+      website when the documents become publicly available.
+    </p>
+  </div>`;
+
+  if (conf.specType === "proposal") {
+    header.appendChild(proposal);
+    header.appendChild(copyright);
+  } else {
+    header.appendChild(ipr);
+
+    if (conf.iprs) {
+      header.appendChild(html`<p>
+        The following participating organizations have made explicit license
+        commitments to this specification:
+      </p>`);
+      let iprTable = `<table>
+        <thead>
+          <tr>
+            <th>Org name</th>
+            <th>Date election made</th>
+            <th>Necessary claims</th>
+            <th>Type</th>
+          </th>
+        </thead>
+        <tbody>`;
+      conf.iprs.forEach(element => {
+        iprTable += `<tr>
+            <td>${element.company}</td>
+            <td>${element.electionDate}</td>
+            <td>${element.necessaryClaims}</td>
+            <td>${element.type}</td>
+          </tr>`;
+      });
+      iprTable += `</tbody></table>`;
+      const iprTableElement = document.createElement("div");
+      iprTableElement.innerHTML = iprTable;
+      header.appendChild(iprTableElement);
+    }
+    header.appendChild(disclosure);
+    header.appendChild(copyright);
+  }
 
   if (body.firstChild) {
     body.insertBefore(header, body.firstChild);

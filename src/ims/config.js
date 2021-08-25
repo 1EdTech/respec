@@ -54,7 +54,7 @@ export async function run(conf) {
     conf.specType = "spec";
   }
 
-  if (conf.specType === "doc") {
+  if (conf.specType === "doc" || conf.specType === "proposal") {
     return;
   }
 
@@ -82,6 +82,7 @@ export async function run(conf) {
     "IMS Candidate Final",
     "IMS Candidate Final Public",
     "IMS Final Release",
+    "Proposal",
   ];
   if (statusValues.indexOf(conf.specStatus) == -1) {
     pub(
