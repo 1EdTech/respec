@@ -3,9 +3,9 @@
   <head>
     <meta charset='utf-8'>
     <!-- default online location of the IMS respec js lib: -->
-    <script src='https://purl.imsglobal.org/spec/respec-ims-default.js' async class='remove'></script>
+    <!-- <script src='https://purl.imsglobal.org/spec/respec-ims-default.js' async class='remove'></script> -->
     <!-- local alternative: --> 
-    <!-- <script src='../../profiles/ims-default.js' async class="remove"></script> -->
+    <script src='../../profiles/ims-default.js' async class="remove"></script>
     <!--
     <script src='./shared/local-biblio.js' class='remove'></script>
     <script src='./shared/contributors.js' class='remove'></script>
@@ -32,6 +32,9 @@
 
         //spec type is "main", "cert", "impl", "errata" or other agreed upon string
         specType: "spec",
+
+        // doc version is required for all doc types
+        docVersion: "1.0",
 
         //contributors is a js object in this case shared between multiple documents
         contributors: [

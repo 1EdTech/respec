@@ -90,7 +90,7 @@ export async function run(conf) {
 
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     const release = html`<div class="subtitle">
-      ${conf.specStatus}<br />Version ${conf.specVersion}
+      ${conf.specStatus}<br />Spec Version ${conf.specVersion}
     </div>`;
     header.appendChild(release);
 
@@ -104,6 +104,13 @@ export async function run(conf) {
     >`;
     header.appendChild(statusPD);
   }
+
+  // Display IMS document version (required for all doc types)
+
+  const docVersion = html`<div class="subtitle">
+    Doc Version ${conf.docVersion ?? "(MISSING)"}
+  </div>`;
+  header.appendChild(docVersion);
 
   const versionTable = html`<table
     id="version-table"
