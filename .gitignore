@@ -14,3 +14,5 @@ js/deps/builds
 !js/shortcut.js
 .vscode/
 .vs/
+drupal.txt
+.vscode
