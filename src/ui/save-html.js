@@ -4,8 +4,8 @@
 import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
 import { pub } from "../core/pubsubhub.js";
-import { rsDocToDataURL } from "../core/exporter.js";
-import { ui } from "../core/ui.js";
+import { rsDocToDataURL } from "../ims/exporter.js";
+import { ui } from "../ims/ui.js";
 
 export const name = "ui/save-html";
 
@@ -60,6 +60,15 @@ const downloadLinks = [
       epubURL.searchParams.append("respec", "true");
       epubURL.searchParams.append("url", document.location.href);
       return epubURL.href;
+    },
+  },
+  {
+    id: "respec-save-as-drupal",
+    fileName: "body.html",
+    title: "DRUPAL",
+    type: "application/drupal",
+    get href() {
+      return rsDocToDataURL(this.type);
     },
   },
 ];

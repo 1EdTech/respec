@@ -8,7 +8,7 @@ window.addEventListener("error", ev => {
 const modules = [
   // order is significant
   import("../src/core/base-runner.js"),
-  import("../src/core/ui.js"),
+  import("../src/ims/ui.js"),
   import("../src/core/location-hash.js"),
   import("../src/core/l10n.js"),
   import("../src/core/style.js"),
