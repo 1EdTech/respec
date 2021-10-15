@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * module: core/exporter
+ * module: ims/exporter
  * Exports a ReSpec document, based on mime type, so it can be saved, etc.
  * Also performs cleanup, removing things that shouldn't be in published documents.
  * That is, elements that have a "removeOnSave" css class.
@@ -97,10 +97,15 @@ function cleanup(cloneDoc) {
   pub("beforesave", documentElement);
 }
 
-function drupalize(doc) {
+/**
+ * Strip content that is not allowed in Drupal.
+ *
+ * @param {HTMLElement} docBody The document body element
+ */
+function drupalize(docBody) {
   let started = false;
   let finished = false;
-  doc.childNodes.forEach(node => {
+  docBody.childNodes.forEach(node => {
     if (!started) {
       if (node.nodeName !== "HEADER") {
         node.remove();
@@ -111,6 +116,8 @@ function drupalize(doc) {
       if (node.nodeName == "FOOTER") {
         finished = true;
       } else if (node.nodeName == "SCRIPT") {
+        node.remove();
+      } else if (node.nodeName == "STYLE") {
         node.remove();
       }
     } else {
