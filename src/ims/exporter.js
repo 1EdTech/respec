@@ -4,6 +4,9 @@
  * Exports a ReSpec document, based on mime type, so it can be saved, etc.
  * Also performs cleanup, removing things that shouldn't be in published documents.
  * That is, elements that have a "removeOnSave" css class.
+ *
+ * Clone of core/exporter. This clone accepts application/cms as a mimeType
+ * and will generate an HTML except suitable for Drupal or other CMS.
  */
 
 import { removeCommentNodes, removeReSpec } from "../core/utils.js";
@@ -14,7 +17,7 @@ import { pub } from "../core/pubsubhub.js";
 const mimeTypes = new Map([
   ["text/html", "html"],
   ["application/xml", "xml"],
-  ["application/drupal", "drupal"],
+  ["application/cms", "cms"],
 ]);
 
 /**
@@ -45,8 +48,8 @@ function serialize(format, doc) {
     case "xml":
       result = new XMLSerializer().serializeToString(cloneDoc);
       break;
-    case "drupal":
-      drupalize(cloneDoc.body);
+    case "cms":
+      createCmsExtract(cloneDoc.body);
       result += cloneDoc.body.innerHTML;
       break;
     default: {
@@ -98,11 +101,11 @@ function cleanup(cloneDoc) {
 }
 
 /**
- * Strip content that is not allowed in Drupal.
+ * Strip content that is not allowed in Drupal or other CMS.
  *
  * @param {HTMLElement} docBody The document body element
  */
-function drupalize(docBody) {
+function createCmsExtract(docBody) {
   let started = false;
   let finished = false;
   docBody.childNodes.forEach(node => {

@@ -175,6 +175,8 @@ async function isRespec() {
 }
 
 /**
+ * Clone of respecDocWriter.js that generates HTML suitable for Drupal.
+ *
  * @param {number[]} version
  * @param {ReturnType<typeof createTimer>} timer
  */
@@ -203,7 +205,7 @@ async function evaluateHTML(version, timer) {
         reject(new Error(err.message));
       });
     });
-    const dataURL = rsDocToDataURL("application/drupal");
+    const dataURL = rsDocToDataURL("application/cms");
     const encodedString = dataURL.replace(/^data:\w+\/\w+;charset=utf-8,/, "");
     return decodeURIComponent(encodedString);
   }

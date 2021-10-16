@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
+/**
+ * Clone of respec2html.js that converts a Respec document into
+ * content appropriate for Drupal or other CMS.
+ */
+
 /* jshint node: true, browser: false */
 "use strict";
 const colors = require("colors");
-const fetchAndWrite = require("./respecDrupalWriter").fetchAndWrite;
+const fetchAndWrite = require("./respecCmsWriter").fetchAndWrite;
 colors.setTheme({
   data: "grey",
   debug: "cyan",
@@ -95,12 +100,12 @@ const usageSections = [
       {
         desc: "1. Output to a file. ",
         example:
-          "$ ./respec2drupal.js --src http://example.com/spec.html --out spec.html",
+          "$ ./respec2cms.js --src http://example.com/spec.html --out spec.html",
       },
       {
         desc: "2. Halt on errors or warning ",
         example:
-          "$ ./respec2drupal.js -e -w --src http://example.com/spec.html --out spec.html",
+          "$ ./respec2cms.js -e -w --src http://example.com/spec.html --out spec.html",
       },
     ],
   },

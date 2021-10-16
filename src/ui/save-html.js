@@ -63,10 +63,10 @@ const downloadLinks = [
     },
   },
   {
-    id: "respec-save-as-drupal",
+    id: "respec-save-as-cms-extract",
     fileName: "body.html",
-    title: "DRUPAL",
-    type: "application/drupal",
+    title: "CMS EXTRACT",
+    type: "application/cms",
     get href() {
       return rsDocToDataURL(this.type);
     },

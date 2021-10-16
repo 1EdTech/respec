@@ -81,6 +81,7 @@
     "snyk-protect": "snyk protect",
     "snyk": "snyk",
     "start": "node ./tools/dev-server.js",
+    "start-ims": "node ./tools/dev-server.js --profile ims-default",
     "test:build": "jasmine --random=false ./tests/test-build.js",
     "test:headless": "node ./tests/headless.js",
     "test:karma": "npm run karma"
@@ -94,7 +95,9 @@
   "files": [
     "builds/",
     "tools/respec2html.js",
-    "tools/respecDocWriter.js"
+    "tools/respecDocWriter.js",
+    "tools/respec2cms.js",
+    "tools/respecCmsWriter.js"
   ],
   "prettier": {
     "trailingComma": "es5",
