@@ -1,9 +1,9 @@
 // @ts-check
-// Module ui/search-xref
+// Module ims/search-xref
 // Search xref database
 import { lang as defaultLang } from "../core/l10n.js";
 import { html } from "../core/import-maps.js";
-import { ui } from "../core/ui.js";
+import { ui } from "../ims/ui.js";
 
 const XREF_URL = "https://respec.org/xref/";
 

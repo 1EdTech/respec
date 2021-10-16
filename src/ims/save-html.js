@@ -1,13 +1,13 @@
 // @ts-check
-// Module ui/save-html
+// Module ims/save-html
 // Saves content to HTML when asked to
 import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
 import { pub } from "../core/pubsubhub.js";
-import { rsDocToDataURL } from "../core/exporter.js";
-import { ui } from "../core/ui.js";
+import { rsDocToDataURL } from "../ims/exporter.js";
+import { ui } from "../ims/ui.js";
 
-export const name = "ui/save-html";
+export const name = "ims/save-html";
 
 const localizationStrings = {
   en: {
@@ -60,6 +60,15 @@ const downloadLinks = [
       epubURL.searchParams.append("respec", "true");
       epubURL.searchParams.append("url", document.location.href);
       return epubURL.href;
+    },
+  },
+  {
+    id: "respec-save-as-cms-extract",
+    fileName: "body.html",
+    title: "CMS EXTRACT",
+    type: "application/cms",
+    get href() {
+      return rsDocToDataURL(this.type);
     },
   },
 ];

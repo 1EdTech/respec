@@ -1,9 +1,9 @@
 // @ts-check
-// Module ui/about-respec
+// Module ims/about-respec
 // A simple about dialog with pointer to the help
 import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import { ui } from "../core/ui.js";
+import { ui } from "../ims/ui.js";
 
 const localizationStrings = {
   en: {

@@ -1,9 +1,9 @@
 // @ts-check
-// Module ui/search-specref
+// Module ims/search-specref
 // Search Specref database
 import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import { ui } from "../core/ui.js";
+import { ui } from "../ims/ui.js";
 import { wireReference } from "../core/biblio.js";
 
 const localizationStrings = {
