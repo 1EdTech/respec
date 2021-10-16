@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // @ts-check
 
 /**
@@ -70,7 +71,9 @@ function showLinkData(data) {
  * @param {*} conf
  */
 export async function run(conf) {
-  document.title = `${conf.specTitle} ${conf.specVersion ?? ""} ${conf.specStatus ?? ""}`;
+  document.title = `${conf.specTitle} ${conf.specVersion ?? ""} ${
+    conf.specStatus ?? ""
+  }`;
 
   const body = document.body;
 
@@ -207,7 +210,9 @@ export async function run(conf) {
     </p>
     <p>
       Public contributions, comments and questions can be posted here:
-      <a href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources">
+      <a
+        href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources"
+      >
         http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources
       </a>.
     </p>
