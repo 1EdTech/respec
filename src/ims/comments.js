@@ -1,27 +1,23 @@
-//@ts-check
+// @ts-check
 
 export const name = "ims/comments";
 
 /**
  * Remove all comment nodes.
- * 
- * @param {*} conf 
  */
-export async function run(conf) {
-
-  var nodeIterator = document.createNodeIterator(
-      document.documentElement,
-      NodeFilter.SHOW_COMMENT
+export async function run() {
+  const nodeIterator = document.createNodeIterator(
+    document.documentElement,
+    NodeFilter.SHOW_COMMENT
   );
-  var comments = [];
-  var currentNode;
+  const comments = [];
+  let currentNode;
 
-  while (currentNode = nodeIterator.nextNode()) {
+  while ((currentNode = nodeIterator.nextNode())) {
     comments.push(currentNode);
   }
 
-  comments.forEach(function(comment) {
+  comments.forEach(comment => {
     comment.parentElement.removeChild(comment);
   });
-
 }

@@ -6,7 +6,7 @@
   <title>
     Replace me with a real title
   </title>
-  <script src='../js/deps/require.js' data-main='../js/profile-ims-default' async class='remove'></script>
+  <script src='../profiles/ims-default.js' async class='remove'></script>
   <script class='remove'>
     var respecConfig = {
       specTitle: "Replace me with a real title",
@@ -14,6 +14,7 @@
       specStatus: "IMS Base Document",
       specDate: "November 16th, 2017",
       specVersion: "1.0",
+      docVersion: "0.1",
       specNature: "normative",
       specType: "spec",
       overrideCSSLocation: "ims-base.css",
@@ -28,7 +29,11 @@
           company: "Acme2 Co Inc (UK)",
           companyURL: "https://www.example.com",
           role: "Editor"
-        }],
+        }
+      ],
+      iprs: [
+        { company: "Acme1 Co Inc", electionDate: "October 24, 2019", necessaryClaims: "No", type: "RF RAND (Required & Optional Elements)" }
+      ]
     };
   </script>
 </head>
@@ -55,6 +60,11 @@
       This section has a CSS class "<code>introductory</code>", which means
       it will not appear in the <abbr title="Table of Contents">TOC</abbr>.
       Example Link to Section <a href="#logo"></a>.
+    </p>
+    <p>
+      Does your application have a <a data-cite="infra">user agent</a> or
+      a <a data-cite="reporting" data-xref-for="report">user agent</a>? Or
+      even <a data-cite="caliper-11">user agent</a>?
     </p>
   </section>
   <section class="informative" id="intro">
@@ -88,14 +98,14 @@
     <h2>
       <dfn>Foo</dfn> interface
     </h2>
-    <pre class="idl">
+    <pre class="idl"><code>
     [Exposed=Window]
     interface Foo {
       constructor();
       attribute DOMString bar;
       void doTheFoo();
     };
-    </pre>
+    </code></pre>
     <p>
       The <a>Foo</a> interface is nice. Lets you do stuff.
     </p>
@@ -115,12 +125,12 @@
       This is an example of a non-normative reference in a normative section
       [[?HTML]]
     </p>
-    <pre class="js example" title="Usage example">
+    <pre class="js example" title="Usage example"><code>
       const foo = new Foo();
       if (foo.bar === "my bar") {
         foo.doTheBar();
       }
-    </pre>
+    </code></pre>
   </section>
   <section id="logo">
     <h2>

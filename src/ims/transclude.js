@@ -1,12 +1,11 @@
-//@ts-check
+// @ts-check
 
-import { pub } from "../core/pubsubhub";
-import { toHTMLNodes } from "../ims/utils";
+import { pub } from "../core/pubsubhub.js";
+import { toHTMLNodes } from "../ims/utils.js";
 
 export const name = "ims/transclude";
 
-export async function run(conf) {  
-  
+export async function run() {
   /*
   Filesystem transclusion is done using script elements with a class 
   of 'transclude'. If the script element has a data-id attribute equal to the 
@@ -23,35 +22,36 @@ export async function run(conf) {
   Note the use of template literals to allow easy authoring and maintenance
   of multi-line strings in the js files referenced. 
   */
-  
-  while(true) {
-    var transclude = document.querySelector('script.transclude');
-    
-    if (transclude == null) { 
-      break; 
-    }
-    
-    if(!transclude.hasAttribute("data-id")) {
+
+  let transclude = document.querySelector("script.transclude");
+
+  while (transclude !== null) {
+    if (!transclude.hasAttribute("data-id")) {
       pub("error", "transclude script element without data-id attribute");
       break;
     }
-    
-    var str = window[transclude.getAttribute("data-id")];
-    
-    if (str === undefined || typeof str !== 'string') {
-      pub("error", "no transclude variable named '" + str + "' found in global scope");
+
+    const str = window[transclude.getAttribute("data-id")];
+
+    if (str === undefined || typeof str !== "string") {
+      pub(
+        "error",
+        `no transclude variable named '${str}' found in global scope`
+      );
       break;
     }
-    
-    var newNodes = toHTMLNodes(str);          
-    
-    for(var k=0; k<newNodes.length; k++) {         
-      var clone = newNodes[k].cloneNode(true);
-      transclude.parentNode.insertBefore(clone,transclude);
+
+    const newNodes = toHTMLNodes(str);
+
+    for (let k = 0; k < newNodes.length; k++) {
+      const clone = newNodes[k].cloneNode(true);
+      transclude.parentNode.insertBefore(clone, transclude);
     }
-    
+
     transclude.parentNode.removeChild(transclude);
-    
+
+    // Get the next transclude
+
+    transclude = document.querySelector("script.transclude");
   }
 }
-

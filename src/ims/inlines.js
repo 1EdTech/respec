@@ -10,51 +10,55 @@
 //
 // Note: Run after core/markdown and before core/inlines
 
-import { addId, children } from "../core/utils";
+import { addId } from "../core/utils.js";
 
 export const name = "ims/inlines";
 
 /**
  * Find the Conformance section in parent and assign an id.
- * 
+ *
  * @param {Element | HTMLElement} parent
  */
 function findConformanceSection(parent) {
-    var sectionElements = children(parent, "section");
-    for (var section of sectionElements) {
-        if (!section.children.length) {
-            continue;
-        }
-
-        if (!section.id) {
-            var header = section.children[0];
-            var title = header.textContent;
-            if (title.toLowerCase() == "conformance" || title.toLowerCase() == "conformance statementss") {
-                addId(section, null, "conformance");
-                return section;
-            }
-        }
-
-        var foundSection = findConformanceSection(section);
-        if (foundSection) {
-            return foundSection;
-        }
+  /** @type {NodeListOf<HTMLElement>} */
+  const sectionElements = parent.querySelectorAll(":scope > section");
+  for (const section of sectionElements) {
+    if (!section.children.length) {
+      continue;
     }
 
-    return null;
+    if (!section.id) {
+      const header = section.children[0];
+      const title = header.textContent;
+      if (
+        title.toLowerCase() == "conformance" ||
+        title.toLowerCase() == "conformance statements"
+      ) {
+        addId(section, null, "conformance");
+        return section;
+      }
+    }
+
+    const foundSection = findConformanceSection(section);
+    if (foundSection) {
+      return foundSection;
+    }
+  }
+
+  return null;
 }
 
 /**
  * @param {*} conf
  */
 export async function run(conf) {
-    // No conformance section in IMS Errata documents
-    if (conf.specType == "errata") {
-        return;
-    }
+  // No conformance section in IMS Errata documents
+  if (conf.specType == "errata") {
+    return;
+  }
 
-    var conformance = document.querySelector("section#conformance");
-    if (!conformance) {
-        conformance = findConformanceSection(document.body);
-    }
+  let conformance = document.querySelector("section#conformance");
+  if (!conformance) {
+    conformance = findConformanceSection(document.body);
+  }
 }

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- HTML template for a generic informative (non-spec) document. -->
+
+  <meta charset='utf-8'>
+  <!-- <script src='https://purl.imsglobal.org/spec/respec-ims-default.js' async class='remove'></script> -->
+  <!-- local alternative: -->
+  <script src='../../profiles/ims-default.js' async class="remove"></script>
+  <script class='remove'>
+    var respecConfig = {
+      mainSpecTitle: "Title of the IMS Spec this document is related to",
+      mainSpecBiblioKey: "BIB-01",
+      specTitle: "Example Generic Document",
+      specNature: "informative",
+      specType: "doc",
+      specDate: "November 16th, 2018",
+      docVersion: "1.0",
+      contributors: [{
+        name: "First Last",
+        company: "Acme1 Co Inc (Sweden)",
+        companyURL: "www.example.com",
+        role: "Editor"
+      }, {
+        name: "Second Third",
+        company: "Acme2 Co Inc (UK)",
+        companyURL: "www.example.com",
+        role: "Editor"
+      }],
+    };
+  </script>
+</head>
+
+<body>
+  <section id="abstract" class="introductory">
+    <h2>Abstract</h2>
+    <p>This is required.</p>
+  </section>
+  <section id="conformance" class="introductory">
+    <h2>Conformance</h2>
+    <aside class="note">
+      This is also required, but this preamble is not. The required text will be generated below.
+      Add <code>class="introductory"</code> to the <code>&lt;section&gt;</code> tag if you do not
+      want the conformance section to appear in the table of contents.
+      </p>
+  </section>
+  <section>
+    <h2>Introduction</h2>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+      magna aliqua.
+    </p>
+    <p>
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+    <p>
+      Duis aute irure dolor in reprehenderit [[ISO8601]]in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+    </p>
+    <p>
+      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+    <section>
+      <h3>Subheading</h3>
+    </section>
+  </section>
+  <section>
+    <h2>ActivityState Object</h2>
+    <p>An <code>ActivityState</code> object is to be used by the EPUB to store stateful information on behalf of the
+      student.</p>
+    <p>Examples of stateful data might be an incomplete multiple choice activity, an incomplete essay or a even the
+      current location in a streaming video.</p>
+
+    <p>The properties of the ActivityState object are defined below.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Data&nbsp;Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>type</td>
+          <td>String</td>
+          <td>yes</td>
+          <td>MUST be set to 'ActivityState'</td>
+        </tr>
+        <tr>
+          <td>createdTime</td>
+          <td>ISO 8601</td>
+          <td>yes</td>
+          <td>The date when the ActivityState object was created. The format MUST be
+            <code>yyyy-MM-ddTHH:mm:ss.SSSZ</code> [[ISO8601]].
+          </td>
+        </tr>
+        <tr>
+          <td>activityId</td>
+          <td>String</td>
+          <td>yes</td>
+          <td>References the
+            <code>data-activityId</code> value in the EPUB markup
+          </td>
+        </tr>
+        <tr>
+          <td>data</td>
+          <td>Object</td>
+          <td>yes</td>
+          <td>An object used to store data. The object structure is purposively arbitrary;
+            the
+            <code>profile</code> property below can be used to inform Reading Systems
+            of the object's format.
+          </td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td>String</td>
+          <td>no</td>
+          <td>A standards-based or vendor-specific identifier that can be used to specify
+            the format of the
+            <code>data</code> object and/or indicate the availability of one or more
+            <code>extensions</code> properties. For example, "ims.qti_v2p1.choice" might
+            be used to specify that the
+            <code>data</code> object conforms to the schema of a qti 2.1 Choice Activity.
+          </td>
+        </tr>
+        <tr>
+          <td>extensions</td>
+          <td>Object</td>
+          <td>no</td>
+          <td>A map of arbitrary vendor-specific extensions to support non-standard
+            reading system functionality. Keys should start with
+            <code>vnd.</code> followed by the vendor name to avoid naming conflicts.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <section>
+      <h3>Admonitions</h3>
+      <aside class="note">Example of text content of note aside</aside>
+      <aside class="warning">Example of text content of warning aside</aside>
+      <aside class="issue">Example of text content of issue aside</aside>
+    </section>
+
+    <section>
+      <h3>Figures</h3>
+      <figure class="example">
+        <pre>
+            {
+              "type": "ActivityState",
+              "createdTime": new Date().toISOString(),
+              "activityId": "unit_1_activity_5",
+              "data": {
+                "choice": "blue",
+                "directionLine": "What color is the sky?",
+                "choices": ["blue","red","green"],
+                "correct": "blue"
+              },
+              "profile": "ims.qti_v2p1.choice",
+              "extensions": {
+                "vnd.vst.timesync_offset": 42000
+              }
+            }
+          </pre>
+        <figcaption>Example of the ActivityState object.</figcaption>
+      </figure>
+    </section>
+  </section>
+</body>
+
+</html>

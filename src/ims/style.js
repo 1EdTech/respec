@@ -1,23 +1,23 @@
-//@ts-check
+// @ts-check
 /**
  * Inserts IMS stylesheet and replaces w3c/style.
- * 
+ *
  * The CSS documents are pulled from known locations so the spec documents
  * can be located anywhere. Overrides are available via respecConfig.
- * 
+ *
  * CONFIGURATION
- * 
+ *
  * - overrideCSSLocation: by default ims-base.css will be loaded from
  *   https://purl.imsglobal.org/spec/ims-base.css
  */
 
-import { toKeyValuePairs, linkCSS } from "../core/utils";
+import { linkCSS, toKeyValuePairs } from "../core/utils.js";
 
 export const name = "ims/style";
 
 /**
  * From w3c/style
- * 
+ *
  * Make a best effort to attach meta viewport at the top of the head.
  * Other plugins might subsequently push it down, but at least we start
  * at the right place. When ReSpec exports the HTML, it again moves the
@@ -32,13 +32,13 @@ function attachMetaViewport() {
     "initial-scale": "1",
     "shrink-to-fit": "no",
   };
-  meta.content = toKeyValuePairs(contentProps).replace(/\"/g, "");
+  meta.content = toKeyValuePairs(contentProps).replace(/"/g, "");
   document.head.insertBefore(meta, document.head.firstChild);
 }
 
 /**
  * From w3c/style
- * 
+ *
  * Ignores specStatus and always loads base.css.
  */
 function linkW3cCSS() {
@@ -48,15 +48,14 @@ function linkW3cCSS() {
 /**
  * @param {*} conf respecConfig
  */
-export async function run(conf) {        
-
+export async function run(conf) {
   // From w3c/style
   attachMetaViewport();
   linkW3cCSS();
 
   // Link to IMS stylesheet
-  var cssURL = "https://purl.imsglobal.org/spec/ims-base.css"  
-  if(conf.overrideCSSLocation) {
+  let cssURL = "https://purl.imsglobal.org/spec/ims-base.css";
+  if (conf.overrideCSSLocation) {
     cssURL = conf.overrideCSSLocation;
   }
   linkCSS(document, cssURL);

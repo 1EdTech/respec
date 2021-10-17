@@ -1,0 +1,234 @@
+<!DOCTYPE html lang="en">
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <!-- default online location of the IMS respec js lib: -->
+    <!-- <script src='https://purl.imsglobal.org/spec/respec-ims-default.js' async class='remove'></script> -->
+    <!-- local alternative: --> 
+    <script src='../../profiles/ims-default.js' async class="remove"></script>
+    <!--
+    <script src='./shared/local-biblio.js' class='remove'></script>
+    <script src='./shared/contributors.js' class='remove'></script>
+    -->
+    <script class='remove'>
+      var respecConfig = {
+        // title of the specification, without version:
+        specTitle: "Template Specification",
+
+        //shortName, provided by IMS staff, list at https://goo.gl/C92RtM
+        shortName: "template",
+
+        //specStatus: IMS Base Document, IMS Candidate Final (Public) or IMS Final Release
+        specStatus: "IMS Base Document",
+
+        //date of publication
+        specDate: "February 29th, 2018",
+
+        //spec version
+        specVersion: "1.0",
+
+        //spec nature is "normative" or "informative"
+        specNature: "normative",
+
+        //spec type is "main", "cert", "impl", "errata" or other agreed upon string
+        specType: "spec",
+
+        // doc version is required for all doc types
+        docVersion: "1.0",
+
+        //contributors is a js object in this case shared between multiple documents
+        contributors: [
+          {name: "First Last", company: "IMS Global", companyURL: "www.imsglobal.org", role: "Editor"},
+          {name: "First Last", company: "IMS Global", companyURL: "www.imsglobal.org"}
+
+        ],
+
+        //localBiblio is used to store bib entries not yet in the online imsBiblio or on specref.org
+        localBiblio:  {
+          "EXAMPLE-IMPL": {
+              title: "Example Implementation Guide 1.1",
+              href: "https://www.imsglobal.org/example/v1p1/impl/",
+              publisher: "IMS Global Learning Consortium",
+              "authors": [
+                "First, Last",
+                "First, Last"
+              ]
+          },
+          "EXAMPLE-CERT": {
+              title: "Example Conformance Certification Guide 1.1",
+              href: "https://www.imsglobal.org/example/v1p1/cert/",
+              publisher: "IMS Global Learning Consortium",
+              "authors": [
+                "First, Last",
+                "First, Last"
+              ]
+          },
+          "EXAMPLE-JSONSCH": {
+              title: "Example JSON Schema",
+              href: "https://purl.imsglobal.org/example/v1p1/schema.json",
+              publisher: "IMS Global Learning Consortium",
+              "authors": [
+                "First, Last",
+                "First, Last"
+              ]
+          },
+          "EXAMPLE-ERRATA": {
+              title: "Example 1.1 Errata",
+              href: "https://www.imsglobal.org/example/v1p1/errata/",
+              publisher: "IMS Global Learning Consortium",
+              "authors": [
+                "First, Last",
+                "First, Last"
+              ]
+          }
+        }
+        //override the default online location of fixup.js:
+        //overrideFixupLocation : "../js/fixup.js",
+
+        //override the default online location of ims-base.css:
+        //overrideCSSLocation : "../css/ims-base.css";
+
+        //override the default online location of ims-biblio.js:
+        //overrideIMSbiblioLocation : "...";
+
+        //disable fetching of ims-biblio.js by setting to true:
+        //disableFetchIMSbiblio: true
+
+        //remove body scripts and/or inline CSS
+        //cleanBodyScripts: true,
+        //cleanBodyCSS: true,
+
+      };
+    </script>
+  </head>
+  <body>
+    <!-- a header is inserted here by the script -->
+    <!-- a toc is inserted here by the script -->
+
+    <!-- The abstract is required and provides a few introductory paragraphs of
+    information on the purpose of the spec.-->
+    <script class="transclude" src="shared/abstract.js" data-id="t1"></script>
+
+    <!-- spec main flow goes here -->
+    <section style="">
+      <h2>Overview</h2>
+      <section class="informative">
+        <h3>Design Goals and Rationale</h3>
+        <p><em>The this section (which can be given another title) describes in
+          detail (as compared to the abstract) what the specification aims to
+          accomplish, and functions as a prelude to the use cases section.</em>
+        </p>
+      </section>
+
+      <section class="informative" id="usecases">
+        <h3>Use cases</h3>
+        <p>The following use cases are supported by this specification:</p>
+        <p><em>Tabular presentation of use cases.</em></p>
+      </section>
+
+      <section id="terminology">
+        <h3>Terminology</h3>
+        <!-- add each term as a dt/dd pair with attrs as below; then use <a> in when referencing back to a term -->
+        <!-- use data-sort to automatically sort the terms -->
+        <!-- note that the terminology can be shared between docs using script class=transclude -->
+        <dl class="termlist" data-sort id="terms">
+          <dt><dfn data-lt="term1">term1</dfn></dt>
+          <dd>Definition</dd>
+          <dt><dfn data-lt="term2">term2</dfn></dt>
+          <dd>Definition</dd>
+        </dl>
+      </section>
+      <section id="conformance">
+        <h3>Conformance Statements</h3>
+        <!-- RFC 2119 text is inserted at the top of this section.
+            If you want, add additional paragraphs below this comment.
+        -->
+        <p>Additional text...<p>
+      </section>
+      <section id="documentset">
+        <h3>Document Set</h3>
+        <!-- a complete list of documents in the Specification document set.
+        Includes both normative and informative references. All documents
+        referenced here also occur in the bibliography-->
+        <section>
+          <h4>Normative Documents</h4>
+          <dl>
+          <dt>Conformance and Certification guide</dt>
+          <dd>The conformance and certification guide
+          that accompanies this specification [[!EXAMPLE-CERT]] defines
+          the requirements for template service consumers and providers.
+          </dd>
+          <dt>JSON Schema</dt>
+          <dd>The JSON [[!EXAMPLE-JSONSCH]] schema is provided hendrerit est.
+          Proin tempor, quam vitae consequat congue, est sapien pharetra odio,
+          sed rhoncus metus sem in turpis. </dd>
+          <dt>Errata</dt>
+          <dd>The errata [[!EXAMPLE-ERRATA]] details any erratum registered for
+            this version of this specification since its publication.</dd>
+          </dl>
+        </section>
+        <section class="informative">
+          <h4>Informative Documents</h4>
+          <dl>
+          <dt>Implementation Guide</dt> <dd>The implementation guide
+          that accompanies this specification [[EXAMPLE-IMPL]] contains
+          informtative guidance on facilisis hendrerit est. Nullam ultrices
+          non libero sed tristique. Proin tempor, quam vitae consequat congue,
+          est sapien pharetra odio, sed rhoncus metus sem in turpis. </dd>
+          </dl>
+          <dl>
+          <dt>OpenAPI Swagger View</dt>
+          <dd>A browseable view of the OpenAPI definition is available at...</dd>
+          </dl>
+        </section>
+      </section>
+    </section> <!-- /overview -->
+
+    <section>
+      <h2>Data Model</h2>
+      <section id="subsec1">
+          <h3>Subsection</h3>
+      </section>
+    </section>
+
+    <section>
+      <h2>API</h2>
+      <section id="subsec2">
+          <h3>Subsection</h3>
+      </section>
+
+    </section>
+
+    <section class="appendix informative">
+      <h2>Examples</h2>
+      <!-- use figure class example for examples -->
+    </section> <!-- /examples -->
+
+    <section class="appendix informative" id="revisionhistory">
+      <h2>Revision History</h2>
+      <section>
+        <h3>Version History</h3>
+        <table title="Revision History"
+          summary="Publication history and revision details for this specification.">
+          <thead>
+            <tr><th>Version No.</th><th>Release Date</th><th>Comments</th></tr>
+          </thead>
+            <tbody>
+                <tr>
+                    <td>IMS Base Document 1.0</td>
+                    <td>Month Day, 2018</td>
+                    <td>The first draft release. This document.</td>
+                </tr>
+            </tbody>
+        </table>
+       </section>
+       <section>
+         <h3>Changes in this version</h3>
+         <p>Changes in this version of Example Specification are detailed below.</p>
+         <p><em>Table with list of changes since previous version</em></p>
+       </section>
+    </section> <!-- /revision history -->
+
+    <!-- a footer is inserted by the script -->
+  </body>
+</html>
