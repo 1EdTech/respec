@@ -1,9 +1,30 @@
 "use strict";
 
 import * as utils from "../../../src/core/utils.js";
-import { hyperHTML } from "../../../src/core/import-maps.js";
+import { html } from "../../../src/core/import-maps.js";
 
 describe("Core - Utils", () => {
+  describe("makeSafeCopy", () => {
+    it("removes attributes from dfn elements when making a safe copy", () => {
+      const p = document.createElement("p");
+      p.innerHTML = `
+        <dfn
+          data-export=""
+          data-dfn-type="interface"
+          data-idl="interface"
+          data-title="RTCIceTransport"
+          data-dfn-for=""
+          tabindex="0"
+          aria-haspopup="dialog"
+          title="Show what links to this definition"><code>RTCIceTransport</code></dfn>
+      `;
+      const copy = utils.makeSafeCopy(p);
+      const span = copy.querySelector("span");
+      expect(span.textContent).toBe("RTCIceTransport");
+      expect(copy.attributes).toHaveSize(0);
+    });
+  });
+
   describe("fetchAndCache", () => {
     async function clearCaches() {
       const keys = await caches.keys();
@@ -22,9 +43,9 @@ describe("Core - Utils", () => {
         expect(cache).toBeTruthy();
         const cachedResponse = await cache.match(url);
         expect(cachedResponse).toBeTruthy();
-        const expires = new Date(
-          cachedResponse.headers.get("Expires")
-        ).valueOf();
+        const expiresHeader = cachedResponse.headers.get("Expires");
+        expect(expiresHeader).toBe(new Date(expiresHeader).toISOString());
+        const expires = new Date(expiresHeader).valueOf();
         expect(expires).toBeGreaterThan(Date.now());
         // default is 86400000, but we give a little leeway (~1 day)
         expect(expires).toBeGreaterThan(Date.now() + 86000000);
@@ -84,37 +105,6 @@ describe("Core - Utils", () => {
         hint: "preconnect",
       });
       expect(link instanceof HTMLLinkElement).toBe(true);
-    });
-    it("throws given invalid opts", () => {
-      expect(() => {
-        utils.createResourceHint();
-      }).toThrow();
-
-      expect(() => {
-        utils.createResourceHint(null);
-      }).toThrow();
-
-      expect(() => {
-        utils.createResourceHint("throw");
-      }).toThrow();
-
-      expect(() => {
-        utils.createResourceHint({
-          href: "https://example.com",
-          hint: "preconnect",
-        });
-      }).not.toThrow();
-    });
-    it("throws given an unknown hint", () => {
-      expect(() => {
-        utils.createResourceHint({ hint: null });
-      }).toThrow();
-      expect(() => {
-        utils.createResourceHint({ hint: "not a real hint" });
-      }).toThrow();
-      expect(() => {
-        utils.createResourceHint({ hint: "preconnect" });
-      }).not.toThrow();
     });
     it("throws given an invalid URL", () => {
       expect(() => {
@@ -228,13 +218,13 @@ describe("Core - Utils", () => {
   describe("linkCSS", () => {
     it("adds a link element", () => {
       utils.linkCSS(document, "BOGUS");
-      expect(document.querySelectorAll("link[href='BOGUS']").length).toBe(1);
+      expect(document.querySelectorAll("link[href='BOGUS']")).toHaveSize(1);
       document.querySelector("link[href='BOGUS']").remove();
     });
 
     it("adds several link elements", () => {
       utils.linkCSS(document, ["BOGUS", "BOGUS", "BOGUS"]);
-      expect(document.querySelectorAll("link[href='BOGUS']").length).toBe(3);
+      expect(document.querySelectorAll("link[href='BOGUS']")).toHaveSize(3);
       document
         .querySelectorAll("link[href='BOGUS']")
         .forEach(element => element.remove());
@@ -275,6 +265,14 @@ describe("Core - Utils", () => {
     });
   });
 
+  describe("isValidConfDate", () => {
+    it("checks the validity of a date", () => {
+      expect(utils.isValidConfDate("2000-01-01")).toBeTrue();
+      expect(utils.isValidConfDate("01-01-01")).toBeFalse();
+      expect(utils.isValidConfDate("March 1, 2020")).toBeFalse();
+    });
+  });
+
   describe("joinAnd", () => {
     it("joins with proper commas and 'and'", () => {
       expect(utils.joinAnd([])).toBe("");
@@ -299,6 +297,37 @@ describe("Core - Utils", () => {
   describe("norm", () => {
     it("normalises text", () => {
       expect(utils.norm("  a   b   ")).toBe("a b");
+    });
+  });
+
+  describe("getIntlData", () => {
+    const { getIntlData } = utils;
+    const localizationStrings = {
+      en: { foo: "EN Foo", bar: "EN Bar" },
+      ko: { foo: "KO Foo" },
+    };
+
+    it("returns localized string in given language", () => {
+      const intl = getIntlData(localizationStrings, "ko");
+      expect(intl.foo).toBe("KO Foo");
+
+      const intlEn = getIntlData(localizationStrings, "EN");
+      expect(intlEn.foo).toBe("EN Foo");
+    });
+
+    it("falls back to English string if key does not exist in language", () => {
+      const intl = getIntlData(localizationStrings, "ko");
+      expect(intl.bar).toBe("EN Bar");
+    });
+
+    it("falls back to English string if language does not exist in localization data", () => {
+      const intl = getIntlData(localizationStrings, "de");
+      expect(intl.bar).toBe("EN Bar");
+    });
+
+    it("throws error if key doesn't exist in either doc lang and English", () => {
+      const intl = getIntlData(localizationStrings, "de");
+      expect(() => intl.baz).toThrowError(/No l10n data for key/);
     });
   });
 
@@ -360,91 +389,43 @@ describe("Core - Utils", () => {
     expect(utils.toKeyValuePairs(obj, " % ", "^")).toBe(expected);
   });
 
-  describe("flatten()", () => {
-    it("flattens arrays", () => {
-      expect(utils.flatten(["pass"], [123, 456])).toEqual(["pass", 123, 456]);
-      const map = new Map([
-        ["key-fail", "pass"],
-        ["anotherKey", 123],
-      ]);
-      expect(utils.flatten([], map)).toEqual([map]);
-      const set = new Set(["pass", 123]);
-      expect(utils.flatten([], set)).toEqual([set]);
-      const object = { "key-fail": "pass", other: 123 };
-      expect(utils.flatten([], object)).toEqual([object]);
-    });
-
-    it("flattens nested arrays as a reducer", () => {
-      const input = [
-        new Map([["fail", "123"]]),
-        new Set([456]),
-        [7, [8, [new Set([9, 10])]]],
-        { key: "11" },
-      ];
-      const output = input.reduce(utils.flatten, ["first", 0]);
-      expect(output).toEqual([
-        "first",
-        0,
-        input[0],
-        input[1],
-        7,
-        8,
-        input[2][1][1][0],
-        input[3],
-      ]);
-    });
-
-    it("flattens sparse and arrays", () => {
-      const input = [, 1, 1, , , , 1, , 1];
-      const output = input.reduce(utils.flatten, ["pass"]);
-      expect(output).toEqual(["pass", 1, 1, 1, 1]);
-    });
-
-    it("flattens dense and arrays", () => {
-      const input = new Array(10);
-      const output = input.reduce(utils.flatten, ["pass"]);
-      expect(output).toEqual(["pass"]);
-    });
-  });
-
   describe("htmlJoinAnd", () => {
     it("joins with proper commas and 'and'", () => {
       const div = document.createElement("div");
-      const render = hyperHTML.bind(div);
+      const render = html.bind(div);
 
-      render`${utils.htmlJoinAnd([], item => hyperHTML`<a>${item}</a>`)}`;
+      render`${utils.htmlJoinAnd([], item => html`<a>${item}</a>`)}`;
       expect(div.textContent).toBe("");
-      expect(div.getElementsByTagName("a").length).toBe(0);
+      expect(div.getElementsByTagName("a")).toHaveSize(0);
 
-      render`${utils.htmlJoinAnd(["<x>"], item => hyperHTML`<a>${item}</a>`)}`;
+      render`${utils.htmlJoinAnd(["<x>"], item => html`<a>${item}</a>`)}`;
       expect(div.textContent).toBe("<x>");
-      expect(div.getElementsByTagName("a").length).toBe(1);
+      expect(div.getElementsByTagName("a")).toHaveSize(1);
 
       render`${utils.htmlJoinAnd(
         ["<x>", "<x>"],
-        item => hyperHTML`<a>${item}</a>`
+        item => html`<a>${item}</a>`
       )}`;
       expect(div.textContent).toBe("<x> and <x>");
-      expect(div.getElementsByTagName("a").length).toBe(2);
+      expect(div.getElementsByTagName("a")).toHaveSize(2);
 
       render`${utils.htmlJoinAnd(
         ["<x>", "<x>", "<x>"],
-        item => hyperHTML`<a>${item}</a>`
+        item => html`<a>${item}</a>`
       )}`;
       expect(div.textContent).toBe("<x>, <x>, and <x>");
-      expect(div.getElementsByTagName("a").length).toBe(3);
+      expect(div.getElementsByTagName("a")).toHaveSize(3);
 
       render`${utils.htmlJoinAnd(
         ["<x>", "<x>", "<X>", "<x>"],
-        item => hyperHTML`<a>${item}</a>`
+        item => html`<a>${item}</a>`
       )}`;
       expect(div.textContent).toBe("<x>, <x>, <X>, and <x>");
-      expect(div.getElementsByTagName("a").length).toBe(4);
+      expect(div.getElementsByTagName("a")).toHaveSize(4);
     });
   });
 
   describe("DOM utils", () => {
-    // migrated from core/jquery-enhanced
     describe("getTextNodes", () => {
       it("finds all the text nodes", () => {
         const node = document.createElement("div");
@@ -452,7 +433,7 @@ describe("Core - Utils", () => {
           "<div>aa<span>bb<div class='exclude'>ignore me</div></span><p>cc<i>dd</i></p><pre>nope</pre></div>";
 
         const textNodes = utils.getTextNodes(node, ["pre", ".exclude"]);
-        expect(textNodes.length).toBe(4);
+        expect(textNodes).toHaveSize(4);
         const str = textNodes.map(tn => tn.nodeValue).join("");
         expect(str).toBe("aabbccdd");
       });
@@ -462,7 +443,7 @@ describe("Core - Utils", () => {
           " <exclude> </exclude> <exclude>\t \n</exclude>include me";
 
         const textNodes = utils.getTextNodes(node, [], "");
-        expect(textNodes.length).toBe(1);
+        expect(textNodes).toHaveSize(1);
         expect(textNodes[0].nodeValue).toBe("include me");
       });
     });
@@ -493,6 +474,19 @@ describe("Core - Utils", () => {
         const inner = document.querySelector("div#this-is-a-div #inner-pass");
         expect(inner).toBeTruthy();
         expect(inner.textContent).toBe("pass");
+        div.remove();
+        a.remove();
+      });
+
+      it("renames elements and doesn't copy attributes when copyAttributes is false", () => {
+        const a = document.createElement("a");
+        a.setAttribute("class", "some-class");
+        a.setAttribute("title", "title");
+        a.innerHTML = "<span id='inner-pass'>pass</span>";
+        document.body.appendChild(a);
+        const div = utils.renameElement(a, "div", { copyAttributes: false });
+        expect(div instanceof HTMLDivElement).toBe(true);
+        expect(div.attributes).toHaveSize(0);
         div.remove();
         a.remove();
       });
@@ -605,6 +599,83 @@ describe("Core - Utils", () => {
         expect(utils.getDfnTitles(dfn)[0]).toBe("TEXT");
 
         dfn.remove();
+      });
+    });
+
+    describe("getElementIndentation", () => {
+      it("should return the indentation of the given element", () => {
+        const fragment = document.createRange().createContextualFragment(`
+          <a>My link</a>
+        `);
+        const [anchor] = fragment.children;
+
+        expect(utils.getElementIndentation(anchor)).toBe("          ");
+      });
+    });
+
+    describe("toMDCode()", () => {
+      it("wraps a string in backticks", () => {
+        expect(utils.toMDCode("")).toBe("");
+        expect(utils.toMDCode("test")).toBe("`test`");
+      });
+    });
+
+    describe("codedJoinOr()", () => {
+      it("uses disjunction", () => {
+        expect(utils.codedJoinOr([])).toBe("");
+        expect(utils.codedJoinOr(["a", "b", "c"])).toBe("`a`, `b`, or `c`");
+      });
+      it("quotes and uses disjunction", () => {
+        expect(utils.codedJoinOr([], { quotes: true })).toBe("");
+        expect(utils.codedJoinOr(["a", "b", "c"], { quotes: true })).toBe(
+          '`"a"`, `"b"`, or `"c"`'
+        );
+      });
+    });
+
+    describe("codedJoinAnd()", () => {
+      it("uses conjunction", () => {
+        expect(utils.codedJoinAnd([])).toBe("");
+        expect(utils.codedJoinAnd(["a", "b", "c"])).toBe("`a`, `b`, and `c`");
+      });
+      it("quotes and uses conjunction", () => {
+        expect(utils.codedJoinAnd([], { quotes: true })).toBe("");
+        expect(utils.codedJoinAnd(["a", "b", "c"], { quotes: true })).toBe(
+          '`"a"`, `"b"`, and `"c"`'
+        );
+      });
+    });
+    describe("docLink", () => {
+      const docLink = utils.docLink;
+      it("it allows unlinked strings", () => {
+        const result = docLink`Link to ${"nothing"}.`;
+        expect(result).toBe("Link to nothing.");
+      });
+
+      it("it links to [config] options", () => {
+        const result = docLink`Link to ${"[specStatus]"}.`;
+        expect(result).toBe(
+          "Link to [`specStatus`](https://respec.org/docs/#specStatus)."
+        );
+      });
+
+      it("it aliases relative to docs folder", () => {
+        const result = docLink`See ${"[using `data-dfn-for`|#data-dfn-for]"}.`;
+        expect(result).toBe(
+          "See [using `data-dfn-for`](https://respec.org/docs/#data-dfn-for)."
+        );
+      });
+
+      it("it aliases absolute URLs", () => {
+        const result = docLink`Link to ${"[doc status|https://somewhere.else]"}.`;
+        expect(result).toBe("Link to [doc status](https://somewhere.else/).");
+      });
+
+      it("it allows mixing known, aliased, and absolute URLs", () => {
+        const result = docLink`Link to ${"[authors]"} ${"[writers|editors]"} ${"[somewhere|https://somewhere.else]"}.`;
+        expect(result).toBe(
+          "Link to [`authors`](https://respec.org/docs/#authors) [writers](https://respec.org/docs/editors) [somewhere](https://somewhere.else/)."
+        );
       });
     });
   });

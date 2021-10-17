@@ -4,9 +4,8 @@
 // in the content of elements with key identifiers:
 // #gh-contributors: people whose PR have been merged.
 // Spec editors get filtered out automatically.
-import { fetchAndCache, joinAnd } from "./utils.js";
-import { hyperHTML } from "./import-maps.js";
-import { pub } from "./pubsubhub.js";
+import { docLink, fetchAndCache, joinAnd, showError } from "./utils.js";
+import { html } from "./import-maps.js";
 export const name = "core/contrib";
 
 export async function run(conf) {
@@ -16,10 +15,8 @@ export async function run(conf) {
   }
 
   if (!conf.github) {
-    const msg =
-      "Requested list of contributors from GitHub, but " +
-      "[`github`](https://github.com/w3c/respec/wiki/github) configuration option is not set.";
-    pub("error", msg);
+    const msg = docLink`Requested list of contributors from GitHub, but ${"[github]"} configuration option is not set.`;
+    showError(msg, name);
     return;
   }
 
@@ -60,7 +57,8 @@ async function showContributors(editors, apiURL) {
         user => !editors.includes(user.name || user.login)
       );
     } catch (error) {
-      pub("error", "Error loading contributors from GitHub.");
+      const msg = "Error loading contributors from GitHub.";
+      showError(msg, name);
       console.error(error);
       return null;
     }
@@ -80,7 +78,7 @@ function toHTML(contributors, element) {
   });
 
   if (element.tagName === "UL") {
-    hyperHTML(element)`${sortedContributors.map(
+    html(element)`${sortedContributors.map(
       ({ name, login }) =>
         `<li><a href="https://github.com/${login}">${name || login}</a></li>`
     )}`;

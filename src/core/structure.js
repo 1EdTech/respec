@@ -2,33 +2,46 @@
 // Module core/structure
 //  Handles producing the ToC and numbering sections across the document.
 
-// LIMITATION:
-//  At this point we don't support having more than 26 appendices.
 // CONFIGURATION:
 //  - noTOC: if set to true, no TOC is generated and sections are not numbered
-//  - tocIntroductory: if set to true, the introductory material is listed in the TOC
 //  - lang: can change the generated text (supported: en, fr)
 //  - maxTocLevel: only generate a TOC so many levels deep
 
-import { addId, children, parents, renameElement } from "./utils.js";
-import { getIntlData } from "../core/l10n.js";
-import { hyperHTML } from "./import-maps.js";
+import {
+  addId,
+  getIntlData,
+  parents,
+  renameElement,
+  showError,
+} from "./utils.js";
+import { html } from "./import-maps.js";
+import { pub } from "./pubsubhub.js";
 
 const lowerHeaderTags = ["h2", "h3", "h4", "h5", "h6"];
-const headerTags = ["h1", ...lowerHeaderTags];
 
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const name = "core/structure";
 
 const localizationStrings = {
   en: {
     toc: "Table of Contents",
   },
+  zh: {
+    toc: "内容大纲",
+  },
+  ko: {
+    toc: "목차",
+  },
+  ja: {
+    toc: "目次",
+  },
   nl: {
     toc: "Inhoudsopgave",
   },
   es: {
     toc: "Tabla de Contenidos",
+  },
+  de: {
+    toc: "Inhaltsverzeichnis",
   },
 };
 
@@ -54,7 +67,7 @@ function scanSections(sections, maxTocLevel, { prefix = "" } = {}) {
     return null;
   }
   /** @type {HTMLElement} */
-  const ol = hyperHTML`<ol class='toc'>`;
+  const ol = html`<ol class="toc"></ol>`;
   for (const section of sections) {
     if (section.isAppendix && !prefix && !appendixMode) {
       lastNonAppendix = index;
@@ -63,9 +76,9 @@ function scanSections(sections, maxTocLevel, { prefix = "" } = {}) {
     let secno = section.isIntro
       ? ""
       : appendixMode
-      ? alphabet.charAt(index - lastNonAppendix)
+      ? appendixNumber(index - lastNonAppendix + 1)
       : prefix + index;
-    const level = Math.ceil(secno.length / 2);
+    const level = secno.split(".").length;
     if (level === 1) {
       secno += ".";
       // if this is a top level item, insert
@@ -76,7 +89,7 @@ function scanSections(sections, maxTocLevel, { prefix = "" } = {}) {
 
     if (!section.isIntro) {
       index += 1;
-      section.header.prepend(hyperHTML`<bdi class='secno'>${secno} </bdi>`);
+      section.header.prepend(html`<bdi class="secno">${secno} </bdi>`);
     }
 
     if (level <= maxTocLevel) {
@@ -95,6 +108,21 @@ function scanSections(sections, maxTocLevel, { prefix = "" } = {}) {
 }
 
 /**
+ * Convert a number to spreadsheet like column name.
+ * For example, 1=A, 26=Z, 27=AA, 28=AB and so on..
+ * @param {number} num
+ */
+function appendixNumber(num) {
+  let s = "";
+  while (num > 0) {
+    num -= 1;
+    s = String.fromCharCode(65 + (num % 26)) + s;
+    num = Math.floor(num / 26);
+  }
+  return s;
+}
+
+/**
  * @typedef {object} Section
  * @property {Element} element
  * @property {Element} header
@@ -105,11 +133,9 @@ function scanSections(sections, maxTocLevel, { prefix = "" } = {}) {
  *
  * @param {Element} parent
  */
-function getSectionTree(parent, { tocIntroductory = false } = {}) {
-  const sectionElements = children(
-    parent,
-    tocIntroductory ? "section" : "section:not(.introductory)"
-  );
+function getSectionTree(parent) {
+  /** @type {NodeListOf<HTMLElement>} */
+  const sectionElements = parent.querySelectorAll(":scope > section");
   /** @type {Section[]} */
   const sections = [];
 
@@ -128,9 +154,9 @@ function getSectionTree(parent, { tocIntroductory = false } = {}) {
       element: section,
       header,
       title,
-      isIntro: section.classList.contains("introductory"),
+      isIntro: Boolean(section.closest(".introductory")),
       isAppendix: section.classList.contains("appendix"),
-      subsections: getSectionTree(section, { tocIntroductory }),
+      subsections: getSectionTree(section),
     });
   }
   return sections;
@@ -141,10 +167,10 @@ function getSectionTree(parent, { tocIntroductory = false } = {}) {
  * @param {string} id
  */
 function createTocListItem(header, id) {
-  const anchor = hyperHTML`<a href="${`#${id}`}" class="tocxref"/>`;
+  const anchor = html`<a href="${`#${id}`}" class="tocxref" />`;
   anchor.append(...header.cloneNode(true).childNodes);
   filterHeader(anchor);
-  return hyperHTML`<li class='tocline'>${anchor}</li>`;
+  return html`<li class="tocline">${anchor}</li>`;
 }
 
 /**
@@ -164,9 +190,6 @@ function filterHeader(h) {
 }
 
 export function run(conf) {
-  if ("tocIntroductory" in conf === false) {
-    conf.tocIntroductory = false;
-  }
   if ("maxTocLevel" in conf === false) {
     conf.maxTocLevel = Infinity;
   }
@@ -175,14 +198,16 @@ export function run(conf) {
 
   // makeTOC
   if (!conf.noTOC) {
-    const sectionTree = getSectionTree(document.body, {
-      tocIntroductory: conf.tocIntroductory,
-    });
+    skipFromToC();
+    const sectionTree = getSectionTree(document.body);
     const result = scanSections(sectionTree, conf.maxTocLevel);
     if (result) {
       createTableOfContents(result);
     }
   }
+
+  // See core/dfn-index
+  pub("toc");
 }
 
 function renameSectionHeaders() {
@@ -200,12 +225,43 @@ function renameSectionHeaders() {
 }
 
 function getNonintroductorySectionHeaders() {
-  const headerSelector = headerTags
-    .map(h => `section:not(.introductory) ${h}:first-child`)
-    .join(",");
-  return [...document.querySelectorAll(headerSelector)].filter(
-    elem => !elem.closest("section.introductory")
-  );
+  return [
+    ...document.querySelectorAll(
+      "section:not(.introductory) :is(h1,h2,h3,h4,h5,h6):first-child"
+    ),
+  ].filter(elem => !elem.closest("section.introductory"));
+}
+
+/**
+ * Skip descendent sections from appearing in ToC using data-max-toc.
+ */
+function skipFromToC() {
+  /** @type {NodeListOf<HTMLElement>} */
+  const sections = document.querySelectorAll("section[data-max-toc]");
+  for (const section of sections) {
+    const maxToc = parseInt(section.dataset.maxToc, 10);
+    if (maxToc < 0 || maxToc > 6 || Number.isNaN(maxToc)) {
+      const msg = "`data-max-toc` must have a value between 0-6 (inclusive).";
+      showError(msg, name, { elements: [section] });
+      continue;
+    }
+
+    // `data-max-toc=0` is equivalent to adding a ".notoc" to current section.
+    if (maxToc === 0) {
+      section.classList.add("notoc");
+      continue;
+    }
+
+    // When `data-max-toc=2`, we skip all ":scope > section > section" from ToC
+    // i.e., at §1, we will keep §1.1 but not §1.1.1
+    // Similarly, `data-max-toc=1` will keep §1, but not §1.1
+    const sectionToSkipFromToC = section.querySelectorAll(
+      `:scope > ${Array.from({ length: maxToc }, () => "section").join(" > ")}`
+    );
+    for (const el of sectionToSkipFromToC) {
+      el.classList.add("notoc");
+    }
+  }
 }
 
 /**
@@ -215,8 +271,8 @@ function createTableOfContents(ol) {
   if (!ol) {
     return;
   }
-  const nav = hyperHTML`<nav id="toc">`;
-  const h2 = hyperHTML`<h2 class="introductory">${l10n.toc}</h2>`;
+  const nav = html`<nav id="toc"></nav>`;
+  const h2 = html`<h2 class="introductory">${l10n.toc}</h2>`;
   addId(h2);
   nav.append(h2, ol);
   const ref =
@@ -231,6 +287,8 @@ function createTableOfContents(ol) {
     }
   }
 
-  const link = hyperHTML`<p role='navigation' id='back-to-top'><a href='#title'><abbr title='Back to Top'>&uarr;</abbr></a></p>`;
+  const link = html`<p role="navigation" id="back-to-top">
+    <a href="#title"><abbr title="Back to Top">&uarr;</abbr></a>
+  </p>`;
   document.body.append(link);
 }

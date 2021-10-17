@@ -67,26 +67,4 @@ describe("Core - UI", () => {
     expect(button.textContent).toBe("2");
     expect(button.getAttribute("aria-label")).toBe("2 ReSpec Warnings");
   });
-
-  describe("ui/dfn-list", () => {
-    it("shows a list of definitions and links them", async () => {
-      const body = "<p><dfn>bar()</dfn> <dfn>foo</dfn></p>";
-      const ops = makeStandardOps(null, body);
-      const doc = await makeRSDoc(ops);
-
-      // open list and wait for loading
-      const dfnListButton = doc.getElementById("respec-button-definitions");
-      dfnListButton.click();
-      await new Promise(resolve => setTimeout(resolve));
-
-      const dfns = doc.querySelectorAll("ul.respec-dfn-list li a");
-      expect(dfns.length).toBe(2);
-
-      const [dfnBar, dfnFoo] = dfns;
-      expect(dfnBar.textContent.trim()).toBe("bar()");
-      expect(dfnBar.getAttribute("href")).toBe("#dfn-bar");
-      expect(dfnFoo.textContent.trim()).toBe("foo");
-      expect(dfnFoo.getAttribute("href")).toBe("#dfn-foo");
-    });
-  });
 });

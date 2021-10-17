@@ -11,38 +11,71 @@
 // numbered to avoid involuntary clashes.
 // If the configuration has issueBase set to a non-empty string, and issues are
 // manually numbered, a link to the issue is created using issueBase and the issue number
-import { addId, joinAnd, parents } from "./utils.js";
-import { fetchAsset } from "./text-loader.js";
-import { getIntlData } from "../core/l10n.js";
-import { hyperHTML } from "./import-maps.js";
+import {
+  addId,
+  getIntlData,
+  parents,
+  showError,
+  showWarning,
+} from "./utils.js";
+import css from "../styles/issues-notes.css.js";
+import { html } from "./import-maps.js";
 import { pub } from "./pubsubhub.js";
 
 export const name = "core/issues-notes";
 
 const localizationStrings = {
   en: {
+    editors_note: "Editor's note",
+    feature_at_risk: "(Feature at Risk) Issue",
+    issue: "Issue",
     issue_summary: "Issue Summary",
     no_issues_in_spec: "There are no issues listed in this specification.",
+    note: "Note",
+    warning: "Warning",
+  },
+  ja: {
+    note: "注",
+    editors_note: "編者注",
+    feature_at_risk: "(変更の可能性のある機能) Issue",
+    issue: "Issue",
+    issue_summary: "Issue の要約",
+    no_issues_in_spec: "この仕様には未解決の issues は含まれていません．",
+    warning: "警告",
   },
   nl: {
+    editors_note: "Redactionele noot",
     issue_summary: "Lijst met issues",
     no_issues_in_spec: "Er zijn geen problemen vermeld in deze specificatie.",
+    note: "Noot",
+    warning: "Waarschuwing",
   },
   es: {
+    editors_note: "Nota de editor",
+    issue: "Cuestión",
     issue_summary: "Resumen de la cuestión",
+    note: "Nota",
     no_issues_in_spec: "No hay problemas enumerados en esta especificación.",
+    warning: "Aviso",
+  },
+  de: {
+    editors_note: "Redaktioneller Hinweis",
+    issue: "Frage",
+    issue_summary: "Offene Fragen",
+    no_issues_in_spec: "Diese Spezifikation enthält keine offenen Fragen.",
+    note: "Hinweis",
+    warning: "Warnung",
+  },
+  zh: {
+    editors_note: "编者注",
+    feature_at_risk: "（有可能变动的特性）Issue",
+    issue: "Issue",
+    issue_summary: "Issue 总结",
+    no_issues_in_spec: "本规范中未列出任何 issue。",
+    note: "注",
+    warning: "警告",
   },
 };
-
-const cssPromise = loadStyle();
-
-async function loadStyle() {
-  try {
-    return (await import("text!../../assets/issues-notes.css")).default;
-  } catch {
-    return fetchAsset("issues-notes.css");
-  }
-}
 
 const l10n = getIntlData(localizationStrings);
 
@@ -68,34 +101,28 @@ const l10n = getIntlData(localizationStrings);
  * @param {*} conf
  */
 function handleIssues(ins, ghIssues, conf) {
-  const hasDataNum = !!document.querySelector(".issue[data-number]");
-  let issueNum = 0;
+  const getIssueNumber = createIssueNumberGetter();
   const issueList = document.createElement("ul");
   ins.forEach(inno => {
-    const { type, displayType, isFeatureAtRisk } = getIssueType(inno, conf);
+    const { type, displayType, isFeatureAtRisk } = getIssueType(inno);
     const isIssue = type === "issue";
     const isInline = inno.localName === "span";
     const { number: dataNum } = inno.dataset;
-    /** @type {Partial<Report>} */
     const report = {
       type,
       inline: isInline,
       title: inno.title,
+      number: getIssueNumber(inno),
     };
-    if (isIssue && !isInline && !hasDataNum) {
-      issueNum++;
-      report.number = issueNum;
-    } else if (dataNum) {
-      report.number = Number(dataNum);
-    }
     // wrap
     if (!isInline) {
       const cssClass = isFeatureAtRisk ? `${type} atrisk` : type;
       const ariaRole = type === "note" ? "note" : null;
-      const div = hyperHTML`<div class="${cssClass}" role="${ariaRole}"></div>`;
+      const div = html`<div class="${cssClass}" role="${ariaRole}"></div>`;
       const title = document.createElement("span");
-      const titleParent = hyperHTML`
-        <div role='heading' class='${`${type}-title marker`}'>${title}</div>`;
+      const className = `${type}-title marker`;
+      // prettier-ignore
+      const titleParent = html`<div role="heading" class="${className}">${title}</div>`;
       addId(titleParent, "h", type);
       let text = displayType;
       if (inno.id) {
@@ -111,10 +138,10 @@ function handleIssues(ins, ghIssues, conf) {
       /** @type {GitHubIssue} */
       let ghIssue;
       if (isIssue) {
-        if (!hasDataNum) {
-          text += ` ${issueNum}`;
-        } else if (dataNum) {
-          text += ` ${dataNum}`;
+        if (report.number !== undefined) {
+          text += ` ${report.number}`;
+        }
+        if (inno.dataset.hasOwnProperty("number")) {
           const link = linkToIssueTracker(dataNum, conf, { isFeatureAtRisk });
           if (link) {
             title.before(link);
@@ -123,7 +150,8 @@ function handleIssues(ins, ghIssues, conf) {
           title.classList.add("issue-number");
           ghIssue = ghIssues.get(dataNum);
           if (!ghIssue) {
-            pub("warning", `Failed to fetch issue number ${dataNum}`);
+            const msg = `Failed to fetch issue number ${dataNum}.`;
+            showWarning(msg, name);
           }
           if (ghIssue && !report.title) {
             report.title = ghIssue.title;
@@ -131,9 +159,7 @@ function handleIssues(ins, ghIssues, conf) {
         }
         if (report.number !== undefined) {
           // Add entry to #issue-summary.
-          issueList.append(
-            createIssueSummaryEntry(conf.l10n.issue, report, div.id)
-          );
+          issueList.append(createIssueSummaryEntry(l10n.issue, report, div.id));
         }
       }
       title.textContent = text;
@@ -165,6 +191,23 @@ function handleIssues(ins, ghIssues, conf) {
   makeIssueSectionSummary(issueList);
 }
 
+function createIssueNumberGetter() {
+  if (document.querySelector(".issue[data-number]")) {
+    return element => {
+      if (element.dataset.number) {
+        return Number(element.dataset.number);
+      }
+    };
+  }
+
+  let issueNumber = 0;
+  return element => {
+    if (element.classList.contains("issue") && element.localName !== "span") {
+      return ++issueNumber;
+    }
+  };
+}
+
 /**
  * @typedef {object} IssueType
  * @property {string} type
@@ -174,7 +217,7 @@ function handleIssues(ins, ghIssues, conf) {
  * @param {HTMLElement} inno
  * @return {IssueType}
  */
-function getIssueType(inno, conf) {
+function getIssueType(inno) {
   const isIssue = inno.classList.contains("issue");
   const isWarning = inno.classList.contains("warning");
   const isEdNote = inno.classList.contains("ednote");
@@ -188,13 +231,13 @@ function getIssueType(inno, conf) {
     : "note";
   const displayType = isIssue
     ? isFeatureAtRisk
-      ? conf.l10n.feature_at_risk
-      : conf.l10n.issue
+      ? l10n.feature_at_risk
+      : l10n.issue
     : isWarning
-    ? conf.l10n.warning
+    ? l10n.warning
     : isEdNote
-    ? conf.l10n.editors_note
-    : conf.l10n.note;
+    ? l10n.editors_note
+    : l10n.note;
   return { type, displayType, isFeatureAtRisk };
 }
 
@@ -205,24 +248,22 @@ function getIssueType(inno, conf) {
 function linkToIssueTracker(dataNum, conf, { isFeatureAtRisk = false } = {}) {
   // Set issueBase to cause issue to be linked to the external issue tracker
   if (!isFeatureAtRisk && conf.issueBase) {
-    return hyperHTML`<a href='${conf.issueBase + dataNum}'/>`;
+    return html`<a href="${conf.issueBase + dataNum}" />`;
   } else if (isFeatureAtRisk && conf.atRiskBase) {
-    return hyperHTML`<a href='${conf.atRiskBase + dataNum}'/>`;
+    return html`<a href="${conf.atRiskBase + dataNum}" />`;
   }
 }
 
 /**
  * @param {string} l10nIssue
- * @param {Partial<Report>} report
+ * @param {Report} report
  */
 function createIssueSummaryEntry(l10nIssue, report, id) {
   const issueNumberText = `${l10nIssue} ${report.number}`;
   const title = report.title
-    ? hyperHTML`<span style="text-transform: none">: ${report.title}</span>`
+    ? html`<span style="text-transform: none">: ${report.title}</span>`
     : "";
-  return hyperHTML`
-    <li><a href="${`#${id}`}">${issueNumberText}</a>${title}</li>
-  `;
+  return html`<li><a href="${`#${id}`}">${issueNumberText}</a>${title}</li>`;
 }
 
 /**
@@ -236,7 +277,7 @@ function makeIssueSectionSummary(issueList) {
 
   issueList.hasChildNodes()
     ? issueSummaryElement.append(issueList)
-    : issueSummaryElement.append(hyperHTML`<p>${l10n.no_issues_in_spec}</p>`);
+    : issueSummaryElement.append(html`<p>${l10n.no_issues_in_spec}</p>`);
   if (
     !heading ||
     (heading && heading !== issueSummaryElement.firstElementChild)
@@ -248,14 +289,6 @@ function makeIssueSectionSummary(issueList) {
   }
 }
 
-function isLight(rgb) {
-  const red = (rgb >> 16) & 0xff;
-  const green = (rgb >> 8) & 0xff;
-  const blue = (rgb >> 0) & 0xff;
-  const illumination = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-  return illumination > 140;
-}
-
 /**
  * @param {GitHubLabel[]} labels
  * @param {string} title
@@ -263,18 +296,15 @@ function isLight(rgb) {
  */
 function createLabelsGroup(labels, title, repoURL) {
   const labelsGroup = labels.map(label => createLabel(label, repoURL));
-  const labelNames = labels.map(label => label.name);
-  const joinedNames = joinAnd(labelNames);
   if (labelsGroup.length) {
     labelsGroup.unshift(document.createTextNode(" "));
   }
-  if (labelNames.length) {
-    const ariaLabel = `This issue is labelled as ${joinedNames}.`;
-    return hyperHTML`<span
-      class="issue-label"
-      aria-label="${ariaLabel}">: ${title}${labelsGroup}</span>`;
-  }
-  return hyperHTML`<span class="issue-label">: ${title}${labelsGroup}</span>`;
+  return html`<span class="issue-label">: ${title}${labelsGroup}</span>`;
+}
+
+/** @param {string} bgColorHex background color as a hex value without '#' */
+function textColorFromBgColor(bgColorHex) {
+  return parseInt(bgColorHex, 16) > 0xffffff / 2 ? "#000" : "#fff";
 }
 
 /**
@@ -282,17 +312,19 @@ function createLabelsGroup(labels, title, repoURL) {
  * @param {string} repoURL
  */
 function createLabel(label, repoURL) {
-  const { color, name } = label;
+  const { color: bgColor, name } = label;
   const issuesURL = new URL("./issues/", repoURL);
   issuesURL.searchParams.set("q", `is:issue is:open label:"${label.name}"`);
-  const rgb = parseInt(color, 16);
-  const textColorClass = isNaN(rgb) || isLight(rgb) ? "light" : "dark";
-  const cssClasses = `respec-gh-label respec-label-${textColorClass}`;
-  const style = `background-color: #${color}`;
-  return hyperHTML`<a
-    class="${cssClasses}"
+  const color = textColorFromBgColor(bgColor);
+  const style = `background-color: #${bgColor}; color: ${color}`;
+  const ariaLabel = `GitHub label: ${name}`;
+  return html` <a
+    class="respec-gh-label"
     style="${style}"
-    href="${issuesURL.href}">${name}</a>`;
+    href="${issuesURL.href}"
+    aria-label="${ariaLabel}"
+    >${name}</a
+  >`;
 }
 
 /**
@@ -319,7 +351,7 @@ async function fetchAndStoreGithubIssues(github) {
   const response = await fetch(url.href);
   if (!response.ok) {
     const msg = `Error fetching issues from GitHub. (HTTP Status ${response.status}).`;
-    pub("error", msg);
+    showError(msg, name);
     return new Map();
   }
 
@@ -336,10 +368,11 @@ export async function run(conf) {
     return; // nothing to do.
   }
   const ghIssues = await fetchAndStoreGithubIssues(conf.github);
-  const css = await cssPromise;
   const { head: headElem } = document;
   headElem.insertBefore(
-    hyperHTML`<style>${[css]}</style>`,
+    html`<style>
+      ${css}
+    </style>`,
     headElem.querySelector("link")
   );
   handleIssues(issuesAndNotes, ghIssues, conf);

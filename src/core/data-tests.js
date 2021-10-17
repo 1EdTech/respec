@@ -7,19 +7,36 @@
  *
  * `data-tests` takes a space separated list of URLs, e.g. data-test="foo.html bar.html".
  *
- * Docs: https://github.com/w3c/respec/wiki/data-tests
+ * Docs: https://respec.org/doc/#data-tests
  */
-import { getIntlData } from "./l10n.js";
-import { hyperHTML } from "./import-maps.js";
-import { pub } from "./pubsubhub.js";
-import { showInlineWarning } from "./utils.js";
+import {
+  codedJoinAnd,
+  docLink,
+  getIntlData,
+  showError,
+  showWarning,
+} from "./utils.js";
+import { html } from "./import-maps.js";
 const localizationStrings = {
   en: {
-    missing_test_suite_uri:
-      "Found tests in your spec, but missing '" +
-      "[`testSuiteURI`](https://github.com/w3c/respec/wiki/testSuiteURI)' in your ReSpec config.",
+    missing_test_suite_uri: docLink`Found tests in your spec, but missing ${"[testSuiteURI]"} in your ReSpec config.`,
     tests: "tests",
     test: "test",
+  },
+  ja: {
+    missing_test_suite_uri: docLink`この仕様内にテストの項目を検出しましたが，ReSpec の設定に ${"[testSuiteURI]"} が見つかりません．`,
+    tests: "テスト",
+    test: "テスト",
+  },
+  de: {
+    missing_test_suite_uri: docLink`Die Spezifikation enthält Tests, aber in der ReSpec-Konfiguration ist keine ${"[testSuiteURI]"} angegeben.`,
+    tests: "Tests",
+    test: "Test",
+  },
+  zh: {
+    missing_test_suite_uri: docLink`本规范中包含测试，但在 ReSpec 配置中缺少 ${"[testSuiteURI]"}。`,
+    tests: "测试",
+    test: "测试",
   },
 };
 
@@ -63,11 +80,10 @@ function toListItem(href) {
     emojiList.push(manualPerformEmoji);
   }
 
-  const testList = hyperHTML`
+  const testList = html`
     <li>
-      <a href="${href}">
-        ${testFileName}
-      </a> ${emojiList}
+      <a href="${href}">${testFileName}</a>
+      ${emojiList}
     </li>
   `;
   return testList;
@@ -82,13 +98,13 @@ export function run(conf) {
     return;
   }
   if (!conf.testSuiteURI) {
-    pub("error", l10n.missing_test_suite_uri);
+    showError(l10n.missing_test_suite_uri, name);
     return;
   }
 
   for (const elem of testables) {
     const tests = elem.dataset.tests.split(/,/gm).map(url => url.trim());
-    const testURLs = toTestURLs(tests, conf.testSuiteURI);
+    const testURLs = toTestURLs(tests, conf.testSuiteURI, elem);
     handleDuplicates(testURLs, elem);
     const details = toHTML(testURLs);
     elem.append(details);
@@ -98,14 +114,16 @@ export function run(conf) {
 /**
  * @param {string[]} tests
  * @param {string} testSuiteURI
+ * @param {HTMLElement} elem
  */
-function toTestURLs(tests, testSuiteURI) {
+function toTestURLs(tests, testSuiteURI, elem) {
   return tests
     .map(test => {
       try {
         return new URL(test, testSuiteURI).href;
       } catch {
-        pub("warn", `Bad URI: ${test}`);
+        const msg = docLink`Invalid URL in ${"[data-tests]"} attribute: ${test}.`;
+        showWarning(msg, name, { elements: [elem] });
       }
     })
     .filter(href => href);
@@ -120,13 +138,10 @@ function handleDuplicates(testURLs, elem) {
     (link, i, self) => self.indexOf(link) !== i
   );
   if (duplicates.length) {
-    showInlineWarning(
-      elem,
-      `Duplicate tests found`,
-      `To fix, remove duplicates from "data-tests": ${duplicates
-        .map(url => new URL(url).pathname)
-        .join(", ")}`
-    );
+    const msg = docLink`Duplicate tests found in the ${"[data-tests]"} attribute.`;
+    const tests = codedJoinAnd(duplicates, { quotes: true });
+    const hint = docLink`To fix, remove duplicates from ${"[data-tests]"}: ${tests}.`;
+    showWarning(msg, name, { hint, elements: [elem] });
   }
 }
 
@@ -135,12 +150,12 @@ function handleDuplicates(testURLs, elem) {
  */
 function toHTML(testURLs) {
   const uniqueList = [...new Set(testURLs)];
-  const details = hyperHTML`
+  const details = html`
     <details class="respec-tests-details removeOnSave">
-      <summary>
-        tests: ${uniqueList.length}
-      </summary>
-      <ul>${uniqueList.map(toListItem)}</ul>
+      <summary>tests: ${uniqueList.length}</summary>
+      <ul>
+        ${uniqueList.map(toListItem)}
+      </ul>
     </details>
   `;
   return details;

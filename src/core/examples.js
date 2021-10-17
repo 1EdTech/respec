@@ -6,10 +6,9 @@
 // When an example is found, it is reported using the "example" event. This can
 // be used by a containing shell to extract all examples.
 
-import { addId } from "./utils.js";
-import { fetchAsset } from "./text-loader.js";
-import { getIntlData } from "../core/l10n.js";
-import { hyperHTML as html } from "./import-maps.js";
+import { addId, getIntlData } from "./utils.js";
+import css from "../styles/examples.css.js";
+import { html } from "./import-maps.js";
 import { pub } from "./pubsubhub.js";
 
 export const name = "core/examples";
@@ -24,19 +23,21 @@ const localizationStrings = {
   es: {
     example: "Ejemplo",
   },
+  ko: {
+    example: "예시",
+  },
+  ja: {
+    example: "例",
+  },
+  de: {
+    example: "Beispiel",
+  },
+  zh: {
+    example: "例",
+  },
 };
 
 const l10n = getIntlData(localizationStrings);
-
-const cssPromise = loadStyle();
-
-async function loadStyle() {
-  try {
-    return (await import("text!../../assets/examples.css")).default;
-  } catch {
-    return fetchAsset("examples.css");
-  }
-}
 
 /**
  * @typedef {object} Report
@@ -54,32 +55,25 @@ function makeTitle(elem, num, report) {
   if (report.title) elem.removeAttribute("title");
   const number = num > 0 ? ` ${num}` : "";
   const title = report.title
-    ? html`
-        <span class="example-title">: ${report.title}</span>
-      `
+    ? html`<span class="example-title">: ${report.title}</span>`
     : "";
-  return html`
-    <div class="marker">
-      <a class="self-link">${l10n.example}<bdi>${number}</bdi></a
-      >${title}
-    </div>
-  `;
+  return html`<div class="marker">
+    <a class="self-link">${l10n.example}<bdi>${number}</bdi></a
+    >${title}
+  </div>`;
 }
 
-export async function run() {
+export function run() {
   /** @type {NodeListOf<HTMLElement>} */
   const examples = document.querySelectorAll(
     "pre.example, pre.illegal-example, aside.example"
   );
   if (!examples.length) return;
 
-  const css = await cssPromise;
   document.head.insertBefore(
-    html`
-      <style>
-        ${css}
-      </style>
-    `,
+    html`<style>
+      ${css}
+    </style>`,
     document.querySelector("link")
   );
 
@@ -96,13 +90,7 @@ export async function run() {
       ++number;
       const div = makeTitle(example, number, report);
       example.prepend(div);
-      if (title) {
-        addId(example, `example-${number}`, title); // title gets used
-      } else {
-        // use the number as the title... so, e.g., "example-5"
-        addId(example, `example`, String(number));
-      }
-      const { id } = example;
+      const id = addId(example, "example", title || String(number));
       const selfLink = div.querySelector("a.self-link");
       selfLink.href = `#${id}`;
       pub("example", report);
@@ -118,15 +106,10 @@ export async function run() {
       const id = example.id ? example.id : null;
       if (id) example.removeAttribute("id");
       const exampleTitle = makeTitle(example, inAside ? 0 : number, report);
-      const div = html`
-        <div class="example" id="${id}">
-          ${exampleTitle} ${example.cloneNode(true)}
-        </div>
-      `;
-      if (title) {
-        addId(div, `example-${number}`, title);
-      }
-      addId(div, `example`, String(number));
+      const div = html`<div class="example" id="${id}">
+        ${exampleTitle} ${example.cloneNode(true)}
+      </div>`;
+      addId(div, "example", title || String(number));
       const selfLink = div.querySelector("a.self-link");
       selfLink.href = `#${div.id}`;
       example.replaceWith(div);

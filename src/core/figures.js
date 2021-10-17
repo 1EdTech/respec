@@ -4,9 +4,14 @@
 // Adds width and height to images, if they are missing.
 // Generates a Table of Figures wherever there is a #tof element.
 
-import { addId, renameElement, showInlineWarning, wrapInner } from "./utils.js";
-import { getIntlData } from "../core/l10n.js";
-import { hyperHTML } from "./import-maps.js";
+import {
+  addId,
+  getIntlData,
+  renameElement,
+  showWarning,
+  wrapInner,
+} from "./utils.js";
+import { html } from "./import-maps.js";
 
 export const name = "core/figures";
 
@@ -16,7 +21,7 @@ const localizationStrings = {
     fig: "Figure ",
   },
   ja: {
-    fig: "図",
+    fig: "図 ",
     list_of_figures: "図のリスト",
   },
   ko: {
@@ -32,8 +37,12 @@ const localizationStrings = {
     list_of_figures: "Lista de Figuras",
   },
   zh: {
-    fig: "圖 ",
-    list_of_figures: "List of Figures",
+    fig: "图 ",
+    list_of_figures: "规范中包含的图",
+  },
+  de: {
+    fig: "Abbildung",
+    list_of_figures: "Abbildungsverzeichnis",
   },
 };
 
@@ -49,8 +58,10 @@ export function run() {
   if (tof.length && tofElement) {
     decorateTableOfFigures(tofElement);
     tofElement.append(
-      hyperHTML`<h2>${l10n.list_of_figures}</h2>`,
-      hyperHTML`<ul class='tof'>${tof}</ul>`
+      html`<h2>${l10n.list_of_figures}</h2>`,
+      html`<ul class="tof">
+        ${tof}
+      </ul>`
     );
   }
 }
@@ -68,7 +79,8 @@ function collectFigures() {
       decorateFigure(fig, caption, i);
       tof.push(getTableOfFiguresListItem(fig.id, caption));
     } else {
-      showInlineWarning(fig, "Found a `<figure>` without a `<figcaption>`");
+      const msg = "Found a `<figure>` without a `<figcaption>`.";
+      showWarning(msg, name, { elements: [fig] });
     }
   });
   return tof;
@@ -83,8 +95,8 @@ function decorateFigure(figure, caption, i) {
   const title = caption.textContent;
   addId(figure, "fig", title);
   // set proper caption title
-  wrapInner(caption, hyperHTML`<span class='fig-title'>`);
-  caption.prepend(l10n.fig, hyperHTML`<bdi class='figno'>${i + 1}</bdi>`, " ");
+  wrapInner(caption, html`<span class="fig-title"></span>`);
+  caption.prepend(l10n.fig, html`<bdi class="figno">${i + 1}</bdi>`, " ");
 }
 
 /**
@@ -97,8 +109,8 @@ function getTableOfFiguresListItem(figureId, caption) {
   tofCaption.querySelectorAll("a").forEach(anchor => {
     renameElement(anchor, "span").removeAttribute("href");
   });
-  return hyperHTML`<li class='tofline'>
-    <a class='tocxref' href='${`#${figureId}`}'>${tofCaption.childNodes}</a>
+  return html`<li class="tofline">
+    <a class="tocxref" href="${`#${figureId}`}">${tofCaption.childNodes}</a>
   </li>`;
 }
 

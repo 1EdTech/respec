@@ -1,11 +1,11 @@
 // @ts-check
-import { children } from "./utils.js";
-import { pub } from "./pubsubhub.js";
+import { showWarning } from "./utils.js";
 export const name = "core/list-sorter";
 
 function makeSorter(direction) {
+  const order = direction === "ascending" ? 1 : -1;
   return ({ textContent: a }, { textContent: b }) => {
-    return direction === "ascending" ? a.localeCompare(b) : b.localeCompare(a);
+    return order * a.trim().localeCompare(b.trim());
   };
 }
 /**
@@ -15,7 +15,7 @@ function makeSorter(direction) {
  * @returns {DocumentFragment}
  */
 export function sortListItems(elem, dir) {
-  const elements = [...children(elem, "li")];
+  const elements = [...elem.querySelectorAll(":scope > li")];
   const sortedElements = elements.sort(makeSorter(dir)).reduce((frag, elem) => {
     frag.appendChild(elem);
     return frag;
@@ -30,7 +30,7 @@ export function sortListItems(elem, dir) {
  * @returns {DocumentFragment}
  */
 export function sortDefinitionTerms(dl, dir) {
-  const elements = [...children(dl, "dt")];
+  const elements = [...dl.querySelectorAll(":scope > dt")];
   const sortedElements = elements.sort(makeSorter(dir)).reduce((frag, elem) => {
     const { nodeType, nodeName } = elem;
     const children = document.createDocumentFragment();
@@ -72,8 +72,10 @@ export function run() {
         sortedElems = sortListItems(list, dir);
         break;
       }
-      default:
-        pub("warning", `ReSpec can't sort ${elem.localName} elements.`);
+      default: {
+        const msg = `ReSpec can't sort ${elem.localName} elements.`;
+        showWarning(msg, name, { elements: [elem] });
+      }
     }
     if (sortedElems) {
       const range = document.createRange();

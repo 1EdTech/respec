@@ -6,7 +6,6 @@ import {
   makeRSDoc,
   makeStandardOps,
 } from "../SpecHelper.js";
-import { children } from "../../../src/core/utils.js";
 
 describe("Core - Structure", () => {
   const body = `
@@ -67,13 +66,18 @@ describe("Core - Structure", () => {
     // test default values
     const toc = doc.getElementById("toc");
     expect(toc.querySelector("h2").textContent).toBe("Table of Contents");
-    expect(toc.querySelector("ol > li a").textContent).toBe("1. ONE");
-    expect(toc.querySelectorAll("li").length).toBe(16);
-    expect(toc.querySelector("ol:first-of-type").childElementCount).toBe(4);
+    expect(toc.querySelector("ol > li:nth-child(1) a").hash).toBe("#abstract");
+    expect(toc.querySelector("ol > li:nth-child(2) a").hash).toBe("#sotd");
+    expect(toc.querySelector("ol > li:nth-child(3) a").hash).toBe("#intro");
+    expect(toc.querySelector("ol > li:nth-child(4) a").textContent).toBe(
+      "1. ONE"
+    );
+    expect(toc.querySelectorAll("li")).toHaveSize(19);
+    expect(toc.querySelector("ol:first-of-type").childElementCount).toBe(7);
     expect(toc.querySelector("a[href='#six']").textContent).toBe(
       "1.1.1.1.1.1 SIX"
     );
-    expect(toc.querySelector("ol > li:nth-child(3) > a").textContent).toBe(
+    expect(toc.querySelector("ol > li:nth-child(6) > a").textContent).toBe(
       "A. ONE"
     );
     expect(toc.querySelector("a[href='#six-0']").textContent).toBe(
@@ -107,12 +111,12 @@ describe("Core - Structure", () => {
     const doc = await makeRSDoc(ops);
 
     const informativeRefs = doc.querySelectorAll("#informative-references dt");
-    expect(informativeRefs.length).toBe(1);
+    expect(informativeRefs).toHaveSize(1);
     const [informativeRef] = informativeRefs;
     expect(informativeRef.textContent).toBe("[informative]");
 
     const normativeRefs = doc.querySelectorAll("#normative-references dt");
-    expect(normativeRefs.length).toBe(1);
+    expect(normativeRefs).toHaveSize(1);
     const [normativeRef1] = normativeRefs;
     expect(normativeRef1.textContent).toBe("[normative]");
   });
@@ -128,19 +132,20 @@ describe("Core - Structure", () => {
     expect(doc.getElementById("toc")).toBeNull();
   });
 
-  it("should include introductory sections in ToC with tocIntroductory", async () => {
+  it("should include introductory sections in ToC", async () => {
     const ops = {
       config: makeBasicConfig(),
       body,
     };
-    ops.config.tocIntroductory = true;
     const doc = await makeRSDoc(ops);
     const toc = doc.getElementById("toc");
     expect(toc.querySelector("h2").textContent).toBe("Table of Contents");
-    expect(children(toc, "ol > li").length).toBe(7);
-    expect(toc.querySelectorAll("li").length).toBe(19);
+    expect(toc.querySelectorAll(":scope > ol > li")).toHaveSize(7);
+    expect(toc.querySelectorAll("li")).toHaveSize(19);
     expect(toc.querySelector("ol > li").textContent).toBe("Abstract");
-    expect(children(toc, "ol > li a[href='#intro']").length).toBe(1);
+    expect(
+      toc.querySelectorAll(":scope > ol > li a[href='#intro']")
+    ).toHaveSize(1);
   });
 
   it("should limit ToC depth with maxTocLevel", async () => {
@@ -152,14 +157,19 @@ describe("Core - Structure", () => {
     const doc = await makeRSDoc(ops);
     const toc = doc.getElementById("toc");
     expect(toc.querySelector("h2").textContent).toBe("Table of Contents");
-    expect(doc.querySelectorAll("#toc > ol > li").length).toBe(4);
-    expect(toc.querySelectorAll("li").length).toBe(12);
-    expect(doc.querySelector("#toc > ol > li > a").textContent).toBe("1. ONE");
+    expect(doc.querySelectorAll("#toc > ol > li")).toHaveSize(7);
+    expect(toc.querySelectorAll("li")).toHaveSize(15);
+    expect(doc.querySelector("#toc > ol > li > a").textContent).toBe(
+      "Abstract"
+    );
+    expect(
+      doc.querySelector("#toc > ol > li:nth-child(4) > a").textContent
+    ).toBe("1. ONE");
     expect(toc.querySelector("a[href='#four']").textContent).toBe(
       "1.1.1.1 FOUR"
     );
     expect(
-      doc.querySelector("#toc > ol > li:nth-child(3) > a").textContent
+      doc.querySelector("#toc > ol > li:nth-child(6) > a").textContent
     ).toBe("A. ONE");
 
     expect(toc.querySelector("a[href='#four-0']").textContent).toBe(
@@ -169,6 +179,100 @@ describe("Core - Structure", () => {
     expect(doc.getElementById("x1-1-1-1-1-five").textContent).toBe(
       "1.1.1.1.1 FIVE"
     );
+  });
+
+  describe("data-max-toc", () => {
+    it("skips current section from ToC with data-max-toc=0", async () => {
+      const body = `
+        <section><h2>PASS</h2></section>
+        <section data-max-toc="0">
+          <h2>SKIPPED</h2>
+        </section>
+      `;
+      const ops = makeStandardOps(null, body);
+      const doc = await makeRSDoc(ops);
+
+      const toc = doc.getElementById("toc");
+      const links = toc.querySelectorAll(":scope > ol > li:nth-child(n + 2)");
+      expect(links).toHaveSize(1);
+      const tocItem = links[0];
+      expect(tocItem.textContent.trim()).toContain("PASS");
+      expect(tocItem.textContent.trim()).not.toContain("SKIPPED");
+    });
+
+    it("skips descendent sections from ToC", async () => {
+      const body = `
+        <section data-max-toc="2">
+          <h2>PASS 1</h2>
+          <section>
+            <h2>PASS 2</h2>
+            <section>
+              <h2>SKIPPED</h2>
+            </section>
+          </section>
+        </section>
+      `;
+      const ops = makeStandardOps(null, body);
+      const doc = await makeRSDoc(ops);
+      const toc = doc.getElementById("toc");
+
+      const level1Item = toc.querySelector(":scope > ol > li:nth-child(n + 2)");
+      expect(level1Item).toBeTruthy();
+      expect(level1Item.textContent).toContain("1. PASS 1");
+
+      const level2Item = toc.querySelector(":scope > ol > li > ol > li");
+      expect(level2Item).toBeTruthy();
+      expect(level2Item.textContent).toContain("1.1 PASS 2");
+
+      const level3Item = toc.querySelector(":scope > ol > li > ol > li li");
+      expect(level3Item).toBeFalsy();
+      expect(toc.textContent).not.toContain("SKIPPED");
+      expect(toc.textContent).not.toContain("1.1.1");
+    });
+
+    it("ignores data-max-toc if not in valid range", async () => {
+      const body = `
+        <section id="test" data-max-toc="7">
+          <h2>PASS 0</h2>
+          <section>
+            <h2>PASS 1</h2>
+            <section>
+              <h2>PASS 2</h2>
+            </section>
+          </section>
+        </section>
+      `;
+      const ops = makeStandardOps(null, body);
+      const doc = await makeRSDoc(ops);
+      const toc = doc.getElementById("toc");
+
+      expect(toc.querySelectorAll(":scope .toc")).toHaveSize(3);
+      expect(doc.getElementById("test").classList).toContain(
+        "respec-offending-element"
+      );
+    });
+  });
+
+  it("should correctly put all headings until maxTocLevel in ToC", async () => {
+    const times = (n, fn) =>
+      Array.from({ length: n }, (_, i) => fn(i)).join("\n");
+    // The first 9 sections are just placeholders. In 10th section (10.x), we
+    // add 10 subsections, so ToC goes till `10.10`, and section number for the
+    // last heading is "10.10" and a depth of 2.
+    const body = `
+      ${makeDefaultBody()}
+      ${times(9, () => `<section><h2>pass</h2></section>`)}
+      <section>
+        <h2>pass</h2>
+        ${times(10, i => `<section><h2>test ${i + 1}</h2></section>`)}
+      </section>
+    `;
+    const ops = makeStandardOps({ maxTocLevel: 2 }, body);
+    const doc = await makeRSDoc(ops);
+
+    expect(doc.getElementById("test-10")).toBeTruthy();
+    expect(doc.querySelector("#toc")).toBeTruthy();
+    expect(doc.querySelector("#toc a[href='#test-10']")).toBeTruthy();
   });
 
   it("gives the toc's heading an id", async () => {
@@ -247,10 +351,34 @@ describe("Core - Structure", () => {
 
     const ops = makeStandardOps(null, body);
     const doc = await makeRSDoc(ops);
-    const links = doc.querySelectorAll("#toc li > a");
+    const links = doc.querySelectorAll("#toc li:nth-child(n + 2) > a");
+    expect(links).toHaveSize(2);
     expect(links[0].hash).toBe("#one");
     expect(links[0].textContent).toBe("1. ONE");
     expect(links[1].hash).toBe("#zwei");
     expect(links[1].textContent).toBe("2. TWO");
+  });
+
+  it("generates correct appendix numbers", async () => {
+    // Choosing 53 as 53/26 gives us 3 different sequences of appendix
+    // numbers: A,B,C... AA,AB,AC... BA,BB,BC..
+    const appendixCount = 53;
+
+    const body = Array.from(
+      { length: appendixCount },
+      (_, i) => `<section class="appendix"><h2>${i + 1}</h2></section>`
+    ).join("\n");
+    const ops = makeStandardOps(null, body);
+    const doc = await makeRSDoc(ops);
+
+    const toc = doc.getElementById("toc");
+    const sectionNumbers = toc.querySelectorAll(".secno");
+    expect(sectionNumbers).toHaveSize(appendixCount);
+    expect(sectionNumbers[0].textContent.trim()).toBe("A.");
+    expect(sectionNumbers[1].textContent.trim()).toBe("B.");
+    expect(sectionNumbers[25].textContent.trim()).toBe("Z.");
+    expect(sectionNumbers[26].textContent.trim()).toBe("AA.");
+    expect(sectionNumbers[27].textContent.trim()).toBe("AB.");
+    expect(sectionNumbers[52].textContent.trim()).toBe("BA.");
   });
 });

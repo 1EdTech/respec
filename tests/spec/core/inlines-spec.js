@@ -32,11 +32,11 @@ describe("Core - Inlines", () => {
     ]);
 
     const inform = [...doc.querySelectorAll("#informative-references dt")];
-    expect(inform.length).toBe(2);
+    expect(inform).toHaveSize(2);
     expect(inform.map(el => el.textContent)).toEqual(["[infra]", "[webidl]"]);
 
     const links = [...doc.querySelectorAll("section cite a")];
-    expect(links.length).toBe(8);
+    expect(links).toHaveSize(8);
     expect(links[0].textContent).toBe("RFC2119");
     expect(links[0].getAttribute("href")).toBe("#bib-rfc2119");
     expect(links[0].dataset.linkType).toBe("biblio");
@@ -58,6 +58,26 @@ describe("Core - Inlines", () => {
     );
   });
 
+  it("processes inline cite content with aliasing", async () => {
+    const body = `
+      <section id="test" class="normative">
+        <p>[[html|not JSX]]</p>
+      </section>
+    `;
+    const ops = makeStandardOps({}, body);
+    const doc = await makeRSDoc(ops);
+
+    const norm = [...doc.querySelectorAll("#normative-references dt")];
+    expect(norm.map(el => el.textContent)).toEqual(["[html]"]);
+
+    const ref = doc.querySelector("#test p");
+    const link = doc.querySelector("#test cite a");
+    expect(ref.textContent).toBe("not JSX");
+    expect(ref.textContent).toBe(link.textContent);
+    expect(link.getAttribute("href")).toBe("#bib-html");
+    expect(link.dataset.linkType).toBe("biblio");
+  });
+
   it("processes abbr and rfc2119 content", async () => {
     const body = `
       <section id='inlines'>
@@ -70,13 +90,38 @@ describe("Core - Inlines", () => {
     const inl = doc.getElementById("inlines");
 
     const abbr = inl.querySelectorAll("abbr[title='ABBR-TIT']");
-    expect(abbr.length).toBe(2);
+    expect(abbr).toHaveSize(2);
     expect([...abbr].every(({ textContent: t }) => t === "ABBR")).toBeTruthy();
 
     const rfc2119 = [...inl.querySelectorAll("em.rfc2119")];
-    expect(rfc2119.length).toBe(2);
+    expect(rfc2119).toHaveSize(2);
     expect(rfc2119[0].textContent).toBe("MUST");
     expect(rfc2119[1].textContent).toBe("NOT RECOMMENDED");
+  });
+
+  it("excludes generating abbr elements when .exclude class is present", async () => {
+    const body = `
+      <section>
+        <h2>
+          <abbr title="excluded" class="exclude">
+            EXCLUDE
+          </abbr>
+          <abbr title="  included  abbr  ">
+            INCLUDE
+          </abbr>
+        </h2>
+        <p id="test">
+          EXCLUDE INCLUDE
+        </p>
+      </section>
+    `;
+    const ops = makeStandardOps({}, body);
+    const doc = await makeRSDoc(ops);
+    const abbrs = doc.querySelectorAll("#test abbr");
+    expect(abbrs).toHaveSize(1);
+
+    const abbr = abbrs.item(0);
+    expect(abbr.title).toBe("included abbr");
   });
 
   it("processes inline variable syntax", async () => {
@@ -97,6 +142,9 @@ describe("Core - Inlines", () => {
       </section>
       <section>
         <p id="h"> TEXT |var: Generic&lt;int&gt;| TEXT |var2: Generic&lt;unsigned short int&gt;| </p>
+      </section>
+      <section>
+        <p id="nulls"> |var 1: null type spaces?| and |var 2 : NullableType?| </p>
       </section>
     `;
     const doc = await makeRSDoc(makeStandardOps(null, body));
@@ -143,6 +191,12 @@ describe("Core - Inlines", () => {
     expect(h[0].dataset.type).toBe("Generic<int>");
     expect(h[1].textContent).toBe("var2");
     expect(h[1].dataset.type).toBe("Generic<unsigned short int>");
+
+    const [nullVar1, nullVar2] = doc.querySelectorAll("#nulls > var");
+    expect(nullVar1.textContent).toBe("var 1");
+    expect(nullVar1.dataset.type).toBe("null type spaces?");
+    expect(nullVar2.textContent).toBe("var 2");
+    expect(nullVar2.dataset.type).toBe("NullableType?");
   });
 
   it("expands inline references and they get classified as normative/informative correctly", async () => {
@@ -179,11 +233,11 @@ describe("Core - Inlines", () => {
     expect(refs[2].textContent).toBe("Fetch Standard");
     expect(refs[3].textContent).toBe("Payment Request API");
     const norm = [...doc.querySelectorAll("#normative-references dt")];
-    expect(norm.length).toBe(2);
+    expect(norm).toHaveSize(2);
     expect(norm.map(el => el.textContent)).toEqual(["[fetch]", "[html]"]);
 
     const inform = [...doc.querySelectorAll("#informative-references dt")];
-    expect(inform.length).toBe(2);
+    expect(inform).toHaveSize(2);
     expect(inform.map(el => el.textContent)).toEqual([
       "[dom]",
       "[payment-request]",
@@ -191,6 +245,10 @@ describe("Core - Inlines", () => {
   });
 
   it("allows [[[#...]]] to be a general expander for ids in document", async () => {
+    /** @param {string} text */
+    function generateDataIncludeUrl(text) {
+      return `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+    }
     const body = `
       <section id="section">
         <h2>section heading</h2>
@@ -200,18 +258,22 @@ describe("Core - Inlines", () => {
         <aside class="example" id="example-aside_thing" title="aside"></aside>
         <pre class="example" id="example-pre" title="pre">
         </pre>
+        <section data-include="${generateDataIncludeUrl(
+          `## Example Dynamic\nA dynamically generated heading`
+        )}" data-include-format="markdown"></section>
       </section>
       <p id="output">
         [[[#section]]]
         [[[#figure]]]
         [[[#example-aside_thing]]]
         [[[#example-pre]]]
+        [[[#example-dynamic]]]
         [[[#does-not-exist]]]
       </p>`;
     const doc = await makeRSDoc(makeStandardOps(null, body));
     const anchors = doc.querySelectorAll("#output a");
-    expect(anchors.length).toBe(4);
-    const [section, figure, exampleAside, examplePre] = anchors;
+    expect(anchors).toHaveSize(6);
+    const [section, figure, exampleAside, examplePre, exampleDynamic] = anchors;
     expect(section.textContent).toBe("§\u00A01. section heading");
     expect(section.classList).toContain("sec-ref");
     expect(figure.textContent).toBe("Figure 1");
@@ -220,8 +282,11 @@ describe("Core - Inlines", () => {
     expect(exampleAside.classList).toContain("box-ref");
     expect(examplePre.textContent).toBe("Example 2");
     expect(examplePre.classList).toContain("box-ref");
-    const badOne = doc.querySelector("#output span.respec-offending-element");
-    expect(badOne.textContent).toBe("[[[#does-not-exist]]]");
+    expect(exampleDynamic.textContent).toContain("Example Dynamic");
+    expect(exampleDynamic.classList).toContain("sec-ref");
+
+    const badOne = doc.querySelector("#output a.respec-offending-element");
+    expect(badOne.textContent).toBe("#does-not-exist");
   });
 
   it("proceseses backticks inside [= =] inline links", async () => {
@@ -277,7 +342,7 @@ describe("Core - Inlines", () => {
 
     // multi per line
     const multi = doc.querySelectorAll("#multi code");
-    expect(multi.length).toBe(3);
+    expect(multi).toHaveSize(3);
     expect(multi[0].textContent).toBe("123");
     expect(multi[1].textContent).toBe("undefined");
     expect(multi[2].textContent.endsWith("string")).toBeTruthy();
@@ -297,19 +362,31 @@ describe("Core - Inlines", () => {
     const doc = await makeRSDoc(makeStandardOps(null, body));
     const syntaxErrorAnchor = doc.querySelector("#test a");
     expect(syntaxErrorAnchor.href).toBe(
-      "https://heycam.github.io/webidl/#syntaxerror"
+      "https://webidl.spec.whatwg.org/#syntaxerror"
     );
   });
 
-  it("processes inline inline [^element^]s.", async () => {
+  it("processes inline [^element^] and hierarchies.", async () => {
     const body = `
       <section>
         <p id="test">[^body^]</p>
+        <p id="test2">[^iframe/allow^]</p>
+        <p id="test3">[^ html-global/inputmode/text ^]</p>
+        <p id="test4">[^ /role ^]</p>
       </section>
     `;
     const doc = await makeRSDoc(makeStandardOps({ xref: ["HTML"] }, body));
     const bodyAnchor = doc.querySelector("#test a");
     expect(bodyAnchor.hash).toBe("#the-body-element");
+    const iframeAllowAnchor = doc.querySelector("#test2 a");
+    expect(iframeAllowAnchor.textContent).toBe("allow");
+    expect(iframeAllowAnchor.hash).toBe("#attr-iframe-allow");
+    const inputModeAnchor = doc.querySelector("#test3 a");
+    expect(inputModeAnchor.textContent).toBe("text");
+    expect(inputModeAnchor.hash).toBe("#attr-inputmode-keyword-text");
+    const roleAttribute = doc.querySelector("#test4 a");
+    expect(roleAttribute.textContent).toBe("role");
+    expect(roleAttribute.hash).toBe("#attr-aria-role");
   });
 
   it("processes [= BikeShed style inline links =]", async () => {
@@ -352,6 +429,10 @@ describe("Core - Inlines", () => {
           [= code point| Unicode code point =]
           [= iteration/break|break out of iteration =]
         </p>
+        <p id="deep-for" data-cite="streams">
+        [= ReadableStream / set
+          up / pullAlgorithm=]
+        </p>
       </section>
     `;
     const config = { xref: true };
@@ -359,7 +440,7 @@ describe("Core - Inlines", () => {
     const dfnId = doc.querySelector("#definitions dfn").id;
     const anchors = doc.querySelectorAll("#simple-links a");
     const expectedAnchor = `#${dfnId}`;
-    expect(anchors.length).toBe(3);
+    expect(anchors).toHaveSize(3);
     for (const a of anchors) {
       expect(a.getAttribute("href")).toBe(expectedAnchor);
       expect(a.dataset.linkFor).toBeUndefined();
@@ -378,9 +459,8 @@ describe("Core - Inlines", () => {
     expect(mapForEach.href).toBe("https://infra.spec.whatwg.org/#map-iterate");
 
     // qualified multiline
-    const [multiListForEach, multiMapForEach] = doc.querySelectorAll(
-      "#overmatch a"
-    );
+    const [multiListForEach, multiMapForEach] =
+      doc.querySelectorAll("#overmatch a");
     expect(multiListForEach.href).toBe(
       "https://infra.spec.whatwg.org/#list-iterate"
     );
@@ -394,6 +474,23 @@ describe("Core - Inlines", () => {
     expect(codePoint.hash).toBe("#code-point");
     expect(iterationBreak.textContent).toBe("break out of iteration");
     expect(iterationBreak.hash).toBe("#iteration-break");
+
+    // Deep for= parts
+    const pullAlgorithm = doc.querySelector("#deep-for a");
+    expect(pullAlgorithm.hash).toBe("#readablestream-set-up-pullalgorithm");
+  });
+
+  it("allows escaping `/` in [= concept =] links", async () => {
+    const body = `<section id="test">
+      <dfn>foo/bar</dfn> [= foo\\/bar =]
+      [=multipart\\/form-data encoding algorithm=]
+    </section>`;
+    const ops = makeStandardOps({ xref: ["HTML"] }, body);
+    const doc = await makeRSDoc(ops);
+
+    const [localLink, conceptLink] = doc.querySelectorAll("#test a");
+    expect(localLink.hash).toBe("#dfn-foo-bar");
+    expect(conceptLink.hash).toBe("#multipart/form-data-encoding-algorithm");
   });
 
   it("processes {{ forContext/term }} IDL", async () => {
@@ -435,5 +532,80 @@ describe("Core - Inlines", () => {
     expect(doc.querySelector("#link5 a").hash).toBe(
       "#dom-referrerpolicy-no-referrer"
     );
+  });
+
+  it("supports {{ Nullable? }} types and primitives", async () => {
+    const body = `
+      <section>
+        <pre class="idl">
+        [Exposed=Window]
+        interface InterFace{};
+        dictionary Dict{};
+        </pre>
+        <p id="interface">{{ InterFace? }}</p>
+        <p id="dictionary">{{ Dict? }}</p>
+        <p id="primitive">{{ unsigned short? }}</p>
+      </section>
+    `;
+    const config = { xref: ["WebIDL"] };
+    const doc = await makeRSDoc(makeStandardOps(config, body));
+
+    const [interfaceDfn, dictDfn] = doc.querySelectorAll(".idl dfn");
+
+    // {{ Interface? }}
+    const interfaceAnchor = doc.querySelector("#interface a");
+    expect(interfaceAnchor.textContent).toBe("InterFace?");
+    expect(interfaceAnchor.hash.endsWith(interfaceDfn.id)).toBeTrue();
+
+    const interfaceData = interfaceAnchor.dataset;
+    expect(interfaceData.xrefType).toBe("_IDL_");
+    expect(interfaceData.linkType).toBe("idl");
+    expect(interfaceData.lt).toBe("InterFace");
+
+    // {{ Dict? }}
+    const dictAnchor = doc.querySelector("#dictionary a");
+    expect(dictAnchor.textContent).toBe("Dict?");
+    expect(dictAnchor.hash.endsWith(dictDfn.id)).toBeTrue();
+
+    const dictData = dictAnchor.dataset;
+    expect(dictData.xrefType).toBe("_IDL_");
+    expect(dictData.linkType).toBe("idl");
+    expect(dictData.lt).toBe("Dict");
+
+    // {{ unsigned short? }}
+    const primitiveAnchor = doc.querySelector("#primitive a");
+    expect(primitiveAnchor.textContent).toBe("unsigned short?");
+    expect(primitiveAnchor.hash).toBe("#idl-unsigned-short");
+
+    const primitiveData = primitiveAnchor.dataset;
+    expect(primitiveData.linkType).toBe("idl");
+    expect(primitiveData.cite).toBe("webidl");
+    expect(primitiveData.xrefType).toBe("interface");
+    expect(primitiveData.lt).toBe("unsigned short");
+  });
+
+  it("doesn't link processed inline WebIDL if inside a definition", async () => {
+    const body = `
+      <section>
+        <dfn id="dfn">
+          ABC
+          {{ EventTarget/addEventListener(type, callback) }}
+          {{ Window / event }}
+          {{ ReferrerPolicy/"no-referrer" }}
+          123
+        </dfn>
+      </section>
+    `;
+    const doc = await makeRSDoc(makeStandardOps(null, body));
+    const dfn = doc.getElementById("dfn");
+    expect(dfn.querySelector("a")).toBeNull();
+
+    const codeElements = dfn.querySelectorAll("code");
+    expect(codeElements).toHaveSize(3);
+
+    const [eventListen, event, noRef] = codeElements;
+    expect(eventListen.textContent).toBe("addEventListener(type, callback)");
+    expect(event.textContent).toBe("event");
+    expect(noRef.textContent).toBe(`"no-referrer"`);
   });
 });

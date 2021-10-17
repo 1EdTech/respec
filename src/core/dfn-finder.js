@@ -1,6 +1,6 @@
 // @ts-check
 import { definitionMap, registerDefinition } from "./dfn-map.js";
-import { showInlineError, wrapInner } from "./utils.js";
+import { showError, wrapInner } from "./utils.js";
 
 const topLevelEntities = new Set([
   "callback interface",
@@ -36,7 +36,7 @@ export function findDfn(defn, name, { parent = "" } = {}) {
 }
 
 /**
- * @param {string} type
+ * @param {{ type: string, arguments: any[] }} idlAst
  * @param {string} parent
  * @param {string} name
  */
@@ -96,10 +96,8 @@ function generateMethodNamesWithArgs(operationName, argsAst) {
   const requiredOperation = `${operationName}(${requiredArgs})`;
   operationNames.push(requiredOperation);
   const optionalOps = optional.map((_, index) => {
-    const optionalArgs = optional.slice(0, index + 1).join(", ");
-    const result = `${operationName}(${requiredArgs}${
-      optionalArgs ? `, ${optionalArgs}` : ""
-    })`;
+    const args = [...required, ...optional.slice(0, index + 1)].join(", ");
+    const result = `${operationName}(${args})`;
     return result;
   });
   operationNames.push(...optionalOps);
@@ -143,22 +141,18 @@ function addAlternativeNames(dfn, names) {
  * @param {...string} names
  */
 function findNormalDfn(defn, parent, ...names) {
+  const { type } = defn;
   for (const name of names) {
     let resolvedName =
-      defn.type === "enum-value" && name === ""
-        ? "the-empty-string"
-        : name.toLowerCase();
-    let dfnForArray = definitionMap[resolvedName];
-    let dfns = getDfns(dfnForArray, parent, name, defn.type);
+      type === "enum-value" && name === "" ? "the-empty-string" : name;
+    let dfns = getDfns(resolvedName, parent, name, type);
     // If we haven't found any definitions with explicit [for]
     // and [title], look for a dotted definition, "parent.name".
     if (dfns.length === 0 && parent !== "") {
       resolvedName = `${parent}.${resolvedName}`;
-      dfnForArray = definitionMap[resolvedName.toLowerCase()];
-      if (dfnForArray !== undefined && dfnForArray.length === 1) {
-        dfns = dfnForArray;
-        // Found it: register with its local name
-        delete definitionMap[resolvedName];
+      const alternativeDfns = definitionMap.get(resolvedName);
+      if (alternativeDfns && alternativeDfns.size === 1) {
+        dfns = [...alternativeDfns];
         registerDefinition(dfns[0], [resolvedName]);
       }
     } else {
@@ -168,7 +162,8 @@ function findNormalDfn(defn, parent, ...names) {
       const msg = `WebIDL identifier \`${name}\` ${
         parent ? `for \`${parent}\`` : ""
       } is defined multiple times`;
-      showInlineError(dfns, msg, "Duplicate definition.");
+      const title = "Duplicate definition.";
+      showError(msg, name, { title, elements: dfns });
     }
     if (dfns.length) {
       return dfns[0];
@@ -186,11 +181,11 @@ export function decorateDfn(dfnElem, idlAst, parent, name) {
   if (!dfnElem.id) {
     const lCaseParent = parent.toLowerCase();
     const middle = lCaseParent ? `${lCaseParent}-` : "";
-    let last = name
-      .toLowerCase()
-      .replace(/[()]/g, "")
-      .replace(/\s/g, "-");
-    if (last === "") last = "the-empty-string";
+    let last = name.toLowerCase().replace(/[()]/g, "").replace(/\s/g, "-");
+    if (last === "") {
+      last = "the-empty-string";
+      dfnElem.setAttribute("aria-label", "the empty string");
+    }
     dfnElem.id = `dom-${middle}${last}`;
   }
   dfnElem.dataset.idl = idlAst.type;
@@ -228,18 +223,23 @@ export function decorateDfn(dfnElem, idlAst, parent, name) {
 }
 
 /**
- * @param {HTMLElement[]} dfnForArray
+ * @param {string} name
  * @param {string} parent data-dfn-for
  * @param {string} originalName
  * @param {string} type
  */
-function getDfns(dfnForArray, parent, originalName, type) {
-  if (!dfnForArray) {
+function getDfns(name, parent, originalName, type) {
+  const foundDfns = definitionMap.get(name);
+  if (!foundDfns || foundDfns.size === 0) {
     return [];
   }
+  const dfnForArray = [...foundDfns];
   // Definitions that have a name and [data-dfn-for] that exactly match the
   // IDL entity:
   const dfns = dfnForArray.filter(dfn => {
+    // This is explicitly marked as a concept, so we can't use it
+    if (dfn.dataset.dfnType === "dfn") return false;
+
     /** @type {HTMLElement} */
     const closestDfnFor = dfn.closest(`[data-dfn-for]`);
     return closestDfnFor && closestDfnFor.dataset.dfnFor === parent;
@@ -260,8 +260,9 @@ function getDfns(dfnForArray, parent, originalName, type) {
 /**
  * @return {string}
  */
-function getDataType(idlStruct) {
+function getDataType(idlStruct = {}) {
   const { idlType, generic, union } = idlStruct;
+  if (idlType === undefined) return "";
   if (typeof idlType === "string") return idlType;
   if (generic) return generic;
   // join on "|" handles for "unsigned short" etc.

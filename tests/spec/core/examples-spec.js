@@ -20,10 +20,10 @@ describe("Core — Examples", () => {
     const example = doc.querySelector("div.example pre");
     const div = example.closest("div");
     expect(div.classList).toContain("example");
-    expect(div.id).toBe("example-1-ex");
+    expect(div.id).toBe("example-ex");
 
     const markers = div.querySelectorAll("div.marker");
-    expect(markers.length).toBe(1);
+    expect(markers).toHaveSize(1);
 
     const marker = markers[0];
     expect(marker.textContent.trim()).toBe("Example 1: EX");
@@ -41,21 +41,24 @@ describe("Core — Examples", () => {
     const ops = makeStandardOps(null, body);
     const doc = await makeRSDoc(ops);
     const example = doc.querySelector("aside.example");
-    expect(example.id).toBe("example-1-ex");
+    expect(example.id).toBe("example-ex");
 
     const markers = example.querySelectorAll("div.marker");
-    expect(markers.length).toBe(1);
+    expect(markers).toHaveSize(1);
 
     const [marker] = markers;
     expect(marker.textContent.trim()).toBe("Example 1: EX");
     expect(marker.querySelector(".example-title").textContent).toBe(": EX");
     expect(example.getAttribute("title")).toBeNull();
     expect(example.textContent.trim()).toBe(
-      "Example 1: EX\n    \n{\n  CONTENT\n}"
+      "Example 1: EX\n  \n{\n  CONTENT\n}"
     );
   });
   it("processes children of aside examples", async () => {
     const body = `
+      <section id="sotd">
+       <p>.</p>
+      <section>
       <aside class="example">
       <pre class="js">
       // Whitespace before this text should be removed
@@ -71,7 +74,7 @@ describe("Core — Examples", () => {
     const ops = makeStandardOps(null, body);
     const doc = await makeRSDoc(ops);
     const example = doc.querySelectorAll("code.hljs");
-    expect(example.length).toBe(3);
+    expect(example).toHaveSize(3);
     expect(example[0].textContent).toBe(
       "// Whitespace before this text should be removed"
     );
@@ -91,11 +94,11 @@ describe("Core — Examples", () => {
     const ops = makeStandardOps({}, body);
     const doc = await makeRSDoc(ops);
     const exampleLinks = doc.querySelectorAll("aside.example a.self-link");
-    expect(exampleLinks.length).toBe(3);
+    expect(exampleLinks).toHaveSize(3);
     const [example1, example2, example3] = exampleLinks;
     expect(example1.getAttribute("href")).toBe("#example-1");
     expect(example2.getAttribute("href")).toBe("#pass");
-    expect(example3.getAttribute("href")).toBe("#example-3-pass");
+    expect(example3.getAttribute("href")).toBe("#example-pass");
   });
   it("self-links examples made from pre", async () => {
     const body = `
@@ -106,11 +109,11 @@ describe("Core — Examples", () => {
     const ops = makeStandardOps({}, body);
     const doc = await makeRSDoc(ops);
     const exampleLinks = doc.querySelectorAll("div.example a.self-link");
-    expect(exampleLinks.length).toBe(3);
+    expect(exampleLinks).toHaveSize(3);
     const [example1, example2, example3] = exampleLinks;
     expect(example1.getAttribute("href")).toBe("#example-1");
     expect(example2.getAttribute("href")).toBe("#pass");
-    expect(example3.getAttribute("href")).toBe("#example-3-pass");
+    expect(example3.getAttribute("href")).toBe("#example-pass");
   });
   it("relocates ids and doesn't duplicate them", async () => {
     const body = `
@@ -119,7 +122,7 @@ describe("Core — Examples", () => {
     const ops = makeStandardOps({}, body);
     const doc = await makeRSDoc(ops);
     const examples = doc.querySelectorAll("#this-is-unique");
-    expect(examples.length).toBe(1);
+    expect(examples).toHaveSize(1);
     const [example] = examples;
     // id got relocated from the pre to the div
     expect(example.localName).toBe("div");

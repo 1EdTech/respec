@@ -1,14 +1,39 @@
 // @ts-check
 // Module w3c/abstract
 // Handle the abstract section properly.
-import { l10n, lang } from "../core/l10n.js";
-import { pub } from "../core/pubsubhub.js";
+import { getIntlData, showError } from "../core/utils.js";
 export const name = "w3c/abstract";
+
+const localizationStrings = {
+  en: {
+    abstract: "Abstract",
+  },
+  ko: {
+    abstract: "요약",
+  },
+  zh: {
+    abstract: "摘要",
+  },
+  ja: {
+    abstract: "要約",
+  },
+  nl: {
+    abstract: "Samenvatting",
+  },
+  es: {
+    abstract: "Resumen",
+  },
+  de: {
+    abstract: "Zusammenfassung",
+  },
+};
+const l10n = getIntlData(localizationStrings);
 
 export async function run() {
   const abs = document.getElementById("abstract");
   if (!abs) {
-    pub("error", `Document must have one element with \`id="abstract"`);
+    const msg = 'Document must have one element with `id="abstract"`.';
+    showError(msg, name);
     return;
   }
   abs.classList.add("introductory");
@@ -17,6 +42,6 @@ export async function run() {
     return;
   }
   abstractHeading = document.createElement("h2");
-  abstractHeading.textContent = l10n[lang].abstract;
+  abstractHeading.textContent = l10n.abstract;
   abs.prepend(abstractHeading);
 }

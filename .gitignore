@@ -6,13 +6,10 @@ scratch
 examples/touchevents.html
 bevy.json
 .idea
-js/*
-!js/deps
 js/deps/builds
 !js/profile-w3c-common.js
 !js/profile-geonovum.js
 !js/profile-ims-default.js
 !js/profile-w3c.js
-!js/shortcut.js
-.vscode/
-.vs/
+.vscode/*
+!.vscode/tasks.json
