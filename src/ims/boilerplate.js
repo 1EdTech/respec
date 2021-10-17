@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // @ts-check
 
 /**
@@ -70,7 +71,8 @@ function showLinkData(data) {
  * @param {*} conf
  */
 export async function run(conf) {
-  document.title = `${conf.specTitle} ${conf.specVersion ?? ""} ${conf.specStatus ?? ""}`;
+  document.title = `${conf.specTitle} ${conf.specVersion ?? ""} 
+    ${conf.specStatus ?? ""}`;
 
   const body = document.body;
 
