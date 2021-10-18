@@ -4,11 +4,9 @@ const modules = [
   // order is significant
   import("../src/core/location-hash.js"),
   import("../src/core/l10n.js"),
-  import("../src/w3c/group.js"),
-  import("../src/w3c/defaults.js"),
+  import("../src/ims/defaults.js"),
   import("../src/core/style.js"),
   import("../src/ims/style.js"),
-  import("../src/w3c/l10n.js"),
   // Check configuration
   import("../src/ims/config.js"),
   // Compute common values
@@ -21,7 +19,7 @@ const modules = [
   import("../src/core/markdown.js"),
   import("../src/core/reindent.js"),
   import("../src/core/title.js"),
-
+  import("../src/ims/headers.js"),
   // Make sure markdown abstract has an id
   import("../src/core/id-headers.js"),
   // Check for abstract
@@ -40,14 +38,12 @@ const modules = [
   import("../src/ims/issues-notes.js"),
   import("../src/core/best-practices.js"),
   import("../src/core/figures.js"),
-  import("../src/core/webidl.js"),
   // Import IMS biblio
   import("../src/ims/biblio.js"),
   import("../src/core/biblio.js"),
   import("../src/core/link-to-dfn.js"),
   import("../src/core/xref.js"),
   import("../src/core/data-cite.js"),
-  import("../src/core/webidl-index.js"),
   import("../src/core/render-biblio.js"),
   import("../src/core/dfn-index.js"),
   import("../src/ims/contrib.js"),
@@ -64,7 +60,6 @@ const modules = [
   import("../src/core/seo.js"),
   import("../src/ims/seo.js"),
   import("../src/core/highlight.js"),
-  import("../src/core/webidl-clipboard.js"),
   import("../src/core/data-tests.js"),
   import("../src/core/list-sorter.js"),
   import("../src/core/highlight-vars.js"),
@@ -73,8 +68,6 @@ const modules = [
   import("../src/core/algorithms.js"),
   import("../src/core/anchor-expander.js"),
   import("../src/core/custom-elements/index.js"),
-  // Add IMS boilerplate content
-  import("../src/ims/boilerplate.js"),
   // Clean up the document
   import("../src/ims/cleanBody.js"),
   // Add title attributes to internal definition references
@@ -85,6 +78,8 @@ const modules = [
   // import("../src/ims/tooltips.js"),
   // Remove all comment nodes
   import("../src/ims/comments.js"),
+  // Add the IMS footer
+  import("../src/ims/footers.js"),
   /* Linters must be the last thing to run */
   import("../src/core/linter-rules/check-charset.js"),
   import("../src/core/linter-rules/check-punctuation.js"),

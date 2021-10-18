@@ -1,24 +1,25 @@
 // @ts-check
-import { pub } from "../core/pubsubhub.js";
-import { toHTMLNode } from "../ims/utils.js";
-
+// Module ims/abstract
+// Handle the abstract section properly.
+import { showError } from "../core/utils.js";
 export const name = "ims/abstract";
 
 /**
  * Handles checking for the abstract, and inserts a temp one if not present.
  */
 export async function run() {
-  const abstract = document.querySelector("#abstract");
-  if (abstract === null) {
-    pub(
-      "warn",
-      "No abstract found. Consider adding a section element with an " +
-        "id of 'abstract'"
-    );
-    // insert a temp abstract
-    const tempAbstract = toHTMLNode(
-      "<section id='abstract' class='introductory remove'><h2>Abstract</h2></section>"
-    );
-    document.body.prepend(tempAbstract);
+  const abstract = document.getElementById("abstract");
+  if (!abstract) {
+    const msg = `Document must have one element with \`id="abstract"`;
+    showError(msg, name);
+    return;
   }
+  abstract.classList.add("introductory");
+  let abstractHeading = document.querySelector("#abstract>h2");
+  if (abstractHeading) {
+    return;
+  }
+  abstractHeading = document.createElement("h2");
+  abstractHeading.textContent = "Abstract";
+  abstract.prepend(abstractHeading);
 }
