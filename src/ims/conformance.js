@@ -1,4 +1,5 @@
 // @ts-check
+// Module ims/conformance
 //
 // Based on w3c/conformance with following differences:
 //
@@ -7,10 +8,8 @@
 // - Use slightly modified conformance text.
 //
 // Note: Run after inlines so the conformance section has an id and NormativeReferences is available.
-
+import { htmlJoinAnd, showError, showWarning } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import { joinAnd } from "../core/utils.js";
-import { pub } from "../core/pubsubhub.js";
 import { renderInlineCitation } from "../core/render-biblio.js";
 import { rfc2119Usage } from "../core/inlines.js";
 
@@ -47,9 +46,9 @@ function getNormativeText(conf) {
 
   // Build the HTML
   const terms = [...Object.keys(rfc2119Usage)];
-  const keywords = joinAnd(
+  const keywords = htmlJoinAnd(
     terms.sort(),
-    item => `"<em class="rfc2119">${item}</em>"`
+    item => html`<em class="rfc2119">${item}</em>`
   );
   const plural = terms.length > 1;
 
@@ -94,11 +93,11 @@ function getNormativeText(conf) {
  */
 function getInformativeText(conf) {
   if (!conf.mainSpecTitle) {
-    pub("warn", "No mainSpecTitle property found in config')");
+    showWarning("warn", "No mainSpecTitle property found in config')");
   }
 
   if (!conf.mainSpecBiblioKey) {
-    pub("warn", "No mainSpecBiblioKey property found in config')");
+    showWarning("warn", "No mainSpecBiblioKey property found in config')");
   }
 
   return html` <p>
@@ -140,7 +139,7 @@ function processConformance(conformance, conf) {
 /**
  * @param {*} conf
  */
-export async function run(conf) {
+export function run(conf) {
   // No conformance section in IMS Errata documents
   if (conf.specType === "errata") {
     return;
@@ -151,13 +150,13 @@ export async function run(conf) {
   if (!conformance)
     conformance = document.querySelector("section#conformance-0");
   if (!conformance) {
-    pub("error", "No section found with id 'conformance'");
+    showError("error", "No section found with id 'conformance'");
     return;
   }
 
   // Use IMS specNature to determine conformance text
   if (!conf.specNature) {
-    pub("error", "Document must have config.specNature set");
+    showError("error", "Document must have config.specNature set");
   }
 
   // IMS standard is to have a Conformance heading
@@ -166,7 +165,7 @@ export async function run(conf) {
       "h1, h2, h3, h4, h5, h6"
     );
     if (!conformanceHeading) {
-      pub("warn", "No heading found in the conformance section");
+      showWarning("warn", "No heading found in the conformance section");
     } else {
       // Insert conformation text after heading
       conformance = conformanceHeading;
@@ -175,8 +174,4 @@ export async function run(conf) {
 
   // Insert the conformance text
   processConformance(conformance, conf);
-
-  // Added message for legacy compat with Aria specs
-  // See https://github.com/w3c/respec/issues/793
-  pub("end", name);
 }

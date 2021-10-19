@@ -1,9 +1,9 @@
 // @ts-check
 import { html } from "../../core/import-maps.js";
 import { l10n } from "./headers.js";
-import showLink from "./show-link.js";
-import showLogo from "./show-logo.js";
-import showPeople from "./show-people.js";
+import showLink from "../../core/templates/show-link.js";
+import showLogo from "../../core/templates/show-logo.js";
+import showPeople from "../../core/templates/show-people.js";
 
 export default (conf, options) => {
   const existingCopyright = document.querySelector(".copyright");
@@ -81,7 +81,7 @@ export default (conf, options) => {
           `
         : ""}
       <dt>${conf.multipleEditors ? l10n.editors : l10n.editor}</dt>
-      ${showPeople(conf.editors)}
+      ${showPeople(conf, "editors")}
       ${Array.isArray(conf.formerEditors) && conf.formerEditors.length > 0
         ? html`
             <dt>
@@ -89,15 +89,13 @@ export default (conf, options) => {
                 ? l10n.former_editors
                 : l10n.former_editor}
             </dt>
-            ${showPeople(conf.formerEditors)}
+            ${showPeople(conf, "formerEditors")}
           `
         : ""}
       ${conf.authors
         ? html`
-            <dt>
-              ${conf.multipleAuthors ? l10n.authors : l10n.author}
-            </dt>
-            ${showPeople(conf.authors)}
+            <dt>${conf.multipleAuthors ? l10n.authors : l10n.author}</dt>
+            ${showPeople(conf, "authors")}
           `
         : ""}
       ${conf.otherLinks ? conf.otherLinks.map(showLink) : ""}

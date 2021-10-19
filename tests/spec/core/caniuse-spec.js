@@ -2,6 +2,7 @@
 
 import {
   flushIframes,
+  getExportedDoc,
   makeBasicConfig,
   makeDefaultBody,
   makeRSDoc,
@@ -20,7 +21,7 @@ describe("Core — Can I Use", () => {
       },
     });
     const doc = await makeRSDoc(ops);
-    await doc.respecIsReady;
+    await doc.respec.ready;
     const { caniuse } = doc.defaultView.respecConfig;
 
     expect(caniuse.feature).toBe("FEATURE");
@@ -38,7 +39,7 @@ describe("Core — Can I Use", () => {
       },
     });
     const doc = await makeRSDoc(ops);
-    await doc.respecIsReady;
+    await doc.respec.ready;
     const { caniuse } = doc.defaultView.respecConfig;
 
     expect(caniuse.feature).toBe("FEATURE");
@@ -49,7 +50,7 @@ describe("Core — Can I Use", () => {
   it("does nothing if caniuse is not enabled", async () => {
     const ops = makeStandardOps();
     const doc = await makeRSDoc(ops);
-    await doc.respecIsReady;
+    await doc.respec.ready;
     const { caniuse } = doc.defaultView.respecConfig;
 
     expect(caniuse).toBeFalsy();
@@ -65,7 +66,7 @@ describe("Core — Can I Use", () => {
       },
     });
     const doc = await makeRSDoc(ops);
-    await doc.respecIsReady;
+    await doc.respec.ready;
 
     const link = doc.querySelector(".caniuse-stats a");
     expect(link.textContent).toBe("caniuse.com");
@@ -82,7 +83,7 @@ describe("Core — Can I Use", () => {
       },
     });
     const doc = await makeRSDoc(ops);
-    await doc.respecIsReady;
+    await doc.respec.ready;
 
     const stats = doc.querySelector(".caniuse-stats");
 
@@ -125,9 +126,55 @@ describe("Core — Can I Use", () => {
       apiURL: `${window.location.origin}/tests/data/caniuse/{FEATURE}.json`,
     };
     const doc = await makeRSDoc(opsWithCaniuse);
-    await doc.respecIsReady;
+    await doc.respec.ready;
 
     const text = doc.getElementById("initialUserConfig").textContent;
     expect(JSON.parse(text)).toEqual(expectedObj);
+  });
+
+  it("includes caniuse by default in exported documents", async () => {
+    const ops = makeStandardOps({
+      caniuse: {
+        feature: "FEATURE",
+        apiURL,
+      },
+    });
+    const exportedDoc = await getExportedDoc(await makeRSDoc(ops));
+    // make sure there is a style element with id caniuse-stylesheet
+    const style = exportedDoc.querySelector("#caniuse-stylesheet");
+    expect(style).toBeTruthy();
+    // make sure that removeOnSave is not present in classlist
+    expect(style.classList.contains("removeOnSave")).toBeFalsy();
+  });
+
+  it("includes caniuse cells via explicit removeOnSave being false", async () => {
+    const ops = makeStandardOps({
+      caniuse: {
+        feature: "FEATURE",
+        apiURL,
+        removeOnSave: false,
+      },
+    });
+    const exportedDoc = await getExportedDoc(await makeRSDoc(ops));
+    // make sure there is a style element with id caniuse-stylesheet
+    const style = exportedDoc.querySelector("#caniuse-stylesheet");
+    expect(style).toBeTruthy();
+    // make sure that removeOnSave is not present in classlist
+    expect(style.classList.contains("removeOnSave")).toBeFalsy();
+  });
+
+  it("allows removing caniuse cells from exported docs via configuration", async () => {
+    const ops = makeStandardOps({
+      caniuse: {
+        feature: "FEATURE",
+        apiURL,
+        removeOnSave: true,
+      },
+    });
+    const exportedDoc = await getExportedDoc(await makeRSDoc(ops));
+    // make sure there is a style element with id caniuse-stylesheet
+    const style = exportedDoc.querySelector("#caniuse-stylesheet");
+    expect(style).toBeNull();
+    expect(exportedDoc.querySelector(".caniuse-browser")).toBeFalsy();
   });
 });

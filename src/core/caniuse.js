@@ -4,9 +4,9 @@
  * Adds a caniuse support table for a "feature" #1238
  * Usage options: https://github.com/w3c/respec/wiki/caniuse
  */
+import { codedJoinAnd, docLink, showError, showWarning } from "./utils.js";
 import { pub, sub } from "./pubsubhub.js";
-import { createResourceHint } from "./utils.js";
-import { fetchAsset } from "./text-loader.js";
+import css from "../styles/caniuse.css.js";
 import { html } from "./import-maps.js";
 
 export const name = "core/caniuse";
@@ -31,27 +31,7 @@ const BROWSERS = new Set([
   "samsung",
 ]);
 
-if (
-  !document.querySelector("link[rel='preconnect'][href='https://respec.org']")
-) {
-  const link = createResourceHint({
-    hint: "preconnect",
-    href: "https://respec.org",
-  });
-  document.head.appendChild(link);
-}
-
-const caniuseCssPromise = loadStyle();
-
-async function loadStyle() {
-  try {
-    return (await import("text!../../assets/caniuse.css")).default;
-  } catch {
-    return fetchAsset("caniuse.css");
-  }
-}
-
-export async function run(conf) {
+export function prepare(conf) {
   if (!conf.caniuse) {
     return; // nothing to do.
   }
@@ -60,29 +40,43 @@ export async function run(conf) {
   if (!options.feature) {
     return; // no feature to show
   }
-  const featureURL = new URL(options.feature, "https://caniuse.com/").href;
 
-  const caniuseCss = await caniuseCssPromise;
-  document.head.appendChild(html`<style class="removeOnSave">
-    ${caniuseCss}
+  document.head.appendChild(html`<style
+    id="caniuse-stylesheet"
+    class="${options.removeOnSave ? "removeOnSave" : ""}"
+  >
+    ${css}
   </style>`);
+
+  const apiUrl = options.apiURL || API_URL;
+  // Initiate a fetch, but do not wait. Try to fill the cache early instead.
+  conf.state[name] = {
+    fetchPromise: fetchStats(apiUrl, options),
+  };
+}
+
+export async function run(conf) {
+  const options = conf.caniuse;
+  if (!options?.feature) return;
+
+  const featureURL = new URL(options.feature, "https://caniuse.com/").href;
 
   const headDlElem = document.querySelector(".head dl");
   const contentPromise = (async () => {
     try {
-      const apiUrl = options.apiURL || API_URL;
-      const stats = await fetchStats(apiUrl, options);
+      const stats = await conf.state[name].fetchPromise;
       return html`${{ html: stats }}`;
     } catch (err) {
+      const msg = `Couldn't find feature "${options.feature}" on caniuse.com.`;
+      const hint = docLink`Please check the feature key on [caniuse.com](https://caniuse.com) and update ${"[caniuse]"}`;
+      showError(msg, name, { hint });
       console.error(err);
-      const msg =
-        `Couldn't find feature "${options.feature}" on caniuse.com? ` +
-        "Please check the feature key on [caniuse.com](https://caniuse.com)";
-      pub("error", msg);
       return html`<a href="${featureURL}">caniuse.com</a>`;
     }
   })();
-  const definitionPair = html`<dt class="caniuse-title">Browser support:</dt>
+  const definitionPair = html`<dt class="caniuse-title">
+      Browser support (caniuse.com):
+    </dt>
     <dd class="caniuse-stats">
       ${{
         any: contentPromise,
@@ -91,13 +85,17 @@ export async function run(conf) {
     </dd>`;
   headDlElem.append(...definitionPair.childNodes);
   await contentPromise;
-
-  // remove from export
   pub("amend-user-config", { caniuse: options.feature });
-  sub("beforesave", outputDoc => {
-    html.bind(outputDoc.querySelector(".caniuse-stats"))`
-      <a href="${featureURL}">caniuse.com</a>`;
-  });
+  if (options.removeOnSave) {
+    // Will remove the browser support cells.
+    headDlElem
+      .querySelectorAll(".caniuse-browser")
+      .forEach(elem => elem.classList.add("removeOnSave"));
+    sub("beforesave", outputDoc => {
+      html.bind(outputDoc.querySelector(".caniuse-stats"))`
+        <a href="${featureURL}">caniuse.com</a>`;
+    });
+  }
 }
 
 /**
@@ -105,7 +103,7 @@ export async function run(conf) {
  * @param {Object} conf   configuration settings
  */
 function getNormalizedConf(conf) {
-  const DEFAULTS = { versions: 4 };
+  const DEFAULTS = { versions: 4, removeOnSave: false };
   if (typeof conf.caniuse === "string") {
     return { feature: conf.caniuse, ...DEFAULTS };
   }
@@ -114,12 +112,9 @@ function getNormalizedConf(conf) {
   if (Array.isArray(browsers)) {
     const invalidBrowsers = browsers.filter(browser => !BROWSERS.has(browser));
     if (invalidBrowsers.length) {
-      const names = invalidBrowsers.map(b => `"\`${b}\`"`).join(", ");
-      pub(
-        "warn",
-        `Ignoring invalid browser(s): ${names} in ` +
-          "[`respecConfig.caniuse.browsers`](https://github.com/w3c/respec/wiki/caniuse)"
-      );
+      const names = codedJoinAnd(invalidBrowsers, { quotes: true });
+      const msg = docLink`Invalid browser(s): (${names}) in the \`browser\` property of ${"[caniuse]"}.`;
+      showWarning(msg, name);
     }
   }
   return caniuseConf;

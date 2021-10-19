@@ -1,4 +1,0 @@
-builds/*
-js/*
-!js/profile-w3c-common.js
-!js/profile-ims-default.js

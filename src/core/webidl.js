@@ -6,17 +6,20 @@
 //  - don't use generated content in the CSS!
 import {
   addHashId,
-  showInlineError,
-  showInlineWarning,
+  docLink,
+  showError,
+  showWarning,
+  wrapInner,
   xmlEscape,
 } from "./utils.js";
 import { decorateDfn, findDfn } from "./dfn-finder.js";
 import { html, webidl2 } from "./import-maps.js";
 import { addCopyIDLButton } from "./webidl-clipboard.js";
-import { fetchAsset } from "./text-loader.js";
+import css from "../styles/webidl.css.js";
 import { registerDefinition } from "./dfn-map.js";
 
 export const name = "core/webidl";
+const pluginName = name;
 
 const operationNames = {};
 const idlPartials = {};
@@ -38,9 +41,9 @@ const templates = {
     // Shepherd classifies "interfaces" as starting with capital letters,
     // like Promise, FrozenArray, etc.
     return /^[A-Z]/.test(keyword)
-      ? html`<a data-xref-type="interface" data-cite="WebIDL">${keyword}</a>`
+      ? html`<a data-xref-type="interface" data-cite="WEBIDL">${keyword}</a>`
       : // Other keywords like sequence, maplike, etc...
-        html`<a data-xref-type="dfn" data-cite="WebIDL">${keyword}</a>`;
+        html`<a data-xref-type="dfn" data-cite="WEBIDL">${keyword}</a>`;
   },
   reference(wrapped, unescaped, context) {
     if (context.type === "extended-attribute" && context.name !== "Exposed") {
@@ -88,6 +91,7 @@ const templates = {
   },
   nameless(escaped, { data, parent }) {
     switch (data.type) {
+      case "operation":
       case "constructor":
         return defineIdlName(escaped, data, parent);
       default:
@@ -138,7 +142,7 @@ function defineIdlName(escaped, data, parent) {
   const linkType = getDfnType(data.type);
   if (dfn) {
     if (!data.partial) {
-      dfn.dataset.export = "";
+      if (!dfn.matches("[data-noexport]")) dfn.dataset.export = "";
       dfn.dataset.dfnType = linkType;
     }
     decorateDfn(dfn, data, parentName, name);
@@ -183,8 +187,9 @@ function defineIdlName(escaped, data, parent) {
   if (showWarnings) {
     const styledName = data.type === "operation" ? `${name}()` : name;
     const ofParent = parentName ? ` \`${parentName}\`'s` : "";
-    const msg = `Missing \`<dfn>\` for${ofParent} \`${styledName}\` ${data.type}. [More info](https://github.com/w3c/respec/wiki/WebIDL-thing-is-not-defined).`;
-    showInlineWarning(unlinkedAnchor, msg, "");
+    const msg = `Missing \`<dfn>\` for${ofParent} \`${styledName}\` ${data.type}.`;
+    const hint = docLink`See ${"using `data-dfn-for`|#data-dfn-for"} in ReSpec's documentation.`;
+    showWarning(msg, pluginName, { elements: [unlinkedAnchor], hint });
   }
   return unlinkedAnchor;
 }
@@ -235,7 +240,9 @@ function getNameAndId(defn, parent = "") {
 
 function resolveNameAndId(defn, parent) {
   let name = getDefnName(defn);
-  let idlId = getIdlId(name, parent);
+  // For getters, setters, etc. "anonymous-getter",
+  const prefix = defn.special && defn.name === "" ? "anonymous-" : "";
+  let idlId = getIdlId(prefix + name, parent);
   switch (defn.type) {
     // Top-level entities with linkable members.
     case "callback interface":
@@ -302,11 +309,22 @@ function getDefnName(defn) {
     case "enum-value":
       return defn.value;
     case "operation":
-      return defn.name;
+      return defn.name || defn.special;
     default:
       return defn.name || defn.type;
   }
 }
+
+// IDL types that never need a data-dfn-for
+const topLevelIdlTypes = [
+  "interface",
+  "interface mixin",
+  "dictionary",
+  "namespace",
+  "enum",
+  "typedef",
+  "callback",
+];
 
 /**
  * @param {Element} idlElement
@@ -319,12 +337,12 @@ function renderWebIDL(idlElement, index) {
       sourceName: String(index),
     });
   } catch (e) {
-    showInlineError(
-      idlElement,
-      `Failed to parse WebIDL: ${e.bareMessage}.`,
-      e.bareMessage,
-      { details: `<pre>${e.context}</pre>` }
-    );
+    const msg = `Failed to parse WebIDL: ${e.bareMessage}.`;
+    showError(msg, pluginName, {
+      title: e.bareMessage,
+      details: `<pre>${e.context}</pre>`,
+      elements: [idlElement],
+    });
     // Skip this <pre> and move on to the next one.
     return [];
   }
@@ -332,14 +350,17 @@ function renderWebIDL(idlElement, index) {
   idlElement.classList.add("def", "idl");
   const highlights = webidl2.write(parse, { templates });
   html.bind(idlElement)`${highlights}`;
+  wrapInner(idlElement, document.createElement("code"));
   idlElement.querySelectorAll("[data-idl]").forEach(elem => {
     if (elem.dataset.dfnFor) {
       return;
     }
     const title = elem.dataset.title;
     // Select the nearest ancestor element that can contain members.
+    const idlType = elem.dataset.dfnType;
+
     const parent = elem.parentElement.closest("[data-idl][data-title]");
-    if (parent) {
+    if (parent && !topLevelIdlTypes.includes(idlType)) {
       elem.dataset.dfnFor = parent.dataset.title;
     }
     if (elem.localName === "dfn") {
@@ -349,11 +370,11 @@ function renderWebIDL(idlElement, index) {
   // cross reference
   const closestCite = idlElement.closest("[data-cite], body");
   const { dataset } = closestCite;
-  if (!dataset.cite) dataset.cite = "WebIDL";
+  if (!dataset.cite) dataset.cite = "WEBIDL";
   // includes webidl in some form
   if (!/\bwebidl\b/i.test(dataset.cite)) {
     const cites = dataset.cite.trim().split(/\s+/);
-    dataset.cite = ["WebIDL", ...cites].join(" ");
+    dataset.cite = ["WEBIDL", ...cites].join(" ");
   }
   addIDLHeader(idlElement);
   return parse;
@@ -371,35 +392,20 @@ export function addIDLHeader(pre) {
   addCopyIDLButton(header);
 }
 
-const cssPromise = loadStyle();
-
-async function loadStyle() {
-  try {
-    return (await import("text!../../assets/webidl.css")).default;
-  } catch {
-    return fetchAsset("webidl.css");
-  }
-}
-
 export async function run() {
   const idls = document.querySelectorAll("pre.idl, pre.webidl");
   if (!idls.length) {
     return;
   }
-  if (!document.querySelector(".idl:not(pre), .webidl:not(pre)")) {
-    const link = document.querySelector("head link");
-    if (link) {
-      const style = document.createElement("style");
-      style.textContent = await cssPromise;
-      link.before(style);
-    }
-  }
+  const style = document.createElement("style");
+  style.textContent = css;
+  document.querySelector("head link, head > *:last-child").before(style);
 
   const astArray = [...idls].map(renderWebIDL);
 
   const validations = webidl2.validate(astArray);
   for (const validation of validations) {
-    let details = `<pre>${validation.context}</pre>`;
+    let details = `<pre>${xmlEscape(validation.context)}</pre>`;
     if (validation.autofix) {
       validation.autofix();
       const idlToFix = webidl2.write(astArray[validation.sourceName]);
@@ -407,12 +413,12 @@ export async function run() {
       details += `Try fixing as:
       <pre>${escaped}</pre>`;
     }
-    showInlineError(
-      idls[validation.sourceName],
-      `WebIDL validation error: ${validation.bareMessage}`,
-      validation.bareMessage,
-      { details }
-    );
+    const msg = `WebIDL validation error: ${validation.bareMessage}`;
+    showError(msg, pluginName, {
+      details,
+      elements: [idls[validation.sourceName]],
+      title: validation.bareMessage,
+    });
   }
   document.normalize();
 }

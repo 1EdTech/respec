@@ -4,7 +4,7 @@
  * check config and inform user if required ones are missing
  */
 
-import { pub } from "../core/pubsubhub.js";
+import { showError, toShortIsoDate } from "../core/utils.js";
 
 export const name = "ims/config";
 
@@ -22,34 +22,46 @@ function check(value) {
  */
 export async function run(conf) {
   if (!check(conf.specTitle)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specTitle</code> property set: " +
-        "title of the document, excluding version"
+        "title of the document, excluding version",
+      name
     );
     conf.specTitle = "@@@FIXME (conf.specTitle)";
   }
 
-  if (!check(conf.specDate)) {
-    pub(
-      "error",
-      "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'"
+  if (!check(conf.docVersion)) {
+    showError(
+      "head config must have the <code>docVersion</code> property set, e.g. 'June 28, 2019'",
+      name
     );
-    conf.specDate = "@@@FIXME(conf.specDate)";
+    conf.docVersion = "@@@FIXME (conf.docVersion)";
+  }
+
+  if (!check(conf.specDate)) {
+    if (conf.specStatus === "IMS Base Document") {
+      conf.specDate = toShortIsoDate(new Date());
+    } else {
+      showError(
+        "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'",
+        name
+      );
+      conf.specDate = "@@@FIXME(conf.specDate)";
+    }
   }
 
   if (!check(conf.specNature)) {
-    pub(
-      "error",
-      "head config must have the <code>specNature</code> property set: one of 'normative' or 'informative'"
+    showError(
+      "head config must have the <code>specNature</code> property set: one of 'normative' or 'informative'",
+      name
     );
     conf.specNature = "informative";
   }
 
   if (!check(conf.specType)) {
-    pub(
-      "error",
-      "head config must have the <code>specType</code> property set: One of 'spec', 'cert', 'impl', 'errata', 'doc' "
+    showError(
+      "head config must have the <code>specType</code> property set: One of 'spec', 'cert', 'impl', 'errata', 'doc' ",
+      name
     );
     conf.specType = "spec";
   }
@@ -59,20 +71,20 @@ export async function run(conf) {
   }
 
   if (!check(conf.shortName)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>shortName</code> property set: " +
-        "list at urls-names.md#shortnames"
+        "list at urls-names.md#shortnames",
+      name
     );
     conf.shortName = "FIXME";
   }
 
   if (!check(conf.specStatus)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specStatus</code> property set to " +
         "one of 'IMS Base Document', 'IMS Candidate Final', IMS Candidate Final Public', " +
-        "or 'IMS Final Release'"
+        "or 'IMS Final Release'",
+      name
     );
     conf.specStatus = "@@@FIXME(conf.specStatus)";
   }
@@ -85,18 +97,18 @@ export async function run(conf) {
     "Proposal",
   ];
   if (statusValues.indexOf(conf.specStatus) == -1) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specStatus</code> property set to " +
         "one of 'IMS Base Document', 'IMS Candidate Final', 'IMS Candidate Final Public', " +
-        "or 'IMS Final Release'"
+        "'IMS Final Release', or 'Proposal'",
+      name
     );
   }
 
   if (!check(conf.specVersion)) {
-    pub(
-      "error",
-      "head config must have the <code>specVersion</code> property set, e.g. '1.1'"
+    showError(
+      "head config must have the <code>specVersion</code> property set, e.g. '1.1'",
+      name
     );
     conf.specVersion = "@@@FIXME(conf.specVersion)";
   }
