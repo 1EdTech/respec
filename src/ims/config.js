@@ -4,8 +4,7 @@
  * check config and inform user if required ones are missing
  */
 
-import { pub } from "../core/pubsubhub.js";
-import { toShortIsoDate } from "../core/utils.js";
+import { showError, toShortIsoDate } from "../core/utils.js";
 
 export const name = "ims/config";
 
@@ -23,38 +22,46 @@ function check(value) {
  */
 export async function run(conf) {
   if (!check(conf.specTitle)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specTitle</code> property set: " +
-        "title of the document, excluding version"
+        "title of the document, excluding version",
+      name
     );
     conf.specTitle = "@@@FIXME (conf.specTitle)";
+  }
+
+  if (!check(conf.docVersion)) {
+    showError(
+      "head config must have the <code>docVersion</code> property set, e.g. 'June 28, 2019'",
+      name
+    );
+    conf.docVersion = "@@@FIXME (conf.docVersion)";
   }
 
   if (!check(conf.specDate)) {
     if (conf.specStatus === "IMS Base Document") {
       conf.specDate = toShortIsoDate(new Date());
     } else {
-      pub(
-        "error",
-        "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'"
+      showError(
+        "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'",
+        name
       );
       conf.specDate = "@@@FIXME(conf.specDate)";
     }
   }
 
   if (!check(conf.specNature)) {
-    pub(
-      "error",
-      "head config must have the <code>specNature</code> property set: one of 'normative' or 'informative'"
+    showError(
+      "head config must have the <code>specNature</code> property set: one of 'normative' or 'informative'",
+      name
     );
     conf.specNature = "informative";
   }
 
   if (!check(conf.specType)) {
-    pub(
-      "error",
-      "head config must have the <code>specType</code> property set: One of 'spec', 'cert', 'impl', 'errata', 'doc' "
+    showError(
+      "head config must have the <code>specType</code> property set: One of 'spec', 'cert', 'impl', 'errata', 'doc' ",
+      name
     );
     conf.specType = "spec";
   }

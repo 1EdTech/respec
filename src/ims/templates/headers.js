@@ -65,9 +65,6 @@ function renderSpecVersion(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<div class="subtitle">
         ${conf.specStatus}<br />Spec Version ${conf.specVersion}
-      </div>
-      <div class="subtitle">
-        Doc Version ${conf.docVersion ?? "(MISSING)"}
       </div>`;
   }
 }
@@ -90,6 +87,10 @@ function renderVersionTable(conf) {
   summary="Details about the version and release.">
     <tbody>
       <tr>
+        <td>Document Version:</td>
+        <td>${conf.docVersion}</td>
+      </tr>
+      <tr>
         <td>Date Issued:</td>
         <td>${conf.specDate}</td>
       </tr>
@@ -101,9 +102,8 @@ function renderVersionTable(conf) {
         <td>This version:</td>
         <td><a href='${conf.thisURL}'>${conf.thisURL}</a></td>
       </tr>
-      ${
-        conf.specNature === "normative"
-          ? html`<tr>
+      ${conf.specNature === "normative"
+        ? html`<tr>
                 <td>Latest version:</td>
                 <td><a href="${conf.latestURI}">${conf.latestURI}</a></td>
               </tr>
@@ -111,7 +111,7 @@ function renderVersionTable(conf) {
                 <td>Errata:</td>
                 <td><a href="${conf.errataURL}">${conf.errataURL}</a></td>
               </tr>`
-          : null
+        : null
       }
       ${conf.otherLinks ? conf.otherLinks.map(showLink) : ""}
     </tbody>
