@@ -82,6 +82,7 @@
     "start-ims": "node ./tools/dev-server.js --profile ims-default",
     "test:build": "jasmine --random=false ./tests/test-build.js",
     "test:headless": "jasmine --random=false ./tests/headless.js",
+    "test:ims-headless": "jasmine --random=false ./tests/spec/ims/headless.js",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "karma start ./tests/unit/karma.conf.js --single-run",
     "test:integration": "karma start ./tests/spec/karma.conf.js --single-run"
