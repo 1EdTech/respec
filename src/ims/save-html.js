@@ -1,9 +1,8 @@
 // @ts-check
 // Module ims/save-html
 // Saves content to HTML when asked to
-import { getIntlData } from "../core/utils.js";
+import { concatDate, getIntlData, showWarning } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import { pub } from "../core/pubsubhub.js";
 import { rsDocToDataURL } from "../ims/exporter.js";
 import { ui } from "../ims/ui.js";
 
@@ -31,7 +30,7 @@ const l10n = getIntlData(localizationStrings);
 const downloadLinks = [
   {
     id: "respec-save-as-html",
-    fileName: "index.html",
+    ext: "html",
     title: "HTML",
     type: "text/html",
     get href() {
@@ -40,7 +39,7 @@ const downloadLinks = [
   },
   {
     id: "respec-save-as-xml",
-    fileName: "index.xhtml",
+    ext: "xhtml",
     title: "XML",
     type: "application/xml",
     get href() {
@@ -49,7 +48,7 @@ const downloadLinks = [
   },
   {
     id: "respec-save-as-epub",
-    fileName: "spec.epub",
+    ext: "epub",
     title: "EPUB 3",
     type: "application/epub+zip",
     get href() {
@@ -64,7 +63,7 @@ const downloadLinks = [
   },
   {
     id: "respec-save-as-cms-extract",
-    fileName: "body.html",
+    ext: "txt",
     title: "CMS EXTRACT",
     type: "application/cms",
     get href() {
@@ -73,12 +72,17 @@ const downloadLinks = [
   },
 ];
 
-function toDownloadLink(details) {
-  const { id, href, fileName, title, type } = details;
+/**
+ * @param {typeof downloadLinks[0]} details
+ */
+function toDownloadLink(details, conf) {
+  const { id, href, ext, title, type } = details;
+  const date = concatDate(conf.publishDate || new Date());
+  const filename = [conf.specStatus, conf.shortName || "spec", date].join("-");
   return html`<a
     href="${href}"
     id="${id}"
-    download="${fileName}"
+    download="${filename}.${ext}"
     type="${type}"
     class="respec-save-button"
     onclick=${() => ui.closeModal()}
@@ -86,25 +90,27 @@ function toDownloadLink(details) {
   >`;
 }
 
-const saveDialog = {
-  async show(button) {
-    await document.respecIsReady;
-    const div = html`<div class="respec-save-buttons">
-      ${downloadLinks.map(toDownloadLink)}
-    </div>`;
-    ui.freshModal(l10n.save_snapshot, div, button);
-  },
-};
+export function run(conf) {
+  const saveDialog = {
+    async show(button) {
+      await document.respec.ready;
+      const div = html`<div class="respec-save-buttons">
+        ${downloadLinks.map(details => toDownloadLink(details, conf))}
+      </div>`;
+      ui.freshModal(l10n.save_snapshot, div, button);
+    },
+  };
 
-const supportsDownload = "download" in HTMLAnchorElement.prototype;
-let button;
-if (supportsDownload) {
-  button = ui.addCommand(l10n.save_snapshot, show, "Ctrl+Shift+Alt+S", "💾");
-}
+  const supportsDownload = "download" in HTMLAnchorElement.prototype;
+  let button;
+  if (supportsDownload) {
+    button = ui.addCommand(l10n.save_snapshot, show, "Ctrl+Shift+Alt+S", "💾");
+  }
 
-function show() {
-  if (!supportsDownload) return;
-  saveDialog.show(button);
+  function show() {
+    if (!supportsDownload) return;
+    saveDialog.show(button);
+  }
 }
 
 /**
@@ -113,9 +119,8 @@ function show() {
  */
 export function exportDocument(_, mimeType) {
   const msg =
-    "Exporting via ui/save-html module's `exportDocument()` is deprecated and will be removed. " +
-    "Use core/exporter `rsDocToDataURL()` instead.";
-  pub("warn", msg);
-  console.warn(msg);
+    "Exporting via ui/save-html module's `exportDocument()` is deprecated and will be removed.";
+  const hint = "Use core/exporter `rsDocToDataURL()` instead.";
+  showWarning(msg, name, { hint });
   return rsDocToDataURL(mimeType);
 }
