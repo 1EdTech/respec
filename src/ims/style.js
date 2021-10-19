@@ -1,5 +1,7 @@
 // @ts-check
 /**
+ * Module ims/style
+ *
  * Inserts IMS stylesheet and replaces w3c/style.
  *
  * The CSS documents are pulled from known locations so the spec documents

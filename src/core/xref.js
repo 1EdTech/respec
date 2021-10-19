@@ -19,13 +19,16 @@
 import { cacheXrefData, resolveXrefCache } from "./xref-db.js";
 import {
   createResourceHint,
+  docLink,
+  joinAnd,
+  joinOr,
   nonNormativeSelector,
   norm as normalize,
-  showInlineError,
-  showInlineWarning,
+  showError,
+  showWarning,
 } from "./utils.js";
-import { pub, sub } from "./pubsubhub.js";
 import { possibleExternalLinks } from "./link-to-dfn.js";
+import { sub } from "./pubsubhub.js";
 
 export const name = "core/xref";
 
@@ -68,8 +71,8 @@ export async function run(conf) {
   const queryKeys = [];
   for (const elem of elems) {
     const entry = getRequestEntry(elem);
-    const id = await objectHash(entry);
-    queryKeys.push({ ...entry, id });
+    entry.id = await objectHash(entry);
+    queryKeys.push(entry);
   }
 
   const data = await getData(queryKeys, xref.url);
@@ -85,8 +88,7 @@ export async function run(conf) {
 function findExplicitExternalLinks() {
   /** @type {NodeListOf<HTMLElement>} */
   const links = document.querySelectorAll(
-    "a[data-cite]:not([data-cite='']):not([data-cite*='#']), " +
-      "dfn[data-cite]:not([data-cite='']):not([data-cite*='#'])"
+    ":is(a,dfn)[data-cite]:not([data-cite=''],[data-cite*='#'])"
   );
   /** @type {NodeListOf<HTMLElement>} */
   const externalDFNs = document.querySelectorAll("dfn.externalDFN");
@@ -132,29 +134,26 @@ function normalizeConfig(xref) {
       if (xref.profile) {
         const profile = xref.profile.toLowerCase();
         if (profile in profiles) {
-          const specs = (xref.specs || []).concat(profiles[profile]);
+          const specs = (xref.specs ?? []).concat(profiles[profile]);
           Object.assign(config, { specs });
         } else {
           invalidProfileError(xref.profile);
         }
       }
       break;
-    default:
-      pub(
-        "error",
-        `Invalid value for \`xref\` configuration option. Received: "${xref}".`
-      );
+    default: {
+      const msg = `Invalid value for \`xref\` configuration option. Received: "${xref}".`;
+      showError(msg, name);
+    }
   }
   return config;
 
   function invalidProfileError(profile) {
-    const supportedProfiles = Object.keys(profiles)
-      .map(p => `"${p}"`)
-      .join(", ");
+    const supportedProfiles = joinOr(Object.keys(profiles), s => `"${s}"`);
     const msg =
       `Invalid profile "${profile}" in \`respecConfig.xref\`. ` +
       `Please use one of the supported profiles: ${supportedProfiles}.`;
-    pub("error", msg);
+    showError(msg, name);
   }
 }
 
@@ -173,6 +172,10 @@ function getRequestEntry(elem) {
   const forContext = getForContext(elem, isIDL);
 
   return {
+    // Add an empty `id` to ensure the shape of object returned stays same when
+    // actual `id` is added later (minor perf optimization, also makes
+    // TypeScript happy).
+    id: "",
     term,
     types,
     ...(specs.length && { specs }),
@@ -301,7 +304,7 @@ async function getData(queryKeys, apiUrl) {
   const fetchedResults = await fetchFromNetwork(termsToLook, apiUrl);
   if (fetchedResults.size) {
     // add data to cache
-    await cacheXrefData(fetchedResults);
+    await cacheXrefData(uniqueQueryKeys, fetchedResults);
   }
 
   return new Map([...resultsFromCache, ...fetchedResults]);
@@ -392,11 +395,17 @@ function addDataCite(elem, query, result, conf) {
   const { uri, shortname, spec, normative, type, for: forContext } = result;
   // if authored spec context had `result.spec`, use it instead of shortname
   const cite = specs.flat().includes(spec) ? spec : shortname;
-  const url = new URL(uri, "https://example.org");
+  // we use this "partial" URL to resolve parts of urls...
+  // but sometimes we get lucky and we get an absolute URL from xref
+  // which we can then use in other places (e.g., data-cite.js)
+  const url = new URL(uri, "https://partial");
   const { pathname: citePath } = url;
   const citeFrag = url.hash.slice(1);
   const dataset = { cite, citePath, citeFrag, type };
   if (forContext) dataset.linkFor = forContext[0];
+  if (url.origin && url.origin !== "https://partial") {
+    dataset.citeHref = url.href;
+  }
   Object.assign(elem.dataset, dataset);
 
   addToReferences(elem, cite, normative, term, conf);
@@ -430,11 +439,9 @@ function addToReferences(elem, cite, normative, term, conf) {
     return;
   }
 
-  const msg =
-    `Adding an informative reference to "${term}" from "${cite}" ` +
-    "in a normative section";
-  const title = "Error: Informative reference in normative section";
-  showInlineWarning(elem, msg, title);
+  const msg = `Normative reference to "${term}" found but term is defined "informatively" in "${cite}".`;
+  const title = "Normative reference to non-normative term.";
+  showWarning(msg, name, { title, elements: [elem] });
 }
 
 /** @param {Errors} errors */
@@ -445,31 +452,38 @@ function showErrors({ ambiguous, notFound }) {
     if (query.for) url.searchParams.set("for", query.for);
     url.searchParams.set("types", query.types.join(","));
     if (specs.length) url.searchParams.set("specs", specs.join(","));
-    return url;
+    return url.href;
   };
 
-  const howToFix = howToCiteURL =>
-    "[Learn more about this error](https://respec.org/docs/#error-term-not-found)" +
-    ` or see [how to cite to resolve the error](${howToCiteURL})`;
+  const howToFix = (howToCiteURL, originalTerm) => {
+    return docLink`
+    [See search matches for "${originalTerm}"](${howToCiteURL}) or
+    ${"[Learn about this error|#error-term-not-found]"}.`;
+  };
 
   for (const { query, elems } of notFound.values()) {
     const specs = query.specs ? [...new Set(query.specs.flat())].sort() : [];
     const originalTerm = getTermFromElement(elems[0]);
     const formUrl = getPrefilledFormURL(originalTerm, query);
-    const specsString = specs.map(spec => `\`${spec}\``).join(", ");
-    const hint = howToFix(formUrl);
-    const msg = `Couldn't match "**${originalTerm}**" to anything in the document or in any other document cited in this specification: ${specsString}. ${hint}`;
-    showInlineError(elems, msg, "Error: No matching dfn found.");
+    const specsString = joinAnd(specs, s => `**[${s}]**`);
+    const hint = howToFix(formUrl, originalTerm);
+    const forParent = query.for ? `, for **"${query.for}"**, ` : "";
+    const msg = `Couldn't find "**${originalTerm}**"${forParent} in this document or other cited documents: ${specsString}.`;
+    const title = "No matching definition found.";
+    showError(msg, name, { title, elements: elems, hint });
   }
 
   for (const { query, elems, results } of ambiguous.values()) {
     const specs = [...new Set(results.map(entry => entry.shortname))].sort();
-    const specsString = specs.map(s => `**${s}**`).join(", ");
+    const specsString = joinAnd(specs, s => `**[${s}]**`);
     const originalTerm = getTermFromElement(elems[0]);
     const formUrl = getPrefilledFormURL(originalTerm, query, specs);
-    const hint = howToFix(formUrl);
-    const msg = `The term "**${originalTerm}**" is defined in ${specsString} in multiple ways, so it's ambiguous. ${hint}`;
-    showInlineError(elems, msg, "Error: Linking an ambiguous dfn.");
+    const forParent = query.for ? `, for **"${query.for}"**, ` : "";
+    const moreInfo = howToFix(formUrl, originalTerm);
+    const hint = docLink`To fix, use the ${"[data-cite]"} attribute to pick the one you mean from the appropriate specification. ${moreInfo}.`;
+    const msg = `The term "**${originalTerm}**"${forParent} is ambiguous because it's defined in ${specsString}.`;
+    const title = "Definition is ambiguous.";
+    showError(msg, name, { title, elements: elems, hint });
   }
 }
 

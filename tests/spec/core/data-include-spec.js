@@ -43,7 +43,7 @@ describe("Core — Data Include", () => {
     };
     const doc = await makeRSDoc(ops, url);
     const missing = doc.getElementById("this-should-be-missing");
-    expect(missing).toBe(null);
+    expect(missing).toBeNull();
     const included = doc.getElementById("replacement-test");
     expect(included).toBeTruthy();
     const heading = doc.querySelector("#replacement-test > h3");
@@ -120,11 +120,11 @@ describe("Core — Data Include", () => {
 
 1. Rose
 
-  Blue rose is blue
+   Blue rose is blue
 
-  Red rose is red
+   Red rose is red
 
-  Rose of the wasteland is violet
+   Rose of the wasteland is violet
     `);
     it("processes multiline markdown text", async () => {
       const ops = {
