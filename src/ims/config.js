@@ -71,20 +71,20 @@ export async function run(conf) {
   }
 
   if (!check(conf.shortName)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>shortName</code> property set: " +
-        "list at urls-names.md#shortnames"
+        "list at urls-names.md#shortnames",
+      name
     );
     conf.shortName = "FIXME";
   }
 
   if (!check(conf.specStatus)) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specStatus</code> property set to " +
         "one of 'IMS Base Document', 'IMS Candidate Final', IMS Candidate Final Public', " +
-        "or 'IMS Final Release'"
+        "or 'IMS Final Release'",
+      name
     );
     conf.specStatus = "@@@FIXME(conf.specStatus)";
   }
@@ -97,18 +97,18 @@ export async function run(conf) {
     "Proposal",
   ];
   if (statusValues.indexOf(conf.specStatus) == -1) {
-    pub(
-      "error",
+    showError(
       "head config must have the <code>specStatus</code> property set to " +
         "one of 'IMS Base Document', 'IMS Candidate Final', 'IMS Candidate Final Public', " +
-        "or 'IMS Final Release'"
+        "or 'IMS Final Release'",
+      name
     );
   }
 
   if (!check(conf.specVersion)) {
-    pub(
-      "error",
-      "head config must have the <code>specVersion</code> property set, e.g. '1.1'"
+    showError(
+      "head config must have the <code>specVersion</code> property set, e.g. '1.1'",
+      name
     );
     conf.specVersion = "@@@FIXME(conf.specVersion)";
   }
