@@ -28,7 +28,7 @@ const mimeTypes = new Map([
  * @param {Document} doc document to export. useful for testing purposes
  * @returns a stringified data-uri of document that can be saved.
  */
-export function rsDocToDataURL(mimeType, doc = document) {
+export function rsDocToCmsDataURL(mimeType, doc = document) {
   const format = mimeTypes.get(mimeType);
   if (!format) {
     const validTypes = [...mimeTypes.values()].join(", ");
@@ -129,4 +129,4 @@ function createCmsExtract(docBody) {
   });
 }
 
-expose("ims/exporter", { rsDocToDataURL });
+expose("ims/exporter", { rsDocToCmsDataURL });
