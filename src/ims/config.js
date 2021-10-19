@@ -100,7 +100,7 @@ export async function run(conf) {
     showError(
       "head config must have the <code>specStatus</code> property set to " +
         "one of 'IMS Base Document', 'IMS Candidate Final', 'IMS Candidate Final Public', " +
-        "or 'IMS Final Release'",
+        "'IMS Final Release', or 'Proposal'",
       name
     );
   }

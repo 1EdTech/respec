@@ -17,15 +17,12 @@ const modules = [
   // import("../src/core/github.js"),
   import("../src/core/data-include.js"),
   import("../src/core/markdown.js"),
-  import("../src/core/reindent.js"),
-  import("../src/core/title.js"),
-  import("../src/ims/headers.js"),
-  // Make sure markdown abstract has an id
-  import("../src/core/id-headers.js"),
-  // Check for abstract
-  import("../src/ims/abstract.js"),
-  // Add introductory class to abstract
   import("../src/ims/post-markdown.js"),
+  import("../src/core/reindent.js"),
+  // import("../src/core/title.js"),
+  import("../src/ims/headers.js"),
+  import("../src/core/id-headers.js"),
+  import("../src/ims/abstract.js"),
   import("../src/core/data-transform.js"),
   import("../src/core/data-abbr.js"),
   // Make sure markdown conformance section has an id

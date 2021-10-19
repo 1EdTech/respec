@@ -14,19 +14,4 @@ export async function run(conf) {
   for (let i = 0; i < mdOnlies.length; i++) {
     mdOnlies[i].parentNode.removeChild(mdOnlies[i]);
   }
-
-  // find abstract and add introductory class
-  let abstract = document.body.querySelector("#abstract");
-  if (abstract) {
-    if (abstract.tagName.startsWith("H")) {
-      abstract.removeAttribute("id");
-      abstract = abstract.parentElement;
-      abstract.id = "abstract";
-    }
-    if (abstract.tagName === "SECTION") {
-      if (!abstract.classList.contains("introductory")) {
-        abstract.classList.add("introductory");
-      }
-    }
-  }
 }
