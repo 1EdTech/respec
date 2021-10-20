@@ -79,8 +79,10 @@
     "release": "node ./tools/release.js",
     "server": "serve",
     "start": "node ./tools/dev-server.js",
+    "start-ims": "node ./tools/dev-server.js --profile ims-default",
     "test:build": "jasmine --random=false ./tests/test-build.js",
     "test:headless": "jasmine --random=false ./tests/headless.js",
+    "test:ims-headless": "jasmine --random=false ./tests/spec/ims/headless.js",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "karma start ./tests/unit/karma.conf.js --single-run",
     "test:integration": "karma start ./tests/spec/karma.conf.js --single-run"
@@ -96,7 +98,9 @@
   "files": [
     "builds/",
     "tools/respec2html.js",
-    "tools/respecDocWriter.js"
+    "tools/respecDocWriter.js",
+    "tools/respec2cms.js",
+    "tools/respecCmsWriter.js"
   ],
   "prettier": {
     "trailingComma": "es5",
