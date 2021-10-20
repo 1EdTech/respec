@@ -2,13 +2,14 @@
 
 import { flushIframes, makePluginDoc } from "../SpecHelper.js";
 
-describe("IMS - Markdown", () => {
+describe("IMS - post-markdown.js", () => {
   afterAll(flushIframes);
 
   const plugins = ["/src/ims/post-markdown.js"];
   const config = { format: "markdown" };
 
   it("Removes <md-only> blocks when format='markdown'", async () => {
+    // This is what the body looks like after w3c/markdown has run
     const body = `
     <md-only>
       <p>
@@ -16,13 +17,14 @@ describe("IMS - Markdown", () => {
       </p>
     </md-only>
     
-    ## Section Title {#custom-id}
-    
-    <md-only>
-      <p>
-        This should be removed
-      </p>
-    </md-only>
+    <section>
+      <h2 id="custom-id">Section Title</h2>
+      <md-only>
+        <p>
+          This should be removed
+        </p>
+      </md-only>
+    </section>
     `;
 
     const makeDoc = () => makePluginDoc(plugins, { config, body });
@@ -36,20 +38,22 @@ describe("IMS - Markdown", () => {
     const body = `
     <section data-format="markdown">
 
-    <md-only>
-      <p>
-        This should be removed
-      </p>
-    </md-only>
-    
-    - A list itme
+      <md-only>
+        <p>
+          This should be removed
+        </p>
+      </md-only>
 
-    <md-only>
-      <p>
-        This should be removed
-      </p>
-    </md-only>
-    
+      <ul>
+        <li>Test</li>
+      </ul>
+      
+      <md-only>
+        <p>
+          This should be removed
+        </p>
+      </md-only>
+
     </section>
     `;
 
