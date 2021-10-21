@@ -7357,9 +7357,13 @@ aside.example .marker > a.self-link {
   async function run$O() {
     let abstract = document.getElementById("abstract");
     if (!abstract) {
-      const msg = `Document must have one element with \`id="abstract"`;
-      showError(msg, name$R);
-      return;
+      const msg = `Document should have one element with \`id="abstract"`;
+      showWarning(msg, name$R);
+      // insert a temp abstract
+      const tempAbstract = toHTMLNode(
+        "<section id='abstract' class='introductory remove'><h2>To be removed</h2></section>"
+      );
+      document.body.prepend(tempAbstract);
     }
 
     if (abstract.tagName.startsWith("H")) {
