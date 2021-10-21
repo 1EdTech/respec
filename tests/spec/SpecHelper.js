@@ -204,6 +204,39 @@ export function makeBasicConfig(profile = "w3c") {
         ],
         specStatus: "PD",
       };
+    case "ims":
+      return {
+        specTitle: "Replace me with a real title",
+        shortName: "example",
+        specStatus: "IMS Base Document",
+        specVersion: "1.0",
+        docVersion: "0.1",
+        specNature: "normative",
+        specType: "spec",
+        specDate: "today",
+        contributors: [
+          {
+            name: "First Last",
+            company: "Acme1 Co Inc (Sweden)",
+            companyURL: "https://www.example.com",
+            role: "Editor",
+          },
+          {
+            name: "Second Third",
+            company: "Acme2 Co Inc (UK)",
+            companyURL: "https://www.example.com",
+            role: "Editor",
+          },
+        ],
+        iprs: [
+          {
+            company: "Acme1 Co Inc",
+            electionDate: "October 24, 2019",
+            necessaryClaims: "No",
+            type: "RF RAND (Required & Optional Elements)",
+          },
+        ],
+      };
     default:
       throw new Error(`Unknown profile: ${profile}`);
   }
@@ -239,5 +272,14 @@ export function makeStandardAomOps(config = {}, body = makeDefaultBody()) {
     body,
     config: { ...makeBasicConfig("aom"), ...config },
     profile: "aom",
+  };
+}
+
+export function makeStandardImsOps(config = {}, body = makeDefaultBody()) {
+  body += "<section id='conformance'><h2>Conformance</h2></section>";
+  return {
+    body,
+    config: { ...makeBasicConfig("ims"), ...config },
+    profile: "ims-default",
   };
 }

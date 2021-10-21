@@ -71,8 +71,6 @@ const modules = [
   import("../src/ims/title-attrs.js"),
   // Insert IMS stylesheet
   import("../src/ims/scripts.js"),
-  // Not working...disable until fixed
-  // import("../src/ims/tooltips.js"),
   // Remove all comment nodes
   import("../src/ims/comments.js"),
   // Add the IMS footer
