@@ -1,7 +1,8 @@
 // @ts-check
 // Module ims/abstract
 // Handle the abstract section properly.
-import { showError } from "../core/utils.js";
+import { showWarning } from "../core/utils.js";
+import { toHTMLNode } from "./utils.js";
 export const name = "ims/abstract";
 
 /**
@@ -10,9 +11,13 @@ export const name = "ims/abstract";
 export async function run() {
   let abstract = document.getElementById("abstract");
   if (!abstract) {
-    const msg = `Document must have one element with \`id="abstract"`;
-    showError(msg, name);
-    return;
+    const msg = `Document should have one element with \`id="abstract"`;
+    showWarning(msg, name);
+    // insert a temp abstract
+    const tempAbstract = toHTMLNode(
+      "<section id='abstract' class='introductory remove'><h2>To be removed</h2></section>"
+    );
+    document.body.prepend(tempAbstract);
   }
 
   if (abstract.tagName.startsWith("H")) {
