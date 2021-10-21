@@ -206,6 +206,8 @@ export function makeBasicConfig(profile = "w3c") {
       };
     case "ims":
       return {
+        mainSpecTitle: "Main Spec",
+        mainSpecBiblioKey: "IMS",
         specTitle: "Replace me with a real title",
         shortName: "example",
         specStatus: "IMS Base Document",
@@ -214,6 +216,7 @@ export function makeBasicConfig(profile = "w3c") {
         specNature: "normative",
         specType: "spec",
         specDate: "today",
+        skipCertGuideConformanceRef: true,
         contributors: [
           {
             name: "First Last",
@@ -276,8 +279,10 @@ export function makeStandardAomOps(config = {}, body = makeDefaultBody()) {
 }
 
 export function makeStandardImsOps(config = {}, body = makeDefaultBody()) {
-  body += "<section id='conformance'><h2>Conformance</h2></section>";
+  const abstract = "<p>test abstract</p>";
+  body = `<section id="conformance"><h2>Conformance</h2></section>`;
   return {
+    abstract,
     body,
     config: { ...makeBasicConfig("ims"), ...config },
     profile: "ims-default",
