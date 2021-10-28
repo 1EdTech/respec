@@ -40,7 +40,7 @@ function renderProperty(property) {
 }
 
 function renderRequired(property) {
-  return property.cardinality.value.includes("ZERO") ? "Yes" : "No";
+  return property.cardinality.value.includes("ZERO") ? "No" : "Yes";
 }
 
 function renderType(property) {
