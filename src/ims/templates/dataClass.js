@@ -7,16 +7,17 @@ import { html } from "../../core/import-maps.js";
 export default classData => {
   console.log("dataClass classData", classData);
   if (classData && classData.properties) {
-    return html` <table>
-      <thead>
-        <tr>
-          <th>Property</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${classData.properties.map(renderProperty)}
-      </tbody>
-    </table>`;
+    return html`<p>${classData.documentation.description}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${classData.properties.map(renderProperty)}
+        </tbody>
+      </table>`;
   }
 };
 

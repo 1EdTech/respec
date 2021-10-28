@@ -21,21 +21,27 @@ export const name = "ims/cdm";
  */
 async function processClass(id) {
   const query = JSON.stringify({
-    query: `{
-        classByID(id: "${id}") {
+    query: `
+    {
+      classByID(id: "${id}") {
         id
         name
+        documentation {
+          description
+        }
         properties {
+          name
+          type {
             name
-            cardinality {
-            label
+          }
+          cardinality {
             value
-            }
-            documentation {
+          }
+          documentation {
             description
-            }
+          }
         }
-        }
+      }
     }`,
   });
 
@@ -86,7 +92,7 @@ async function processClass(id) {
         }
         const fullElem = dataClassTmpl(payload);
         if (fullElem) {
-          section.append(fullElem);
+          section.append(...fullElem.childNodes);
         }
       }
     });
