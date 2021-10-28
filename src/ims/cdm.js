@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 
 /**
  * Module ims/cdm
@@ -52,6 +52,7 @@ async function processDataClass(id) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      // eslint-disable-next-line no-undef
       "X-Api-Key": env.API_KEY,
     },
     body: query,
@@ -127,6 +128,7 @@ async function processDataModel(id) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      // eslint-disable-next-line no-undef
       "X-Api-Key": env.API_KEY,
     },
     body: query,
