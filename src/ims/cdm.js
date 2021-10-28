@@ -1,4 +1,5 @@
 // @ts-check
+
 /**
  * Module ims/cdm
  * Handles the optional Common Data Model processing.
@@ -9,7 +10,6 @@
  * The HTML created by the CDM parser is a table for each data class.
  */
 import dataClassTmpl from "./templates/dataClass.js";
-import env from "../../env.js";
 import { html } from "../core/import-maps.js";
 
 export const name = "ims/cdm";
@@ -43,7 +43,7 @@ async function processClass(id) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": env().API_KEY,
+      "X-Api-Key": env.API_KEY,
     },
     body: query,
   })

@@ -6141,9 +6141,8 @@ window.respecVersion = "26.16.1";
     // Don't use github
     // import("../src/core/github.js"),
     Promise.resolve().then(function () { return dataInclude; }),
-
+    // Common Data Model plugins
     Promise.resolve().then(function () { return cdm; }),
-    
     Promise.resolve().then(function () { return markdown; }),
     Promise.resolve().then(function () { return postMarkdown; }),
     Promise.resolve().then(function () { return reindent$1; }),
@@ -6995,51 +6994,53 @@ aside.example .marker > a.self-link {
   });
 
   // @ts-check
-  // import { html } from "../../core/import-maps.js";
   // import { showWarning } from "../../core/utils.js";
 
   // const name = "ims/templates/dataClass";
 
   var dataClassTmpl = classData => {
-    console.log(classData);
-    return `<section id="${classData.id}"><h3>${classData.name}</h3></section>`;
+    console.log("dataClass classData", classData);
+    if (classData && classData.properties) {
+      classData.properties.sort(compare);
+      return html` <table>
+      <thead>
+        <tr>
+          <th>Property</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${classData.properties.map(renderProperty)}
+      </tbody>
+    </table>`;
+    }
   };
 
-  /* eslint-disable no-unused-vars */
-  var env = env => {
-    return {
-      API_KEY: "5dWQ^Q96WG.N?TaH",
-    };
-  };
+  function renderProperty(property) {
+    return html` <tr>
+    <td>${property.name}</td>
+  </tr>`;
+  }
+
+  function compare(a, b) {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  }
 
   // @ts-check
 
   const name$W = "ims/cdm";
 
-  async function httpPost(query) {
-    const res = await fetch("https://imsum2.herokuapp.com/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": env().API_KEY,
-      },
-      body: query,
-    });
-    if (res.ok) {
-      const json = await res.json();
-      return json;
-    } else {
-      console.error(res.status);
-      return null;
-    }
-  }
-
   /**
-   * Returns the Common Data Model (CDM) information for a class.
+   * Process a single data model class definition.
    *
    * @param {string} id The CDM id for the class.
    */
-  async function getClass(id) {
+  async function processClass(id) {
     const query = JSON.stringify({
       query: `{
         classByID(id: "${id}") {
@@ -7059,29 +7060,77 @@ aside.example .marker > a.self-link {
     }`,
     });
 
-    const payload = await httpPost(query);
-    if (!payload) {
-      return null;
-    }
-
-    return payload.data.classByID;
+    fetch("https://imsum2.herokuapp.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": env.API_KEY,
+      },
+      body: query,
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("fetched data", data);
+        const payload = data.data.classByID;
+        const section = document.getElementById(payload.id);
+        const header = section.getElementsByTagName("h3")[0];
+        if (header) {
+          // Replace the placeholder text with the class name
+          const headerText = payload.name;
+          header.childNodes.forEach(node => {
+            if (node.nodeType === 3) {
+              node.nodeValue = headerText;
+            }
+          });
+          // Replace the TOC placeholder text with the same name
+          const tocxrefs = document.getElementsByClassName("tocxref");
+          Array.from(tocxrefs).forEach(tocxref => {
+            const href = tocxref.getAttribute("href");
+            const headerId = `#${header.id}`;
+            if (href === headerId) {
+              tocxref.childNodes.forEach(node => {
+                if (node.nodeType === 3) {
+                  node.nodeValue = headerText;
+                }
+              });
+            }
+          });
+        }
+        const fullElem = dataClassTmpl(payload);
+        if (fullElem) {
+          section.append(fullElem);
+        }
+      });
   }
 
+  /**
+   * Process all the <dataclass> elements in the document.
+   * 
+   * @param {*} classes Array of matching <dataclass> elements.
+   */
+
   function processDataClasses(classes) {
-    classes.forEach(async element => {
+    // Insert a place holder for this class. It will
+    // be replaced asynchronously
+    classes.forEach(element => {
+      element.replaceWith(
+        html`<section id="${element.id}"><h3>${element.id}</h3></section>`
+      );
+    });
+
+    // Queue filling in details
+    classes.forEach(element => {
       const id = element.id;
-      const classData = await getClass(id);
-      element.innerHTML = dataClassTmpl(classData);
+      processClass(id);
     });
   }
 
   /**
-   *
+   * Convert <dataclass> elements into a normative data model
+   * definition using information from the Common Data Model.
    */
   async function run$S() {
     const classes = document.querySelectorAll("dataclass");
-
-    console.log("classes", classes);
 
     if (!classes) {
       return;
