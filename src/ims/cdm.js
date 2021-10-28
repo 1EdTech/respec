@@ -32,6 +32,7 @@ async function processClass(id) {
         properties {
           name
           type {
+            id
             name
           }
           cardinality {

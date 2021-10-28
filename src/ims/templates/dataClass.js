@@ -12,6 +12,9 @@ export default classData => {
         <thead>
           <tr>
             <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required?</th>
           </tr>
         </thead>
         <tbody>
@@ -22,7 +25,31 @@ export default classData => {
 };
 
 function renderProperty(property) {
-  return html` <tr>
-    <td>${property.name}</td>
-  </tr>`;
+  if (property.name !== "extensions") {
+    return html` <tr>
+      <td>${property.name}</td>
+      <td>${renderType(property)}</td>
+      <td>${property.documentation.description}</td>
+      <td>${renderRequired(property)}</td>
+    </tr>`;
+  } else {
+    return html` <tr>
+      <td colspan="4">This class can be extended.</td>
+    </tr>`;
+  }
+}
+
+function renderRequired(property) {
+  return property.cardinality.value.includes("ZERO") ? "Yes" : "No";
+}
+
+function renderType(property) {
+  let name = property.type.name;
+  if (property.cardinality.value.includes("MANY")) {
+    name += "[]";
+  }
+  if (!property.type.id.includes("primitive")) {
+    name = html`<a href="#${property.type.id}">${name}</a>`;
+  }
+  return name;
 }
