@@ -52,39 +52,49 @@ async function processClass(id) {
       console.log("fetched data", data);
       const payload = data.data.classByID;
       const section = document.getElementById(payload.id);
-      const header = section.getElementsByTagName("h3")[0];
+      const header = section.querySelector("h3");
       if (header) {
         // Replace the placeholder text with the class name
         const headerText = payload.name;
+        let textChanged = false;
         header.childNodes.forEach(node => {
           if (node.nodeType === 3) {
-            node.nodeValue = headerText;
+            if (textChanged) {
+              node.remove();
+            } else {
+              node.nodeValue = headerText;
+              textChanged = true;
+            }
           }
         });
         // Replace the TOC placeholder text with the same name
-        const tocxrefs = document.getElementsByClassName("tocxref");
-        Array.from(tocxrefs).forEach(tocxref => {
-          const href = tocxref.getAttribute("href");
-          const headerId = `#${header.id}`;
-          if (href === headerId) {
-            tocxref.childNodes.forEach(node => {
-              if (node.nodeType === 3) {
+        const tocxref = document.querySelector(
+          `a.tocxref[href='#${header.id}']`
+        );
+        if (tocxref) {
+          let textChanged = false;
+          tocxref.childNodes.forEach(node => {
+            if (node.nodeType === 3) {
+              if (textChanged) {
+                node.remove();
+              } else {
                 node.nodeValue = headerText;
+                textChanged = true;
               }
-            });
-          }
-        });
-      }
-      const fullElem = dataClassTmpl(payload);
-      if (fullElem) {
-        section.append(fullElem);
+            }
+          });
+        }
+        const fullElem = dataClassTmpl(payload);
+        if (fullElem) {
+          section.append(fullElem);
+        }
       }
     });
 }
 
 /**
  * Process all the <dataclass> elements in the document.
- * 
+ *
  * @param {*} classes Array of matching <dataclass> elements.
  */
 
@@ -93,7 +103,9 @@ function processDataClasses(classes) {
   // be replaced asynchronously
   classes.forEach(element => {
     element.replaceWith(
-      html`<section id="${element.id}"><h3>${element.id}</h3></section>`
+      html`<section id="${element.id}">
+        <h3>${element.id} loading...</h3>
+      </section>`
     );
   });
 
