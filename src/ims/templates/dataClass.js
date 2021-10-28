@@ -7,7 +7,6 @@ import { html } from "../../core/import-maps.js";
 export default classData => {
   console.log("dataClass classData", classData);
   if (classData && classData.properties) {
-    classData.properties.sort(compare);
     return html` <table>
       <thead>
         <tr>
@@ -25,14 +24,4 @@ function renderProperty(property) {
   return html` <tr>
     <td>${property.name}</td>
   </tr>`;
-}
-
-function compare(a, b) {
-  if (a.name < b.name) {
-    return -1;
-  }
-  if (a.name > b.name) {
-    return 1;
-  }
-  return 0;
 }
