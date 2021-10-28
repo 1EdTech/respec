@@ -43,7 +43,7 @@ window.respecVersion = "26.16.1";
    * localize their text.
    */
 
-  const name$19 = "core/l10n";
+  const name$1a = "core/l10n";
 
   const html$1 = document.documentElement;
   if (html$1 && !html$1.hasAttribute("lang")) {
@@ -57,16 +57,16 @@ window.respecVersion = "26.16.1";
 
   const lang$2 = html$1.lang;
 
-  function run$15(config) {
+  function run$16(config) {
     config.l10n = l10n$o[lang$2] || l10n$o.en;
   }
 
   var l10n$p = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$19,
+    name: name$1a,
     l10n: l10n$o,
     lang: lang$2,
-    run: run$15
+    run: run$16
   });
 
   const instanceOfAny = (object, constructors) => constructors.some((c) => object instanceof c);
@@ -3183,10 +3183,10 @@ window.respecVersion = "26.16.1";
       // ==-- Parse WalkTokens extensions --== //
       if (pack.walkTokens) {
         const walkTokens = marked$1.defaults.walkTokens;
-        opts.walkTokens = (token) => {
+        opts.walkTokens = function(token) {
           pack.walkTokens.call(this, token);
           if (walkTokens) {
-            walkTokens(token);
+            walkTokens.call(this, token);
           }
         };
       }
@@ -3205,7 +3205,7 @@ window.respecVersion = "26.16.1";
 
   marked$1.walkTokens = function(tokens, callback) {
     for (const token of tokens) {
-      callback(token);
+      callback.call(marked$1, token);
       switch (token.type) {
         case 'table': {
           for (const cell of token.header) {
@@ -4719,7 +4719,7 @@ window.respecVersion = "26.16.1";
    * Returns a singleton that can be used for message broadcasting
    * and message receiving. Replaces legacy "msg" code in ReSpec.
    */
-  const name$18 = "core/pubsubhub";
+  const name$19 = "core/pubsubhub";
 
   const subscriptions = new Map();
 
@@ -4733,7 +4733,7 @@ window.respecVersion = "26.16.1";
       } catch (err) {
         const msg = `Error when calling function ${cb.name}.`;
         const hint = "See developer console.";
-        showError(msg, name$18, { hint });
+        showError(msg, name$19, { hint });
         console.error(err);
       }
     });
@@ -4785,13 +4785,13 @@ window.respecVersion = "26.16.1";
     return callbacks.delete(cb);
   }
 
-  expose(name$18, { sub });
+  expose(name$19, { sub });
 
   // @ts-check
 
   const removeList = ["githubToken", "githubUser"];
 
-  function run$14(config) {
+  function run$15(config) {
     const userConfig = {};
     const amendConfig = newValues => Object.assign(userConfig, newValues);
 
@@ -4908,7 +4908,7 @@ window.respecVersion = "26.16.1";
 
   // @ts-check
 
-  const name$17 = "core/respec-global";
+  const name$18 = "core/respec-global";
 
   class ReSpec {
     constructor() {
@@ -4954,7 +4954,7 @@ window.respecVersion = "26.16.1";
           const msg =
             "`document.respecIsReady` is deprecated and will be removed in a future release.";
           const hint = "Use `document.respec.ready` instead.";
-          showWarning(msg, name$17, { hint });
+          showWarning(msg, name$18, { hint });
           respecIsReadyWarningShown = true;
         }
         return document.respec.ready;
@@ -4964,7 +4964,7 @@ window.respecVersion = "26.16.1";
 
   // @ts-check
 
-  function run$13(config) {
+  function run$14(config) {
     const params = new URLSearchParams(document.location.search);
     const overrideEntries = Array.from(params)
       .filter(([key, value]) => !!key && !!value)
@@ -4986,16 +4986,16 @@ window.respecVersion = "26.16.1";
 
   // @ts-check
 
-  const name$16 = "core/post-process";
+  const name$17 = "core/post-process";
 
-  async function run$12(config) {
+  async function run$13(config) {
     if (Array.isArray(config.postProcess)) {
       const promises = config.postProcess
         .filter(f => {
           const isFunction = typeof f === "function";
           if (!isFunction) {
             const msg = "Every item in `postProcess` must be a JS function.";
-            showError(msg, name$16);
+            showError(msg, name$17);
           }
           return isFunction;
         })
@@ -5005,7 +5005,7 @@ window.respecVersion = "26.16.1";
           } catch (err) {
             const msg = `Function ${f.name} threw an error during \`postProcess\`.`;
             const hint = "See developer console.";
-            showError(msg, name$16, { hint });
+            showError(msg, name$17, { hint });
             console.error(err);
           }
         });
@@ -5018,16 +5018,16 @@ window.respecVersion = "26.16.1";
 
   // @ts-check
 
-  const name$15 = "core/pre-process";
+  const name$16 = "core/pre-process";
 
-  async function run$11(config) {
+  async function run$12(config) {
     if (Array.isArray(config.preProcess)) {
       const promises = config.preProcess
         .filter(f => {
           const isFunction = typeof f === "function";
           if (!isFunction) {
             const msg = "Every item in `preProcess` must be a JS function.";
-            showError(msg, name$15);
+            showError(msg, name$16);
           }
           return isFunction;
         })
@@ -5037,7 +5037,7 @@ window.respecVersion = "26.16.1";
           } catch (err) {
             const msg = `Function ${f.name} threw an error during \`preProcess\`.`;
             const hint = "See developer console.";
-            showError(msg, name$15, { hint });
+            showError(msg, name$16, { hint });
             console.error(err);
           }
         });
@@ -5047,16 +5047,16 @@ window.respecVersion = "26.16.1";
 
   // @ts-check
 
-  const name$14 = "core/base-runner";
+  const name$15 = "core/base-runner";
 
   async function runAll(plugs) {
     init();
 
     pub("start-all", respecConfig);
+    run$15(respecConfig);
     run$14(respecConfig);
-    run$13(respecConfig);
-    performance.mark(`${name$14}-start`);
-    await run$11(respecConfig);
+    performance.mark(`${name$15}-start`);
+    await run$12(respecConfig);
 
     const runnables = plugs.filter(p => isRunnableModule(p));
     runnables.forEach(
@@ -5068,11 +5068,11 @@ window.respecVersion = "26.16.1";
     respecConfig.state = {};
     pub("plugins-done", respecConfig);
 
-    await run$12(respecConfig);
+    await run$13(respecConfig);
     pub("end-all");
     removeReSpec(document);
-    performance.mark(`${name$14}-end`);
-    performance.measure(name$14, `${name$14}-start`, `${name$14}-end`);
+    performance.mark(`${name$15}-end`);
+    performance.measure(name$15, `${name$15}-start`, `${name$15}-end`);
   }
 
   function isRunnableModule(plug) {
@@ -5496,7 +5496,7 @@ window.respecVersion = "26.16.1";
    * so that indentation inside <pre> won't affect the rendered result.
    */
 
-  const name$13 = "core/reindent";
+  const name$14 = "core/reindent";
 
   /**
    * @param {string} text
@@ -5514,7 +5514,7 @@ window.respecVersion = "26.16.1";
     return lines.map(s => s.slice(leastIndent)).join("\n");
   }
 
-  function run$10() {
+  function run$11() {
     for (const pre of document.getElementsByTagName("pre")) {
       pre.innerHTML = reindent(pre.innerHTML);
     }
@@ -5522,13 +5522,13 @@ window.respecVersion = "26.16.1";
 
   var reindent$1 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$13,
+    name: name$14,
     reindent: reindent,
-    run: run$10
+    run: run$11
   });
 
   // @ts-check
-  const name$12 = "core/markdown";
+  const name$13 = "core/markdown";
 
   const gtEntity = /&gt;/gm;
   const ampEntity = /&amp;/gm;
@@ -5788,7 +5788,7 @@ window.respecVersion = "26.16.1";
   const blockLevelElements =
     "[data-format=markdown], section, div, address, article, aside, figure, header, main";
 
-  function run$$(conf) {
+  function run$10(conf) {
     const hasMDSections = !!document.querySelector(
       "[data-format=markdown]:not(body)"
     );
@@ -5824,10 +5824,10 @@ window.respecVersion = "26.16.1";
 
   var markdown = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$12,
+    name: name$13,
     markdownToHtml: markdownToHtml,
     restructure: restructure,
-    run: run$$
+    run: run$10
   });
 
   // @ts-check
@@ -6107,7 +6107,7 @@ window.respecVersion = "26.16.1";
     console.error(ev.error, ev.message, ev);
   });
 
-  async function run$_(plugins) {
+  async function run$$(plugins) {
     try {
       ui.show();
       await domReady();
@@ -6141,6 +6141,9 @@ window.respecVersion = "26.16.1";
     // Don't use github
     // import("../src/core/github.js"),
     Promise.resolve().then(function () { return dataInclude; }),
+
+    Promise.resolve().then(function () { return cdm; }),
+    
     Promise.resolve().then(function () { return markdown; }),
     Promise.resolve().then(function () { return postMarkdown; }),
     Promise.resolve().then(function () { return reindent$1; }),
@@ -6214,16 +6217,16 @@ window.respecVersion = "26.16.1";
   ];
 
   Promise.all(modules)
-    .then(plugins => run$_(plugins))
+    .then(plugins => run$$(plugins))
     .catch(err => console.error(err));
 
   // @ts-check
   // Module core/location-hash
   // Resets window.location.hash to jump to the right point in the document
 
-  const name$11 = "core/location-hash";
+  const name$12 = "core/location-hash";
 
-  function run$Z() {
+  function run$_() {
     if (!location.hash) {
       return;
     }
@@ -6248,8 +6251,8 @@ window.respecVersion = "26.16.1";
 
   var locationHash = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$11,
-    run: run$Z
+    name: name$12,
+    run: run$_
   });
 
   // @ts-check
@@ -6275,11 +6278,11 @@ window.respecVersion = "26.16.1";
   /**
    * Sets the defaults for IMS specs
    */
-  const name$10 = "ims/defaults";
+  const name$11 = "ims/defaults";
 
   const imsDefaults = {};
 
-  function run$Y(conf) {
+  function run$Z(conf) {
     // assign the defaults
     const lint =
       conf.lint === false
@@ -6299,8 +6302,8 @@ window.respecVersion = "26.16.1";
 
   var defaults = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$10,
-    run: run$Y
+    name: name$11,
+    run: run$Z
   });
 
   /* ReSpec specific CSS */
@@ -6577,7 +6580,7 @@ aside.example .marker > a.self-link {
 
   // @ts-check
 
-  const name$$ = "core/style";
+  const name$10 = "core/style";
 
   // Opportunistically inserts the style, with the chance to reduce some FOUC
   const styleElement = insertStyle();
@@ -6590,7 +6593,7 @@ aside.example .marker > a.self-link {
     return styleElement;
   }
 
-  function run$X(conf) {
+  function run$Y(conf) {
     if (conf.noReSpecCSS) {
       styleElement.remove();
     }
@@ -6598,13 +6601,13 @@ aside.example .marker > a.self-link {
 
   var style$1 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$$,
-    run: run$X
+    name: name$10,
+    run: run$Y
   });
 
   // @ts-check
 
-  const name$_ = "ims/style";
+  const name$$ = "ims/style";
 
   /**
    * From w3c/style
@@ -6639,7 +6642,7 @@ aside.example .marker > a.self-link {
   /**
    * @param {*} conf respecConfig
    */
-  async function run$W(conf) {
+  async function run$X(conf) {
     // From w3c/style
     attachMetaViewport();
     linkW3cCSS();
@@ -6654,13 +6657,13 @@ aside.example .marker > a.self-link {
 
   var style = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$_,
-    run: run$W
+    name: name$$,
+    run: run$X
   });
 
   // @ts-check
 
-  const name$Z = "ims/config";
+  const name$_ = "ims/config";
 
   /**
    * Returns true if value is not null or empty.
@@ -6674,12 +6677,12 @@ aside.example .marker > a.self-link {
   /**
    * @param {*} conf
    */
-  async function run$V(conf) {
+  async function run$W(conf) {
     if (!check(conf.specTitle)) {
       showError(
         "head config must have the <code>specTitle</code> property set: " +
           "title of the document, excluding version",
-        name$Z
+        name$_
       );
       conf.specTitle = "@@@FIXME (conf.specTitle)";
     }
@@ -6687,7 +6690,7 @@ aside.example .marker > a.self-link {
     if (!check(conf.docVersion)) {
       showError(
         "head config must have the <code>docVersion</code> property set, e.g. 'June 28, 2019'",
-        name$Z
+        name$_
       );
       conf.docVersion = "@@@FIXME (conf.docVersion)";
     }
@@ -6698,7 +6701,7 @@ aside.example .marker > a.self-link {
       } else {
         showError(
           "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'",
-          name$Z
+          name$_
         );
         conf.specDate = "@@@FIXME(conf.specDate)";
       }
@@ -6707,7 +6710,7 @@ aside.example .marker > a.self-link {
     if (!check(conf.specNature)) {
       showError(
         "head config must have the <code>specNature</code> property set: one of 'normative' or 'informative'",
-        name$Z
+        name$_
       );
       conf.specNature = "informative";
     }
@@ -6715,7 +6718,7 @@ aside.example .marker > a.self-link {
     if (!check(conf.specType)) {
       showError(
         "head config must have the <code>specType</code> property set: One of 'spec', 'cert', 'impl', 'errata', 'doc' ",
-        name$Z
+        name$_
       );
       conf.specType = "spec";
     }
@@ -6728,7 +6731,7 @@ aside.example .marker > a.self-link {
       showError(
         "head config must have the <code>shortName</code> property set: " +
           "list at urls-names.md#shortnames",
-        name$Z
+        name$_
       );
       conf.shortName = "FIXME";
     }
@@ -6738,7 +6741,7 @@ aside.example .marker > a.self-link {
         "head config must have the <code>specStatus</code> property set to " +
           "one of 'IMS Base Document', 'IMS Candidate Final', IMS Candidate Final Public', " +
           "or 'IMS Final Release'",
-        name$Z
+        name$_
       );
       conf.specStatus = "@@@FIXME(conf.specStatus)";
     }
@@ -6755,14 +6758,14 @@ aside.example .marker > a.self-link {
         "head config must have the <code>specStatus</code> property set to " +
           "one of 'IMS Base Document', 'IMS Candidate Final', 'IMS Candidate Final Public', " +
           "'IMS Final Release', or 'Proposal'",
-        name$Z
+        name$_
       );
     }
 
     if (!check(conf.specVersion)) {
       showError(
         "head config must have the <code>specVersion</code> property set, e.g. '1.1'",
-        name$Z
+        name$_
       );
       conf.specVersion = "@@@FIXME(conf.specVersion)";
     }
@@ -6770,20 +6773,20 @@ aside.example .marker > a.self-link {
 
   var config = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$Z,
-    run: run$V
+    name: name$_,
+    run: run$W
   });
 
   // @ts-check
 
-  const name$Y = "ims/compute";
+  const name$Z = "ims/compute";
 
   /**
    * Compute misc variables used by multiple other modules and store them back in conf.
    *
    * @param {*} conf
    */
-  async function run$U(conf) {
+  async function run$V(conf) {
     const base = `https://www.imsglobal.org/spec/${conf.shortName}/`;
 
     // v1p2-style reformat for use in path segments
@@ -6808,8 +6811,8 @@ aside.example .marker > a.self-link {
 
   var compute = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$Y,
-    run: run$U
+    name: name$Z,
+    run: run$V
   });
 
   // @ts-check
@@ -6839,9 +6842,9 @@ aside.example .marker > a.self-link {
 
   // @ts-check
 
-  const name$X = "ims/transclude";
+  const name$Y = "ims/transclude";
 
-  async function run$T() {
+  async function run$U() {
     /*
     Filesystem transclusion is done using script elements with a class 
     of 'transclude'. If the script element has a data-id attribute equal to the 
@@ -6894,13 +6897,13 @@ aside.example .marker > a.self-link {
 
   var transclude = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    name: name$X,
-    run: run$T
+    name: name$Y,
+    run: run$U
   });
 
   // @ts-check
 
-  const name$W = "core/data-include";
+  const name$X = "core/data-include";
 
   /**
    * @param {HTMLElement} el
@@ -6961,7 +6964,7 @@ aside.example .marker > a.self-link {
     ].forEach(attr => el.removeAttribute(attr));
   }
 
-  async function run$S() {
+  async function run$T() {
     /** @type {NodeListOf<HTMLElement>} */
     const includables = document.querySelectorAll("[data-include]");
 
@@ -6979,13 +6982,115 @@ aside.example .marker > a.self-link {
       } catch (err) {
         const msg = `\`data-include\` failed: \`${url}\` (${err.message}).`;
         console.error(msg, el, err);
-        showError(msg, name$W, { elements: [el] });
+        showError(msg, name$X, { elements: [el] });
       }
     });
     await Promise.all(promisesToInclude);
   }
 
   var dataInclude = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    name: name$X,
+    run: run$T
+  });
+
+  // @ts-check
+  // import { html } from "../../core/import-maps.js";
+  // import { showWarning } from "../../core/utils.js";
+
+  // const name = "ims/templates/dataClass";
+
+  var dataClassTmpl = classData => {
+    console.log(classData);
+    return `<section id="${classData.id}"><h3>${classData.name}</h3></section>`;
+  };
+
+  /* eslint-disable no-unused-vars */
+  var env = env => {
+    return {
+      API_KEY: "5dWQ^Q96WG.N?TaH",
+    };
+  };
+
+  // @ts-check
+
+  const name$W = "ims/cdm";
+
+  async function httpPost(query) {
+    const res = await fetch("https://imsum2.herokuapp.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": env().API_KEY,
+      },
+      body: query,
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return json;
+    } else {
+      console.error(res.status);
+      return null;
+    }
+  }
+
+  /**
+   * Returns the Common Data Model (CDM) information for a class.
+   *
+   * @param {string} id The CDM id for the class.
+   */
+  async function getClass(id) {
+    const query = JSON.stringify({
+      query: `{
+        classByID(id: "${id}") {
+        id
+        name
+        properties {
+            name
+            cardinality {
+            label
+            value
+            }
+            documentation {
+            description
+            }
+        }
+        }
+    }`,
+    });
+
+    const payload = await httpPost(query);
+    if (!payload) {
+      return null;
+    }
+
+    return payload.data.classByID;
+  }
+
+  function processDataClasses(classes) {
+    classes.forEach(async element => {
+      const id = element.id;
+      const classData = await getClass(id);
+      element.innerHTML = dataClassTmpl(classData);
+    });
+  }
+
+  /**
+   *
+   */
+  async function run$S() {
+    const classes = document.querySelectorAll("dataclass");
+
+    console.log("classes", classes);
+
+    if (!classes) {
+      return;
+    }
+
+    processDataClasses(classes);
+  }
+
+  var cdm = /*#__PURE__*/Object.freeze({
     __proto__: null,
     name: name$W,
     run: run$S

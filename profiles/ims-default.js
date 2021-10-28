@@ -16,6 +16,9 @@ const modules = [
   // Don't use github
   // import("../src/core/github.js"),
   import("../src/core/data-include.js"),
+
+  import("../src/ims/cdm.js"),
+  
   import("../src/core/markdown.js"),
   import("../src/ims/post-markdown.js"),
   import("../src/core/reindent.js"),
