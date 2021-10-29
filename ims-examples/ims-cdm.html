@@ -13,27 +13,10 @@
       shortName: "example",
       specStatus: "IMS Base Document",
       specVersion: "1.0",
-      docVersion: "0.1",
+      docVersion: "1",
       specNature: "normative",
       specType: "spec",
-      skipCertGuideConformanceRef: true,
-      overrideCSSLocation: "ims-base.css",
-      contributors: [
-        {
-          name: "First Last",
-          company: "Acme1 Co Inc (Sweden)",
-          companyURL: "https://www.example.com",
-          role: "Editor"
-        }, {
-          name: "Second Third",
-          company: "Acme2 Co Inc (UK)",
-          companyURL: "https://www.example.com",
-          role: "Editor"
-        }
-      ],
-      iprs: [
-        { company: "Acme1 Co Inc", electionDate: "October 24, 2019", necessaryClaims: "No", type: "RF RAND (Required & Optional Elements)" }
-      ]
+      skipCertGuideConformanceRef: true
     };
   </script>
 </head>
@@ -44,13 +27,6 @@
   </section>
   <section id="conformance">
     <h2>Conformance</h2>
-    <p>
-      This section is required for IMS spec documents. The section will be
-      filled with boilerplate text, including a reference to the
-      Conformance and Certification Guide in a section with <code>id="document-set"</code>.
-      If you do not want to include the reference, set
-      <code>conf.skipCertGuideConformanceRef = true</code>
-    </p>
   </section>
 
   <!-- Pull in CDM configuration -->
@@ -59,7 +35,7 @@
   <section data-model id="org.1edtech.ob.v2p1.model">
     <section data-class id="org.1edtech.ob.v2p1.assertion.class">
       <aside class="example">
-        <pre class="js">
+        <pre class="json">
           {
             type: "Assertion"
           }
