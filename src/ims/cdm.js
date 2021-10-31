@@ -9,10 +9,10 @@
  *
  * The HTML created by the CDM parser is a table for each data class.
  */
-import { showError, showWarning } from "../core/utils.js";
 import dataClassTmpl from "./templates/dataClass.js";
 import dataModelTmpl from "./templates/dataModel.js";
 import { html } from "../core/import-maps.js";
+import { showError } from "../core/utils.js";
 
 export const name = "ims/cdm";
 
@@ -79,7 +79,16 @@ async function getDataModel(id) {
   }
 }
 
-async function getDataSample(id, includeOptionalFields) {
+/**
+ * Async function that returns a sample JSON object for a single
+ * Common Data Model class.
+ *
+ * @param {string} id Common Data Model class id
+ * @param {boolean} includeOptionalFields True if the sample should
+ * include all optional fields (the default is false)
+ * @returns The sample JSON object
+ */
+async function getDataSample(id, includeOptionalFields = false) {
   try {
     const res = await fetch(
       `https://imsum2.herokuapp.com/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
@@ -104,41 +113,6 @@ async function getDataSample(id, includeOptionalFields) {
     return null;
   }
 }
-
-/**
- * Replaces the heading text and the TOC entry.
- *
- * @param {HTMLHeadingElement} header The heading element to change
- * @param {String} headerText The new text
- */
-// function replaceHeaderText(header, headerText) {
-//   let textChanged = false;
-//   header.childNodes.forEach(node => {
-//     if (node.nodeType === 3) {
-//       if (textChanged) {
-//         node.remove();
-//       } else {
-//         node.nodeValue = headerText;
-//         textChanged = true;
-//       }
-//     }
-//   });
-//   // Replace the TOC placeholder text with the same name
-//   const tocxref = document.querySelector(`a.tocxref[href='#${header.id}']`);
-//   if (tocxref) {
-//     let textChanged = false;
-//     tocxref.childNodes.forEach(node => {
-//       if (node.nodeType === 3) {
-//         if (textChanged) {
-//           node.remove();
-//         } else {
-//           node.nodeValue = headerText;
-//           textChanged = true;
-//         }
-//       }
-//     });
-//   }
-// }
 
 /**
  * Process a single data model class definition.
@@ -211,44 +185,6 @@ async function processDataModel(id) {
     processDataClass(dataClass);
   });
 }
-
-/**
- * Process all of the <section data-model> elements in the document.
- *
- * @param {HTMLElement[]} dataModelSections An array of data-model sections
- */
-// const processDataModels = async function (dataModelSections) {
-//   dataModelSections.forEach(dataModelSection => {
-//     // Insert placeholder headings to be replaced when
-//     // the fetch from CDM finishes.
-//     dataModelSection.prepend(html`<h2>${dataModelSection.id}</h2>`);
-//     const dataClassSections = dataModelSection.querySelectorAll(
-//       "section[data-class]"
-//     );
-//     if (dataClassSections) {
-//       dataClassSections.forEach(dataClassSection => {
-//         dataClassSection.prepend(html`<h3>${dataClassSection.id}</h3>`);
-//       });
-//     } else {
-//       showWarning(
-//         `No <section data-class> found for data-model ${dataModelSection.id}`,
-//         name
-//       );
-//     }
-//   });
-
-//   // Queue filling in the details
-//   try {
-//     // eslint-disable-next-line no-undef
-//     if (env.API_KEY) {
-//       dataModelSections.forEach(async dataModelSection => {
-//         await processDataModel(dataModelSection.id);
-//       });
-//     }
-//   } catch (error) {
-//     showError(`Cannot read from CDM (no API_KEY defined): ${error}`);
-//   }
-// };
 
 /**
  * Convert <section data-model> and <section data-class> elements into
