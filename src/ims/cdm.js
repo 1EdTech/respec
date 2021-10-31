@@ -79,6 +79,32 @@ async function getDataModel(id) {
   }
 }
 
+async function getDataSample(id, includeOptionalFields) {
+  try {
+    const res = await fetch(
+      `https://imsum2.herokuapp.com/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // eslint-disable-next-line no-undef
+          "X-Api-Key": env.API_KEY,
+        },
+      }
+    );
+    if (!res.ok) {
+      showError(`Could not get sampledata for ${id}: ${res.status}`, name);
+      return null;
+    }
+    const data = await res.json();
+    console.log("fetched data", data);
+    return data;
+  } catch (error) {
+    showError(`Could not get sample data for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
 /**
  * Replaces the heading text and the TOC entry.
  *
@@ -119,7 +145,7 @@ async function getDataModel(id) {
  *
  * @param {*} dataClass The CDM class object.
  */
-function processDataClass(dataClass) {
+async function processDataClass(dataClass) {
   const section = document.getElementById(dataClass.id);
   if (!section) {
     showError(`Missing class ${dataClass.id}`, name);
@@ -134,38 +160,27 @@ function processDataClass(dataClass) {
       }
       target = element;
     });
-    // const sample = section.querySelector("[data-sample]");
-    // if (sample) {
-    //   const includeOptionalFields =
-    //     sample.getAttribute("data-include-optional-fields") ?? "false";
-    //   fetch(
-    //     `https://imsum2.herokuapp.com/sample/${dataClass.id}?includeOptionalFields=${includeOptionalFields}`,
-    //     {
-    //       method: "GET",
-    //       headers: {
-    //         // "Content-Type": "application/json",
-    //         // eslint-disable-next-line no-undef
-    //         "X-Api-Key": env.API_KEY,
-    //       },
-    //     }
-    //   )
-    //     .then(res => {
-    //       if (res.ok) {
-    //         res.json().then(data => {
-    //           sample.append(html`<pre class="json">
-    //         ${JSON.stringify(data)}
-    //         </pre
-    //           >`);
-    //         });
-    //       } else {
-    //         throw res;
-    //       }
-    //     })
-    //     .catch(() => {
-    //       showError(`Cannot fetch sample for ${dataClass.id}`, name);
-    //       sample.append(html`<p>Error: Cannot fetch sample</p>`);
-    //     });
-    // }
+    const sampleElement = section.querySelector("[data-sample]");
+    if (sampleElement) {
+      const includeOptionalFields =
+        sampleElement.getAttribute("data-include-optional-fields") ?? "false";
+      const sampleData = await getDataSample(
+        dataClass.id,
+        includeOptionalFields
+      );
+      if (sampleData) {
+        sampleElement.append(html`<pre class="json">
+          ${JSON.stringify(sampleData)}
+          </pre
+        >`);
+      } else {
+        sampleElement.append(
+          html`<p>
+            Could not get sample data. See developer console for details.
+          </p>`
+        );
+      }
+    }
   }
 }
 
