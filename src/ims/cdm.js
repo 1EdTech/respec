@@ -62,7 +62,10 @@ async function getDataModel(id) {
       body: query,
     });
     if (!res.ok) {
-      showError(`Could not get CDM for ${id}: ${res.status}`, name);
+      showError(
+        `Could not get CDM model for ${id}. Please see the developer console for details.`,
+        name
+      );
       return null;
     }
     const data = await res.json();
@@ -74,7 +77,7 @@ async function getDataModel(id) {
     }
     return dataModel;
   } catch (error) {
-    showError(`Could not get CDM for ${id}: ${error}`, name);
+    showError(`Could not get CDM model for ${id}. Please see the developer console for details.`, name);
     return null;
   }
 }
@@ -197,6 +200,7 @@ export async function run() {
     const promises = Array.from(dataModelSections).map(
       async dataModelSection => {
         try {
+          console.log("Check for API_KEY");
           // eslint-disable-next-line no-undef
           if (env.API_KEY) {
             await processDataModel(dataModelSection.id);
