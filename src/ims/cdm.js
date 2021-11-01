@@ -76,8 +76,11 @@ async function getDataModel(id) {
       return null;
     }
     return dataModel;
-  } catch (error) {
-    showError(`Could not get CDM model for ${id}. Please see the developer console for details.`, name);
+  } catch {
+    showError(
+      `Could not get CDM model for ${id}. Please see the developer console for details.`,
+      name
+    );
     return null;
   }
 }
