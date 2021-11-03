@@ -49,8 +49,6 @@ function renderType(property) {
   if (property.cardinality.value.includes("MANY")) {
     name += "[]";
   }
-  if (!property.type.id.includes("primitive")) {
-    name = html`<a href="#${property.type.id}">${name}</a>`;
-  }
+  name = html`<a href="#${property.type.id}">${name}</a>`;
   return name;
 }

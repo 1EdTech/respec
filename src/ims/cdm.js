@@ -40,6 +40,7 @@ async function getDataModel(id) {
         classes {
           id
           name
+          stereoType
           documentation {
             description
           }
@@ -129,21 +130,28 @@ async function getDataSample(id, includeOptionalFields = false) {
 /**
  * Process a single data model class definition.
  *
- * @param {*} dataClass The CDM class object.
+ * @param {*} classModel The CDM class object.
  */
-async function processDataClass(dataClass) {
-  const section = document.getElementById(dataClass.id);
-  if (dataClass.id.includes(".primitive.")) {
+async function processDataClass(classModel) {
+  const section = document.getElementById(classModel.id);
+  if (classModel.stereoType === "PrimitiveType") {
     if (section) {
-      showWarning(`Ignoring primitive class ${dataClass.id}`, name);
+      showWarning(`Ignoring primitive class ${classModel.id}`, name);
+      section.remove();
+    }
+    return;
+  }
+  if (classModel.stereoType === "DerivedType") {
+    if (section) {
+      showWarning(`Ignoring derived class ${classModel.id}`, name);
       section.remove();
     }
     return;
   }
   if (!section) {
-    showError(`Missing class ${dataClass.id}`, name);
+    showError(`Missing class ${classModel.id}`, name);
   } else {
-    const fullElem = dataClassTmpl(dataClass);
+    const fullElem = dataClassTmpl(classModel);
     let target = null;
     Array.from(fullElem.childNodes).forEach(element => {
       if (!target) {
@@ -158,7 +166,7 @@ async function processDataClass(dataClass) {
       const includeOptionalFields =
         sampleElement.getAttribute("data-include-optional-fields") ?? "false";
       const sampleData = await getDataSample(
-        dataClass.id,
+        classModel.id,
         includeOptionalFields
       );
       if (sampleData) {
@@ -198,17 +206,70 @@ async function processDataModel(id) {
         target = element;
       });
     }
-    Array.from(dataModel.classes).map(async dataClass => {
-      processDataClass(dataClass);
+    Array.from(dataModel.classes).map(async classModel => {
+      processDataClass(classModel);
     });
     processPrimitives(dataModel);
+    processDerivatives(dataModel);
   } else {
     // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${id}</h3>`);
   }
 }
 
-function processPrimitives
+function processDerivatives(dataModel) {
+  if (!dataModel) return;
+  const derivatives = Array.from(dataModel.classes).filter(classModel => {
+    return classModel.stereoType === "DerivedType";
+  });
+  if (derivatives.length === 0) return;
+
+  const appendix = html`<section class="appendix">
+    <h1>${dataModel.name} Derived Types</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${derivatives.map(model => {
+          return html`<tr>
+            <td id="${model.id}">${model.name}</td>
+          </tr>`;
+        })}
+      </tbody>
+    </table>
+  </section>`;
+  document.body.append(appendix);
+}
+
+function processPrimitives(dataModel) {
+  if (!dataModel) return;
+  const primitives = Array.from(dataModel.classes).filter(classModel => {
+    return classModel.stereoType === "PrimitiveType";
+  });
+  if (primitives.length === 0) return;
+
+  const appendix = html`<section class="appendix">
+    <h1>${dataModel.name} Primitive Types</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${primitives.map(model => {
+          return html`<tr>
+            <td id="${model.id}">${model.name}</td>
+          </tr>`;
+        })}
+      </tbody>
+    </table>
+  </section>`;
+  document.body.append(appendix);
+}
 
 /**
  * Convert <section data-model> and <section data-class> elements into
