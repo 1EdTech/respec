@@ -201,10 +201,14 @@ async function processDataModel(id) {
     Array.from(dataModel.classes).map(async dataClass => {
       processDataClass(dataClass);
     });
+    processPrimitives(dataModel);
   } else {
+    // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${id}</h3>`);
   }
 }
+
+function processPrimitives
 
 /**
  * Convert <section data-model> and <section data-class> elements into
