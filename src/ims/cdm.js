@@ -9,12 +9,23 @@
  *
  * The HTML created by the CDM parser is a table for each data class.
  */
+import { showError, showWarning } from "../core/utils.js";
 import dataClassTmpl from "./templates/dataClass.js";
 import dataModelTmpl from "./templates/dataModel.js";
 import { html } from "../core/import-maps.js";
-import { showError } from "../core/utils.js";
 
 export const name = "ims/cdm";
+
+if (typeof window.env === "undefined") {
+  window.env = {};
+}
+
+function getApiKey() {
+  if (window.env.API_KEY) {
+    return window.env.API_KEY;
+  }
+  throw "No CDM API_KEY found";
+}
 
 async function getDataModel(id) {
   const query = JSON.stringify({
@@ -56,8 +67,7 @@ async function getDataModel(id) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // eslint-disable-next-line no-undef
-        "X-Api-Key": env.API_KEY,
+        "X-Api-Key": getApiKey(),
       },
       body: query,
     });
@@ -76,11 +86,8 @@ async function getDataModel(id) {
       return null;
     }
     return dataModel;
-  } catch {
-    showError(
-      `Could not get CDM model for ${id}. Please see the developer console for details.`,
-      name
-    );
+  } catch (error) {
+    showError(`Could not get CDM model for ${id}: ${error}`, name);
     return null;
   }
 }
@@ -102,8 +109,7 @@ async function getDataSample(id, includeOptionalFields = false) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          // eslint-disable-next-line no-undef
-          "X-Api-Key": env.API_KEY,
+          "X-Api-Key": getApiKey(),
         },
       }
     );
@@ -127,6 +133,13 @@ async function getDataSample(id, includeOptionalFields = false) {
  */
 async function processDataClass(dataClass) {
   const section = document.getElementById(dataClass.id);
+  if (dataClass.id.includes(".primitive.")) {
+    if (section) {
+      showWarning(`Ignoring primitive class ${dataClass.id}`, name);
+      section.remove();
+    }
+    return;
+  }
   if (!section) {
     showError(`Missing class ${dataClass.id}`, name);
   } else {
@@ -170,26 +183,27 @@ async function processDataClass(dataClass) {
  * @param {string} id The CDM id for the model.
  */
 async function processDataModel(id) {
-  const dataModel = await getDataModel(id);
-  if (!dataModel) return;
-
-  const section = document.getElementById(dataModel.id);
-  const fullElem = dataModelTmpl(dataModel);
-  if (fullElem) {
-    let target = null;
-    Array.from(fullElem.childNodes).forEach(element => {
-      if (target) {
-        target.insertAdjacentElement("afterend", element);
-      } else {
-        section.insertAdjacentElement("afterbegin", element);
-      }
-      target = element;
+  const section = document.getElementById(id);
+  const dataModel = await getDataModel(section.id);
+  if (dataModel) {
+    const fullElem = dataModelTmpl(dataModel);
+    if (fullElem) {
+      let target = null;
+      Array.from(fullElem.childNodes).forEach(element => {
+        if (target) {
+          target.insertAdjacentElement("afterend", element);
+        } else {
+          section.insertAdjacentElement("afterbegin", element);
+        }
+        target = element;
+      });
+    }
+    Array.from(dataModel.classes).map(async dataClass => {
+      processDataClass(dataClass);
     });
+  } else {
+    section.insertAdjacentElement("afterbegin", html`<h3>${id}</h3>`);
   }
-
-  Array.from(dataModel.classes).map(async dataClass => {
-    processDataClass(dataClass);
-  });
 }
 
 /**
@@ -203,13 +217,9 @@ export async function run() {
     const promises = Array.from(dataModelSections).map(
       async dataModelSection => {
         try {
-          console.log("Check for API_KEY");
-          // eslint-disable-next-line no-undef
-          if (env.API_KEY) {
-            await processDataModel(dataModelSection.id);
-          }
+          await processDataModel(dataModelSection.id);
         } catch (error) {
-          showError(`Cannot read from CDM (no API_KEY defined): ${error}`);
+          showError(`Cannot process model ${dataModelSection.id}: ${error}`);
         }
       }
     );
