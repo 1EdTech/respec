@@ -151,16 +151,26 @@ async function processDataClass(classModel) {
   if (!section) {
     showError(`Missing class ${classModel.id}`, name);
   } else {
-    const fullElem = dataClassTemplate(classModel);
-    let target = null;
-    Array.from(fullElem.childNodes).forEach(element => {
-      if (!target) {
-        section.insertAdjacentElement("afterbegin", element);
-      } else {
-        target.insertAdjacentElement("afterend", element);
-      }
-      target = element;
-    });
+    let fullElem = dataClassTemplate(classModel);
+    if (typeof window.dataClassTemplate === "function") {
+      fullElem = window.dataClassTemplate(classModel);
+    }
+    if (fullElem) {
+      let target = null;
+      Array.from(fullElem.childNodes).forEach(element => {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      });
+    }
     const sampleElement = section.querySelector("[data-sample]");
     if (sampleElement) {
       const includeOptionalFields =
@@ -195,15 +205,15 @@ async function processDataModel(id) {
   const dataModel = await getDataModel(section.id);
   if (dataModel) {
     let fullElem = dataModelTemplate(dataModel);
-    if (typeof window.dataModelTemplate !== "undefined") {
-      fullElem = window.dataModelTmpl(dataModel);
+    if (typeof window.dataModelTemplate === "function") {
+      fullElem = window.dataModelTemplate(dataModel);
     }
     if (fullElem) {
       let target = null;
       Array.from(fullElem.childNodes).forEach(element => {
         let thisElement = element;
         if (element.nodeName === "#text") {
-          thisElement = document.createElement("span");
+          thisElement = document.createElement("text");
           thisElement.innerHTML = element.nodeValue;
         }
         if (target) {
