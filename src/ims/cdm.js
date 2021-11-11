@@ -10,8 +10,8 @@
  * The HTML created by the CDM parser is a table for each data class.
  */
 import { showError, showWarning } from "../core/utils.js";
-import dataClassTmpl from "./templates/dataClass.js";
-import dataModelTmpl from "./templates/dataModel.js";
+import dataClassTemplate from "./templates/dataClass.js";
+import dataModelTemplate from "./templates/dataModel.js";
 import { html } from "../core/import-maps.js";
 
 export const name = "ims/cdm";
@@ -151,7 +151,7 @@ async function processDataClass(classModel) {
   if (!section) {
     showError(`Missing class ${classModel.id}`, name);
   } else {
-    const fullElem = dataClassTmpl(classModel);
+    const fullElem = dataClassTemplate(classModel);
     let target = null;
     Array.from(fullElem.childNodes).forEach(element => {
       if (!target) {
@@ -194,16 +194,24 @@ async function processDataModel(id) {
   const section = document.getElementById(id);
   const dataModel = await getDataModel(section.id);
   if (dataModel) {
-    const fullElem = dataModelTmpl(dataModel);
+    let fullElem = dataModelTemplate(dataModel);
+    if (typeof window.dataModelTemplate !== "undefined") {
+      fullElem = window.dataModelTmpl(dataModel);
+    }
     if (fullElem) {
       let target = null;
       Array.from(fullElem.childNodes).forEach(element => {
-        if (target) {
-          target.insertAdjacentElement("afterend", element);
-        } else {
-          section.insertAdjacentElement("afterbegin", element);
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("span");
+          thisElement.innerHTML = element.nodeValue;
         }
-        target = element;
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
       });
     }
     Array.from(dataModel.classes).map(async classModel => {
