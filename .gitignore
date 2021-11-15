@@ -14,3 +14,4 @@ js/deps/builds
 .vscode/*
 !.vscode/tasks.json
 cdm.config
+git-crypt.exe
