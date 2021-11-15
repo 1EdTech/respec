@@ -20,11 +20,28 @@ if (typeof window.env === "undefined") {
   window.env = {};
 }
 
+/**
+ * Get the CDM API_KEY from the configuration.
+ *
+ * @returns The CDM API_KEY.
+ */
 function getApiKey() {
   if (window.env.API_KEY) {
     return window.env.API_KEY;
   }
   throw "No CDM API_KEY found";
+}
+
+/**
+ * Get the CDM BASE_URL from the configuration.
+ *
+ * @returns The CDM BASE_URL.
+ */
+function getBaseUrl() {
+  if (window.env.BASE_URL) {
+    return window.env.BASE_URL;
+  }
+  throw "No CDM BASE_URL found";
 }
 
 async function getDataModel(id) {
@@ -64,7 +81,7 @@ async function getDataModel(id) {
   });
 
   try {
-    const res = await fetch("https://imsum2.herokuapp.com/graphql", {
+    const res = await fetch(`${getBaseUrl()}/graphql`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +122,7 @@ async function getDataModel(id) {
 async function getDataSample(id, includeOptionalFields = false) {
   try {
     const res = await fetch(
-      `https://imsum2.herokuapp.com/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
+      `${getBaseUrl()}/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
       {
         method: "GET",
         headers: {
