@@ -7,7 +7,7 @@ const serveHandler = require("serve-handler");
 const port = 5000;
 const timeout = 30; // seconds
 
-describe("IMS Headless (examples)", () => {
+describe("IMS Headless", () => {
   beforeAll(() => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout * 1000;
     const server = http.createServer(serveHandler);
