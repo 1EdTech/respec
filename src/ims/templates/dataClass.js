@@ -1,8 +1,5 @@
 // @ts-check
 import { html } from "../../core/import-maps.js";
-// import { showWarning } from "../../core/utils.js";
-
-// const name = "ims/templates/dataClass";
 
 export default classData => {
   console.log("dataClass classData", classData);
