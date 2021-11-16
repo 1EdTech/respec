@@ -7,6 +7,10 @@
     Replace me with a real title
   </title>
   <script src='../profiles/ims-default.js' type="module" class="remove"></script>
+
+  <!-- Read the CDM configuration -->
+  <script class="remove" src="cdm-config.js"></script>
+
   <script class='remove'>
     var respecConfig = {
       specTitle: "Replace me with a real title",
@@ -16,7 +20,10 @@
       docVersion: "1",
       specNature: "normative",
       specType: "spec",
-      skipCertGuideConformanceRef: true
+      skipCertGuideConformanceRef: true,
+
+      // Add the CDM configuration to respecConfig
+      cdm: _cdm,
     };
   </script>
 </head>
@@ -30,15 +37,7 @@
     <h2>Conformance</h2>
   </section>
 
-  <!-- Pull in CDM configuration -->
-  <script class="remove" src="cdm-config.js"></script>
-
-  <!-- Override the default Data Model template -->
-  <script class="remove" src="dataModel.js"></script>
-
-  <!-- Override the default Data Class template -->
-  <!-- <script class="remove" src="dataClass.js"></script> -->
-
+  <!-- Start a data model section-->
   <section data-model id="org.1edtech.ob.v2p1.model">
     <section data-class id="org.1edtech.ob.v2p1.assertion.class">
       <aside class="example">
@@ -50,7 +49,8 @@
       </aside>
     </section>
     <section data-class id="org.1edtech.ob.v2p1.badgeclass.class">
-      <aside data-sample class="example"></aside>
+      <!-- Optionally add a generated sample -->
+      <!-- <aside data-sample class="example"></aside> -->
     </section>
     <section data-class id="org.1edtech.ob.v2p1.profile.class"></section>
     <section data-class id="org.1edtech.ob.v2p1.issuer.class"></section>
@@ -66,6 +66,9 @@
     <section data-class id="org.1edtech.ob.v2p1.revocationlist.class"></section>
     <section data-class id="org.1edtech.ob.v2p1.cryptographickey.class"></section>
     <section data-class id="org.1edtech.ob.v2p1.endorsement.class"></section>
+
+    <!-- If you omit a class in the, it will show up as a Respec error -->
+    <!-- <section data-class id="org.1edtech.ob.v2p1.assertionpayload.class"></section> -->
   </section>
 
   </body>

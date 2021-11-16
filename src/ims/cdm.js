@@ -13,6 +13,7 @@ import { showError, showWarning } from "../core/utils.js";
 import dataClassTemplate from "./templates/dataClass.js";
 import dataModelTemplate from "./templates/dataModel.js";
 import { html } from "../core/import-maps.js";
+import { sub } from "../core/pubsubhub.js";
 
 export const name = "ims/cdm";
 
@@ -21,30 +22,39 @@ if (typeof window.env === "undefined") {
 }
 
 /**
- * Get the CDM API_KEY from the configuration.
+ * Get the CDM API KEY from the configuration.
  *
- * @returns The CDM API_KEY.
+ * @param {*} config The respecConfig
+ * @returns The CDM API KEY.
  */
-function getApiKey() {
-  if (window.env.API_KEY) {
-    return window.env.API_KEY;
+function getApiKey(config) {
+  if (config.cdm.apiKey) {
+    return config.cdm.apiKey;
   }
-  throw "No CDM API_KEY found";
+  throw "No CDM API KEY found";
 }
 
 /**
- * Get the CDM BASE_URL from the configuration.
+ * Get the CDM server URL from the configuration.
  *
- * @returns The CDM BASE_URL.
+ * @param {*} config The respecConfig
+ * @returns The CDM server URL.
  */
-function getBaseUrl() {
-  if (window.env.BASE_URL) {
-    return window.env.BASE_URL;
+function getBaseUrl(config) {
+  if (config.cdm.serverUrl) {
+    return config.cdm.serverUrl;
   }
-  throw "No CDM BASE_URL found";
+  throw "No CDM server URL found";
 }
 
-async function getDataModel(id) {
+/**
+ * Execute the API call to retrieve the CDM model.
+ *
+ * @param {*} config The respecConfig
+ * @param {string} id The id of the CDM model to retrieve
+ * @returns The data model as an object
+ */
+async function getDataModel(config, id) {
   const query = JSON.stringify({
     query: `
     {
@@ -81,11 +91,11 @@ async function getDataModel(id) {
   });
 
   try {
-    const res = await fetch(`${getBaseUrl()}/graphql`, {
+    const res = await fetch(`${getBaseUrl(config)}/graphql`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": getApiKey(),
+        "X-Api-Key": getApiKey(config),
       },
       body: query,
     });
@@ -114,20 +124,23 @@ async function getDataModel(id) {
  * Async function that returns a sample JSON object for a single
  * Common Data Model class.
  *
+ * @param {*} config The respecConfig
  * @param {string} id Common Data Model class id
  * @param {boolean} includeOptionalFields True if the sample should
  * include all optional fields (the default is false)
  * @returns The sample JSON object
  */
-async function getDataSample(id, includeOptionalFields = false) {
+async function getDataSample(config, id, includeOptionalFields = false) {
   try {
     const res = await fetch(
-      `${getBaseUrl()}/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
+      `${getBaseUrl(
+        config
+      )}/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": getApiKey(),
+          "X-Api-Key": getApiKey(config),
         },
       }
     );
@@ -147,9 +160,10 @@ async function getDataSample(id, includeOptionalFields = false) {
 /**
  * Process a single data model class definition.
  *
- * @param {*} classModel The CDM class object.
+ * @param {*} config The respecConfig
+ * @param {*} classModel The CDM class object
  */
-async function processDataClass(classModel) {
+async function processDataClass(config, classModel) {
   const section = document.getElementById(classModel.id);
   if (classModel.stereoType === "PrimitiveType") {
     if (section) {
@@ -168,13 +182,13 @@ async function processDataClass(classModel) {
   if (!section) {
     showError(`Missing class ${classModel.id}`, name);
   } else {
-    let fullElem = dataClassTemplate(classModel);
-    if (typeof window.dataClassTemplate === "function") {
-      fullElem = window.dataClassTemplate(classModel);
+    if (typeof config.cdm.dataClassTemplate !== "function") {
+      config.cdm.dataClassTemplate = dataClassTemplate;
     }
-    if (fullElem) {
+    const wrapper = config.cdm.dataClassTemplate(classModel);
+    if (wrapper) {
       let target = null;
-      Array.from(fullElem.childNodes).forEach(element => {
+      Array.from(wrapper.childNodes).forEach(element => {
         let thisElement = element;
         if (element.nodeName === "#text") {
           thisElement = document.createElement("text");
@@ -193,6 +207,7 @@ async function processDataClass(classModel) {
       const includeOptionalFields =
         sampleElement.getAttribute("data-include-optional-fields") ?? "false";
       const sampleData = await getDataSample(
+        config,
         classModel.id,
         includeOptionalFields
       );
@@ -215,19 +230,20 @@ async function processDataClass(classModel) {
 /**
  * Process a single data model definition.
  *
+ * @param {*} config The respecConfig.
  * @param {string} id The CDM id for the model.
  */
-async function processDataModel(id) {
+async function processDataModel(config, id) {
   const section = document.getElementById(id);
-  const dataModel = await getDataModel(section.id);
+  const dataModel = await getDataModel(config, section.id);
   if (dataModel) {
-    let fullElem = dataModelTemplate(dataModel);
-    if (typeof window.dataModelTemplate === "function") {
-      fullElem = window.dataModelTemplate(dataModel);
+    if (typeof config.cdm.dataModelTemplate !== "function") {
+      config.cdm.dataModelTemplate = dataModelTemplate;
     }
-    if (fullElem) {
+    const wrapper = config.cdm.dataModelTemplate(dataModel);
+    if (wrapper) {
       let target = null;
-      Array.from(fullElem.childNodes).forEach(element => {
+      Array.from(wrapper.childNodes).forEach(element => {
         let thisElement = element;
         if (element.nodeName === "#text") {
           thisElement = document.createElement("text");
@@ -242,7 +258,7 @@ async function processDataModel(id) {
       });
     }
     Array.from(dataModel.classes).map(async classModel => {
-      processDataClass(classModel);
+      processDataClass(config, classModel);
     });
     processPrimitives(dataModel);
     processDerivatives(dataModel);
@@ -310,14 +326,16 @@ function processPrimitives(dataModel) {
  * Convert <section data-model> and <section data-class> elements into
  * a normative data model definition using information from the Common
  * Data Model.
+ *
+ * @param {*} config respecConfig
  */
-export async function run() {
+export async function run(config) {
   const dataModelSections = document.querySelectorAll("section[data-model]");
   if (dataModelSections) {
     const promises = Array.from(dataModelSections).map(
       async dataModelSection => {
         try {
-          await processDataModel(dataModelSection.id);
+          await processDataModel(config, dataModelSection.id);
         } catch (error) {
           showError(`Cannot process model ${dataModelSection.id}: ${error}`);
         }
@@ -325,4 +343,14 @@ export async function run() {
     );
     await Promise.all(promises);
   }
+
+  // Remove CDM config from initialUserConfig so API_KEY is not exposed
+  sub("end-all", () => {
+    const script = document.getElementById("initialUserConfig");
+    const userConfig = JSON.parse(script.innerHTML);
+    if ("cdm" in userConfig) {
+      delete userConfig.cdm;
+      script.innerHTML = JSON.stringify(userConfig, null, 2);
+    }
+  });
 }
