@@ -212,7 +212,9 @@ async function processDataClass(config, classModel) {
         includeOptionalFields
       );
       if (sampleData) {
-        sampleElement.append(html`<pre class="nohighlight json">${JSON.stringify(sampleData, null, 2)}</pre>`);
+        const sample = html`<pre class="nohighlight json">
+${JSON.stringify(sampleData, null, 2)}</pre>`;
+        sampleElement.append(sample);
       } else {
         sampleElement.append(
           html`<p>
