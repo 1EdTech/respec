@@ -12,7 +12,7 @@ export default classData => {
             <th>Property</th>
             <th>Type</th>
             <th>Description</th>
-            <th>Required?</th>
+            <th>Required</th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@ function renderProperty(property) {
 }
 
 function renderRequired(property) {
-  return property.cardinality.value.includes("ZERO") ? "No" : "Yes";
+  return property.cardinality.value.includes("ZERO") ? "Optional" : "Required";
 }
 
 function renderType(property) {
