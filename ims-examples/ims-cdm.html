@@ -8,6 +8,8 @@
   </title>
   <script src='../profiles/ims-default.js' type="module" class="remove"></script>
 
+  <script class="remove" src="https://cdn.jsdelivr.net/gh/digitalbazaar/respec-vc@1.0.0/dist/main.js"></script>
+
   <!-- Read the CDM configuration -->
   <script class="remove" src="cdm-config.js"></script>
 
@@ -24,8 +26,42 @@
 
       // Add the CDM configuration to respecConfig
       cdm: _cdm,
+
+      // Add VC proof examples
+
+      postProcess: [
+        window.respecVc.createVcExamples
+      ],
     };
   </script>
+
+<style>
+  pre .highlight {
+    font-weight: bold;
+    color: Green;
+  }
+  pre .subject {
+    font-weight: bold;
+    color: RoyalBlue;
+  }
+  pre .property {
+    font-weight: bold;
+    color: DarkGoldenrod;
+  }
+  pre .comment {
+    font-weight: bold;
+    color: SteelBlue;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .color-text {
+    font-weight: bold;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  }
+      </style>
+
 </head>
 
 <body>
@@ -38,39 +74,54 @@
   </section>
 
   <!-- Start a data model section-->
-  <section data-model id="org.1edtech.ob.v2p1.model">
-    <section data-class id="org.1edtech.ob.v2p1.assertion.class">
-      <aside class="example">
-        <pre class="json">
-          {
-            type: "Assertion"
-          }
-        </pre>
-      </aside>
+  <section data-model id="org.1edtech.ob.v3p0.model">
+    <section data-class id="org.1edtech.ob.v3p0.assertion.class">
+      <aside class="example" title="Usage of the id property">
+      <pre class="nohighlight vc"
+        data-vc-vm="https://example.edu/issuers/565049#key-1">
+    {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
+      ],
+      <span class="highlight">"id": "http://example.edu/credentials/3732"</span>,
+      "type": ["VerifiableCredential", "UniversityDegreeCredential"],
+      "issuer": "https://example.edu/issuers/565049",
+      "issuanceDate": "2010-01-01T00:00:00Z",
+      "credentialSubject": {
+        <span class="highlight">"id": "did:example:ebfeb1f712ebc6f1c276e12ec21"</span>,
+        "degree": {
+          "type": "BachelorDegree",
+          "name": "Bachelor of Science and Arts"
+        }
+      }
+    }
+    </pre>
+  </aside>
     </section>
-    <section data-class id="org.1edtech.ob.v2p1.badgeclass.class">
+    <section data-class id="org.1edtech.ob.v3p0.badgeclass.class">
       <!-- Optionally add a generated sample -->
-      <!-- <aside data-sample class="example"></aside> -->
+      <aside data-sample class="example" title="Sample BadgeClass (Generated)"></aside>
     </section>
-    <section data-class id="org.1edtech.ob.v2p1.profile.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.issuer.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.identityobject.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.identitytype.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.verificationobject.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.hostedbadge.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.signedbadge.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.evidence.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.image.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.criteria.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.alignmentobject.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.revocationlist.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.cryptographickey.class"></section>
-    <section data-class id="org.1edtech.ob.v2p1.endorsement.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.profile.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.issuer.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.identityobject.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.identitytype.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.verificationobject.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.hostedbadge.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.signedbadge.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.evidence.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.image.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.criteria.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.alignmentobject.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.revocationlist.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.cryptographickey.class"></section>
+    <section data-class id="org.1edtech.ob.v3p0.endorsement.class"></section>
 
     <!-- If you omit a class in the, it will show up as a Respec error -->
-    <!-- <section data-class id="org.1edtech.ob.v2p1.assertionpayload.class"></section> -->
+    <!-- <section data-class id="org.1edtech.ob.v3p0.assertionpayload.class"></section> -->
   </section>
 
-  </body>
+</body>
 
 </html>
