@@ -212,8 +212,11 @@ async function processDataClass(config, classModel) {
         includeOptionalFields
       );
       if (sampleData) {
-        const sample = html`<pre class="nohighlight json">
-${JSON.stringify(sampleData, null, 2)}</pre>`;
+        // eslint-disable-next-line prettier/prettier
+        const sample = html`
+<pre class="nohighlight">
+${JSON.stringify(sampleData, null, 2)}
+</pre>`;
         sampleElement.append(sample);
       } else {
         sampleElement.append(
