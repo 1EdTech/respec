@@ -58,7 +58,7 @@ async function getDataModel(config, id) {
   const query = JSON.stringify({
     query: `
     {
-      modelByID(id: "${id}") {
+      modelByID(id: "${id}", source: ${config.cdm.source ?? "CORE"}) {
         id
         name
         documentation {
@@ -212,10 +212,7 @@ async function processDataClass(config, classModel) {
         includeOptionalFields
       );
       if (sampleData) {
-        sampleElement.append(html`<pre class="json">
-          ${JSON.stringify(sampleData)}
-          </pre
-        >`);
+        sampleElement.append(html`<pre class="nohighlight json">${JSON.stringify(sampleData, null, 2)}</pre>`);
       } else {
         sampleElement.append(
           html`<p>
@@ -260,8 +257,8 @@ async function processDataModel(config, id) {
     Array.from(dataModel.classes).map(async classModel => {
       processDataClass(config, classModel);
     });
-    processPrimitives(dataModel);
     processDerivatives(dataModel);
+    processPrimitives(dataModel);
   } else {
     // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${id}</h3>`);
@@ -281,12 +278,14 @@ function processDerivatives(dataModel) {
       <thead>
         <tr>
           <th>Type</th>
+          <th>Description</th>
         </tr>
       </thead>
       <tbody>
         ${derivatives.map(model => {
           return html`<tr>
             <td id="${model.id}">${model.name}</td>
+            <td>${model.documentation.description}</td>
           </tr>`;
         })}
       </tbody>
@@ -308,12 +307,14 @@ function processPrimitives(dataModel) {
       <thead>
         <tr>
           <th>Type</th>
+          <th>Description</th>
         </tr>
       </thead>
       <tbody>
         ${primitives.map(model => {
           return html`<tr>
             <td id="${model.id}">${model.name}</td>
+            <td>${model.documentation.description}</td>
           </tr>`;
         })}
       </tbody>
