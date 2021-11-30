@@ -2,7 +2,7 @@
 import { html } from "../../core/import-maps.js";
 
 export default classData => {
-  console.log("dataClass classData", classData);
+  // console.log("dataClass classData", classData);
   if (classData && classData.properties) {
     return html`<h3>${classData.name}</h3>
       <p>${classData.documentation.description}</p>
