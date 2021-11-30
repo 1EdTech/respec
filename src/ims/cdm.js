@@ -107,10 +107,15 @@ async function getDataModel(config, id) {
       return null;
     }
     const data = await res.json();
-    console.log("fetched data", data);
+    // console.log("fetched data", data);
     const dataModel = data.data.modelByID;
     if (!dataModel) {
-      showError(`Unknown CDM for ${id}`, name);
+      showError(
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
+          config.cdm.source ?? "CORE"
+        }`,
+        name
+      );
       return null;
     }
     return dataModel;
@@ -149,10 +154,39 @@ async function getDataSample(config, id, includeOptionalFields = false) {
       return null;
     }
     const data = await res.json();
-    console.log("fetched data", data);
+    // console.log("fetched data", data);
     return data;
   } catch (error) {
     showError(`Could not get sample data for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
+/**
+ * Async function that returns the schema for a class.
+ *
+ * @param {*} config The respecConfig
+ * @param {string} id Common Data Model class id
+ * @returns The schema
+ */
+async function getSchema(config, id) {
+  try {
+    const res = await fetch(`${getBaseUrl(config)}/jsonschema/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": getApiKey(config),
+      },
+    });
+    if (!res.ok) {
+      showError(`Could not get the schema for ${id}: ${res.status}`, name);
+      return null;
+    }
+    const data = await res.json();
+    // console.log("fetched data", data);
+    return data;
+  } catch (error) {
+    showError(`Could not get the schema for ${id}: ${error}`, name);
     return null;
   }
 }
@@ -180,7 +214,10 @@ async function processDataClass(config, classModel) {
     return;
   }
   if (!section) {
-    showError(`Missing class ${classModel.id}`, name);
+    showError(
+      `Class ${classModel.id} is defined in the data model, but not included in the document`,
+      name
+    );
   } else {
     if (typeof config.cdm.dataClassTemplate !== "function") {
       config.cdm.dataClassTemplate = dataClassTemplate;
@@ -329,6 +366,48 @@ function processPrimitives(dataModel) {
 }
 
 /**
+ * Validate the JSON in a <pre> element. The schema is identified
+ * by a data-schema attribute.
+ *
+ * @param {*} config The respecConfig
+ * @param {HTMLPreElement} pre The <pre> element that contains the JSON to be validated
+ */
+async function validateExample(config, pre) {
+  const schemaId = pre.getAttribute("data-schema");
+  if (schemaId === "") {
+    showError("Example is missing a schema id", name);
+    return;
+  }
+  const schemaDef = await getSchema(config, schemaId);
+  if (schemaDef === null) return;
+  try {
+    const data = JSON.parse(pre.innerText);
+
+    const Ajv = window.ajv2019;
+    const ajv = new Ajv({
+      allErrors: true,
+      validateFormats: false,
+    });
+
+    const validate = ajv.compile(schemaDef);
+    const valid = validate(data);
+    if (!valid) {
+      console.error(
+        `Schema validation errors for ${schemaId}:`,
+        validate.errors
+      );
+      showError(
+        `Invalid example JSON for ${schemaId}. See console for details`,
+        name
+      );
+    }
+  } catch (error) {
+    showError(`Cannot parse example JSON for ${schemaId}: ${error}`, name);
+    return;
+  }
+}
+
+/**
  * Convert <section data-model> and <section data-class> elements into
  * a normative data model definition using information from the Common
  * Data Model.
@@ -343,11 +422,28 @@ export async function run(config) {
         try {
           await processDataModel(config, dataModelSection.id);
         } catch (error) {
-          showError(`Cannot process model ${dataModelSection.id}: ${error}`);
+          showError(
+            `Cannot process model ${dataModelSection.id}: ${error}`,
+            name
+          );
         }
       }
     );
     await Promise.all(promises);
+  }
+
+  if (typeof window.ajv2019 !== "undefined") {
+    const examples = document.querySelectorAll("pre[data-schema]");
+    if (examples) {
+      const promises = Array.from(examples).map(async example => {
+        try {
+          await validateExample(config, example);
+        } catch (error) {
+          showError(`Cannot validate example ${example}: ${error}`, name);
+        }
+      });
+      await Promise.all(promises);
+    }
   }
 
   // Remove CDM config from initialUserConfig so API_KEY is not exposed
