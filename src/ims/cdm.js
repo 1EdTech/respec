@@ -219,8 +219,7 @@ async function processClass(config, classModel) {
     );
   } else {
     section.removeAttribute("data-class");
-    let id = section.getAttribute("id");
-    if (id === null) id = classModel.id;
+    const id = section.getAttribute("id") ?? classModel.id;
     section.setAttribute("id", id);
     if (typeof config.cdm.dataClassTemplate !== "function") {
       config.cdm.dataClassTemplate = dataClassTemplate;
@@ -255,8 +254,7 @@ async function processModel(config, modelId) {
   const section = document.querySelector(`section[data-model="${modelId}"]`);
   const dataModel = await getDataModel(config, modelId);
   if (dataModel) {
-    let id = section.getAttribute("id");
-    if (id === null) id = modelId;
+    const id = section.getAttribute("id") ?? modelId;
     section.setAttribute("id", id);
     if (typeof config.cdm.dataModelTemplate !== "function") {
       config.cdm.dataModelTemplate = dataModelTemplate;
@@ -360,8 +358,7 @@ async function processSample(config, parentElem) {
     showError("Example is missing a schema id", name);
     return;
   }
-  let id = parentElem.getAttribute("id");
-  if (id === null) id = `example-${classId}`;
+  const id = parentElem.getAttribute("id") ?? `example-${classId}`;
   parentElem.setAttribute("id", id);
   parentElem.removeAttribute("data-sample");
   const includeOptionalFields =
