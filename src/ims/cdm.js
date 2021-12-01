@@ -10,16 +10,13 @@
  * The HTML created by the CDM parser is a table for each data class.
  */
 import { showError, showWarning } from "../core/utils.js";
+import { addFormats } from "./ajv-formats.js";
 import dataClassTemplate from "./templates/dataClass.js";
 import dataModelTemplate from "./templates/dataModel.js";
 import { html } from "../core/import-maps.js";
 import { sub } from "../core/pubsubhub.js";
 
 export const name = "ims/cdm";
-
-if (typeof window.env === "undefined") {
-  window.env = {};
-}
 
 /**
  * Get the CDM API KEY from the configuration.
@@ -197,8 +194,10 @@ async function getSchema(config, id) {
  * @param {*} config The respecConfig
  * @param {*} classModel The CDM class object
  */
-async function processDataClass(config, classModel) {
-  const section = document.getElementById(classModel.id);
+async function processClass(config, classModel) {
+  const section = document.querySelector(
+    `section[data-class="${classModel.id}"]`
+  );
   if (classModel.stereoType === "PrimitiveType") {
     if (section) {
       showWarning(`Ignoring primitive class ${classModel.id}`, name);
@@ -215,10 +214,14 @@ async function processDataClass(config, classModel) {
   }
   if (!section) {
     showError(
-      `Class ${classModel.id} is defined in the data model, but not included in the document`,
+      `Class ${classModel.id} is defined in the data model, but does not appear in the document`,
       name
     );
   } else {
+    section.removeAttribute("data-class");
+    let id = section.getAttribute("id");
+    if (id === null) id = classModel.id;
+    section.setAttribute("id", id);
     if (typeof config.cdm.dataClassTemplate !== "function") {
       config.cdm.dataClassTemplate = dataClassTemplate;
     }
@@ -239,30 +242,6 @@ async function processDataClass(config, classModel) {
         target = thisElement;
       });
     }
-    const sampleElement = section.querySelector("[data-sample]");
-    if (sampleElement) {
-      const includeOptionalFields =
-        sampleElement.getAttribute("data-include-optional-fields") ?? "false";
-      const sampleData = await getDataSample(
-        config,
-        classModel.id,
-        includeOptionalFields
-      );
-      if (sampleData) {
-        // eslint-disable-next-line prettier/prettier
-        const sample = html`
-<pre class="nohighlight">
-${JSON.stringify(sampleData, null, 2)}
-</pre>`;
-        sampleElement.append(sample);
-      } else {
-        sampleElement.append(
-          html`<p>
-            Could not get sample data. See developer console for details.
-          </p>`
-        );
-      }
-    }
   }
 }
 
@@ -270,17 +249,21 @@ ${JSON.stringify(sampleData, null, 2)}
  * Process a single data model definition.
  *
  * @param {*} config The respecConfig.
- * @param {string} id The CDM id for the model.
+ * @param {string} modelId The CDM id for the model.
  */
-async function processDataModel(config, id) {
-  const section = document.getElementById(id);
-  const dataModel = await getDataModel(config, section.id);
+async function processModel(config, modelId) {
+  const section = document.querySelector(`section[data-model="${modelId}"]`);
+  const dataModel = await getDataModel(config, modelId);
   if (dataModel) {
+    let id = section.getAttribute("id");
+    if (id === null) id = modelId;
+    section.setAttribute("id", id);
     if (typeof config.cdm.dataModelTemplate !== "function") {
       config.cdm.dataModelTemplate = dataModelTemplate;
     }
     const wrapper = config.cdm.dataModelTemplate(dataModel);
     if (wrapper) {
+      section.removeAttribute("data-model");
       let target = null;
       Array.from(wrapper.childNodes).forEach(element => {
         let thisElement = element;
@@ -297,13 +280,13 @@ async function processDataModel(config, id) {
       });
     }
     Array.from(dataModel.classes).map(async classModel => {
-      processDataClass(config, classModel);
+      processClass(config, classModel);
     });
     processDerivatives(dataModel);
     processPrimitives(dataModel);
   } else {
     // If there is no data model, add a header to satisfy Respec
-    section.insertAdjacentElement("afterbegin", html`<h3>${id}</h3>`);
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
   }
 }
 
@@ -366,13 +349,51 @@ function processPrimitives(dataModel) {
 }
 
 /**
+ * Generate a sample. The schema is identified by the data-sample attribute.
+ *
+ * @param {*} config The respecConfig
+ * @param {HTMLElement} parentElem The element that will contain the generated sample
+ */
+async function processSample(config, parentElem) {
+  const classId = parentElem.getAttribute("data-sample");
+  if (classId === "") {
+    showError("Example is missing a schema id", name);
+    return;
+  }
+  let id = parentElem.getAttribute("id");
+  if (id === null) id = `example-${classId}`;
+  parentElem.setAttribute("id", id);
+  parentElem.removeAttribute("data-sample");
+  const includeOptionalFields =
+    parentElem.getAttribute("data-include-optional-fields") ?? "false";
+  const sampleData = await getDataSample(
+    config,
+    classId,
+    includeOptionalFields
+  );
+  if (sampleData) {
+    // eslint-disable-next-line prettier/prettier
+      const sample = html`
+<pre class="nohighlight">
+${JSON.stringify(sampleData, null, 2)}
+</pre>`;
+    parentElem.append(sample);
+  } else {
+    parentElem.append(
+      html`<p>Could not get sample data. See developer console for details.</p>`
+    );
+  }
+}
+
+/**
  * Validate the JSON in a <pre> element. The schema is identified
  * by a data-schema attribute.
  *
  * @param {*} config The respecConfig
+ * @param {Object} ajv An instance of ajv2019
  * @param {HTMLPreElement} pre The <pre> element that contains the JSON to be validated
  */
-async function validateExample(config, pre) {
+async function validateExample(config, ajv, pre) {
   const schemaId = pre.getAttribute("data-schema");
   if (schemaId === "") {
     showError("Example is missing a schema id", name);
@@ -382,19 +403,30 @@ async function validateExample(config, pre) {
   if (schemaDef === null) return;
   try {
     const data = JSON.parse(pre.innerText);
-
-    const Ajv = window.ajv2019;
-    const ajv = new Ajv({
-      allErrors: true,
-      validateFormats: false,
-    });
-
     const validate = ajv.compile(schemaDef);
     const valid = validate(data);
     if (!valid) {
       console.error(
         `Schema validation errors for ${schemaId}:`,
         validate.errors
+      );
+      pre.insertAdjacentElement(
+        "beforebegin",
+        html`<div class="admonition warning">
+          <p>NOTE: This example contains invalid JSON for ${schemaId}.</p>
+          <ul>
+            ${validate.errors.map(error => {
+              if (error.instancePath === "") error.instancePath = "class";
+              let message = `${error.instancePath}: ${error.message}`;
+              switch (error.keyword) {
+                case "additionalProperties":
+                  message += ` (additional property: "${error.params.additionalProperty})"`;
+                  break;
+              }
+              return `<li>${message}</li>`;
+            })}
+          </ul>
+        </div>`
       );
       showError(
         `Invalid example JSON for ${schemaId}. See console for details`,
@@ -416,35 +448,55 @@ async function validateExample(config, pre) {
  */
 export async function run(config) {
   const dataModelSections = document.querySelectorAll("section[data-model]");
+  const promises = new Array();
   if (dataModelSections) {
-    const promises = Array.from(dataModelSections).map(
-      async dataModelSection => {
+    promises.push(
+      ...Array.from(dataModelSections).map(async dataModelSection => {
+        const modelId = dataModelSection.getAttribute("data-model");
         try {
-          await processDataModel(config, dataModelSection.id);
+          await processModel(config, modelId);
         } catch (error) {
-          showError(
-            `Cannot process model ${dataModelSection.id}: ${error}`,
-            name
-          );
+          showError(`Cannot process model ${modelId}: ${error}`, name);
         }
-      }
+      })
     );
-    await Promise.all(promises);
   }
 
-  if (typeof window.ajv2019 !== "undefined") {
+  const samples = document.querySelectorAll("[data-sample]");
+  if (samples) {
+    promises.push(
+      ...Array.from(samples).map(async sample => {
+        const classId = sample.getAttribute("data-sample");
+        try {
+          await processSample(config, sample);
+        } catch (error) {
+          showError(`Cannot generate sample ${classId}: ${error}`, name);
+        }
+      })
+    );
+  }
+
+  if (typeof window.ajv2019 === "function") {
+    const ajv = new window.ajv2019({
+      allErrors: true,
+    });
+    addFormats(ajv);
     const examples = document.querySelectorAll("pre[data-schema]");
     if (examples) {
-      const promises = Array.from(examples).map(async example => {
-        try {
-          await validateExample(config, example);
-        } catch (error) {
-          showError(`Cannot validate example ${example}: ${error}`, name);
-        }
-      });
-      await Promise.all(promises);
+      promises.push(
+        ...Array.from(examples).map(async example => {
+          const classId = example.getAttribute("data-schema");
+          try {
+            await validateExample(config, ajv, example);
+          } catch (error) {
+            showError(`Cannot validate example ${classId}: ${error}`, name);
+          }
+        })
+      );
     }
   }
+
+  await Promise.all(promises);
 
   // Remove CDM config from initialUserConfig so API_KEY is not exposed
   sub("end-all", () => {
