@@ -71,8 +71,9 @@ async function getDataModel(config, id) {
           properties {
             name
             type {
-              name
               id
+              name
+              stereoType
             }
             cardinality {
               value
