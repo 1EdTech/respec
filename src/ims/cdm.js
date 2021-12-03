@@ -193,55 +193,32 @@ async function getSchema(config, id) {
  * Process a single data model class definition.
  *
  * @param {*} config The respecConfig
+ * @param {HTMLElement} classSection The class section element
  * @param {*} classModel The CDM class object
  */
-async function processClass(config, classModel) {
-  const section = document.querySelector(
-    `section[data-class="${classModel.id}"]`
-  );
-  if (classModel.stereoType === "PrimitiveType") {
-    if (section) {
-      showWarning(`Ignoring primitive class ${classModel.id}`, name);
-      section.remove();
-    }
-    return;
+async function processClass(config, classSection, classModel) {
+  classSection.removeAttribute("data-class");
+  const id = classSection.getAttribute("id") ?? classModel.id;
+  classSection.setAttribute("id", id);
+  if (typeof config.cdm.dataClassTemplate !== "function") {
+    config.cdm.dataClassTemplate = dataClassTemplate;
   }
-  if (classModel.stereoType === "DerivedType") {
-    if (section) {
-      showWarning(`Ignoring derived class ${classModel.id}`, name);
-      section.remove();
-    }
-    return;
-  }
-  if (!section) {
-    showError(
-      `Class ${classModel.id} is defined in the data model, but does not appear in the document`,
-      name
-    );
-  } else {
-    section.removeAttribute("data-class");
-    const id = section.getAttribute("id") ?? classModel.id;
-    section.setAttribute("id", id);
-    if (typeof config.cdm.dataClassTemplate !== "function") {
-      config.cdm.dataClassTemplate = dataClassTemplate;
-    }
-    const wrapper = config.cdm.dataClassTemplate(classModel);
-    if (wrapper) {
-      let target = null;
-      Array.from(wrapper.childNodes).forEach(element => {
-        let thisElement = element;
-        if (element.nodeName === "#text") {
-          thisElement = document.createElement("text");
-          thisElement.innerHTML = element.nodeValue;
-        }
-        if (target) {
-          target.insertAdjacentElement("afterend", thisElement);
-        } else {
-          section.insertAdjacentElement("afterbegin", thisElement);
-        }
-        target = thisElement;
-      });
-    }
+  const wrapper = config.cdm.dataClassTemplate(classModel);
+  if (wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      let thisElement = element;
+      if (element.nodeName === "#text") {
+        thisElement = document.createElement("text");
+        thisElement.innerHTML = element.nodeValue;
+      }
+      if (target) {
+        target.insertAdjacentElement("afterend", thisElement);
+      } else {
+        classSection.insertAdjacentElement("afterbegin", thisElement);
+      }
+      target = thisElement;
+    });
   }
 }
 
@@ -279,8 +256,45 @@ async function processModel(config, modelId) {
       });
     }
     Array.from(dataModel.classes).map(async classModel => {
-      processClass(config, classModel);
+      const classSection = section.querySelector(
+        `section[data-class="${classModel.id}"]`
+      );
+      if (classSection) {
+        if (classModel.stereoType === "PrimitiveType") {
+          showWarning(`Ignoring primitive class ${classModel.id}`, name);
+          classSection.remove();
+        } else if (classModel.stereoType === "DerivedType") {
+          showWarning(`Ignoring derived class ${classModel.id}`, name);
+          classSection.remove();
+        } else {
+          processClass(config, classSection, classModel);
+        }
+      } else if (
+        classModel.stereoType !== "PrimitiveType" &&
+        classModel.stereoType !== "DerivedType"
+      ) {
+        const message = `Class ${classModel.id} is defined in the data model, but does not
+        appear in the document`;
+        showWarning(message, name);
+        section.childNodes[0].insertAdjacentElement(
+          "afterend",
+          html`<div class="admonition warning">${message}.</div>`
+        );
+      }
     });
+    const unknownSections = section.querySelectorAll("section[data-class]");
+    if (unknownSections) {
+      Array.from(unknownSections).map(unknownSection => {
+        const classId = unknownSection.getAttribute("data-class");
+        const message = `Unknown or Duplicate Class ${classId}`;
+        showWarning(message, name);
+        unknownSection.insertAdjacentHTML(
+          "afterbegin",
+          `<h3>${classId}</h3>
+            <div class="admonition warning">${message}.</div>`
+        );
+      });
+    }
     processDerivatives(dataModel);
     processPrimitives(dataModel);
   } else {
