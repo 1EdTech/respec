@@ -4,7 +4,7 @@
  * check config and inform user if required ones are missing
  */
 
-import { showError, toShortIsoDate } from "../core/utils.js";
+import { humanDate, showError } from "../core/utils.js";
 
 export const name = "ims/config";
 
@@ -40,7 +40,7 @@ export async function run(conf) {
 
   if (!check(conf.specDate)) {
     if (conf.specStatus === "IMS Base Document") {
-      conf.specDate = toShortIsoDate(new Date());
+      conf.specDate = humanDate();
     } else {
       showError(
         "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'",
