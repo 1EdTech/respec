@@ -8,7 +8,7 @@ export default classData => {
       classData.stereoType === "Enumeration" ||
       classData.stereoType === "EnumExt"
     ) {
-      return html`<h3>${classData.name} Vocabulary</h3>
+      return html`<h3>${classData.name} Enumeration</h3>
         <p>${classData.documentation.description}</p>
         <table>
           <thead>
@@ -22,9 +22,8 @@ export default classData => {
             ${classData.stereoType === "EnumExt"
               ? html`<tr>
                   <td colspan="2">
-                    This vocabulary can be extended with new, proprietary
-                    vocabulary terms. The new terms must start with the
-                    substring 'ext:'.
+                    This enumeration can be extended with new, proprietary
+                    terms. The new terms must start with the substring 'ext:'.
                   </td>
                 </tr>`
               : html``}
@@ -64,7 +63,7 @@ function renderExtensions(property) {
 }
 
 function renderProperty(property) {
-  if (property.name === "extensions" || property.name === "pattern") {
+  if (property.name === "extensions") {
     return html``;
   } else {
     return html` <tr>
@@ -96,7 +95,7 @@ function renderType(property) {
     property.type.stereoType === "Enumeration" ||
     property.type.stereoType === "EnumExt"
   ) {
-    name += " Vocabulary";
+    name += " Enumeration";
   }
   name = html`<a href="#${property.type.id}">${name}</a>`;
   return name;
