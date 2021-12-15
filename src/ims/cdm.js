@@ -232,6 +232,8 @@ async function processClass(config, classSection, classModel) {
 async function processModel(config, section) {
   const modelId = section.getAttribute("data-model");
   const source = section.getAttribute("data-source") ?? config.cdm.source;
+  const generateClasses =
+    !!section.getAttribute("data-generate-classes") ?? false;
   const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
     const id = section.getAttribute("id") ?? modelId;
@@ -258,7 +260,7 @@ async function processModel(config, section) {
       });
     }
     Array.from(dataModel.classes).map(async classModel => {
-      const classSection = section.querySelector(
+      let classSection = section.querySelector(
         `section[data-class="${classModel.id}"]`
       );
       if (classSection) {
@@ -275,13 +277,19 @@ async function processModel(config, section) {
         classModel.stereoType !== "PrimitiveType" &&
         classModel.stereoType !== "DerivedType"
       ) {
-        const message = `Class ${classModel.id} is defined in the data model, but does not
-        appear in the document`;
-        showWarning(message, name);
-        section.childNodes[0].insertAdjacentElement(
-          "afterend",
-          html`<div class="admonition warning">${message}.</div>`
-        );
+        if (generateClasses) {
+          classSection = html`<section></section>`;
+          processClass(config, classSection, classModel);
+          section.insertAdjacentElement("beforeend", classSection);
+        } else {
+          const message = `Class ${classModel.id} is defined in the data model, but does not
+          appear in the document`;
+          showWarning(message, name);
+          section.childNodes[0].insertAdjacentElement(
+            "afterend",
+            html`<div class="admonition warning">${message}.</div>`
+          );
+        }
       }
     });
     const unknownSections = section.querySelectorAll("section[data-class]");
