@@ -48,14 +48,15 @@ function getBaseUrl(config) {
  * Execute the API call to retrieve the CDM model.
  *
  * @param {*} config The respecConfig
+ * @param {string} source The source (CORE or SANDBOX) of the model
  * @param {string} id The id of the CDM model to retrieve
  * @returns The data model as an object
  */
-async function getDataModel(config, id) {
+async function getDataModel(config, source, id) {
   const query = JSON.stringify({
     query: `
     {
-      modelByID(id: "${id}", source: ${config.cdm.source ?? "CORE"}) {
+      modelByID(id: "${id}", source: ${source ?? "CORE"}) {
         id
         name
         documentation {
@@ -226,11 +227,12 @@ async function processClass(config, classSection, classModel) {
  * Process a single data model definition.
  *
  * @param {*} config The respecConfig.
- * @param {string} modelId The CDM id for the model.
+ * @param {HTMLElement} section The CDM id for the model.
  */
-async function processModel(config, modelId) {
-  const section = document.querySelector(`section[data-model="${modelId}"]`);
-  const dataModel = await getDataModel(config, modelId);
+async function processModel(config, section) {
+  const modelId = section.getAttribute("data-model");
+  const source = section.getAttribute("data-source") ?? config.cdm.source;
+  const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
     const id = section.getAttribute("id") ?? modelId;
     section.setAttribute("id", id);
@@ -463,10 +465,10 @@ export async function run(config) {
   const promises = new Array();
   if (dataModelSections) {
     promises.push(
-      ...Array.from(dataModelSections).map(async dataModelSection => {
-        const modelId = dataModelSection.getAttribute("data-model");
+      ...Array.from(dataModelSections).map(async section => {
+        const modelId = section.getAttribute("data-model");
         try {
-          await processModel(config, modelId);
+          await processModel(config, section);
         } catch (error) {
           showError(`Cannot process model ${modelId}: ${error}`, name);
         }
