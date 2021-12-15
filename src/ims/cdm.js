@@ -232,8 +232,10 @@ async function processClass(config, classSection, classModel) {
 async function processModel(config, section) {
   const modelId = section.getAttribute("data-model");
   const source = section.getAttribute("data-source") ?? config.cdm.source;
+  section.removeAttribute("data-source");
   const generateClasses =
     !!section.getAttribute("data-generate-classes") ?? false;
+  section.removeAttribute("data-generate-classes");
   const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
     const id = section.getAttribute("id") ?? modelId;
