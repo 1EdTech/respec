@@ -18,6 +18,15 @@ import { sub } from "../core/pubsubhub.js";
 
 export const name = "ims/cdm";
 
+function appendAppendix(appendix) {
+  const history = document.getElementById("history");
+  if (history) {
+    history.insertAdjacentElement("beforebegin", appendix);
+  } else {
+    document.body.append(appendix);
+  }
+}
+
 /**
  * Get the CDM API KEY from the configuration.
  *
@@ -342,7 +351,7 @@ function processDerivatives(dataModel) {
       </tbody>
     </table>
   </section>`;
-  document.body.append(appendix);
+  appendAppendix(appendix);
 }
 
 function processPrimitives(dataModel) {
@@ -371,7 +380,7 @@ function processPrimitives(dataModel) {
       </tbody>
     </table>
   </section>`;
-  document.body.append(appendix);
+  appendAppendix(appendix);
 }
 
 /**
