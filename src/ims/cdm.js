@@ -428,7 +428,10 @@ async function validateExample(config, ajv, pre) {
   if (schemaDef === null) return;
   try {
     const data = JSON.parse(pre.innerText);
-    const validate = ajv.compile(schemaDef);
+    if (ajv.refs[schemaDef.$id] === undefined) {
+      ajv.compile(schemaDef);
+    }
+    const validate = ajv.refs[schemaDef.$id].validate;
     const valid = validate(data);
     if (!valid) {
       console.error(
