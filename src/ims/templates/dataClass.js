@@ -1,14 +1,14 @@
 // @ts-check
 import { html } from "../../core/import-maps.js";
 
-export default classData => {
-  // console.log("dataClass classData", classData);
+export default (classData, title) => {
   if (classData && classData.properties) {
     if (
       classData.stereoType === "Enumeration" ||
       classData.stereoType === "EnumExt"
     ) {
-      return html`<h3>${classData.name} Enumeration</h3>
+      title = title ?? `${classData.name} Enumeration`;
+      return html`<h3>${title}</h3>
         <p>${classData.documentation.description}</p>
         <table>
           <thead>
@@ -30,7 +30,8 @@ export default classData => {
           </tbody>
         </table>`;
     } else {
-      return html`<h3>${classData.name}</h3>
+      title = title ?? `${classData.name}`;
+      return html`<h3>${title}</h3>
         <p>${classData.documentation.description}</p>
         <table>
           <thead>

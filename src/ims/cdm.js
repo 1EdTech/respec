@@ -207,13 +207,15 @@ async function getSchema(config, id) {
  * @param {*} classModel The CDM class object
  */
 async function processClass(config, classSection, classModel) {
-  classSection.removeAttribute("data-class");
   const id = classSection.getAttribute("id") ?? classModel.id;
   classSection.setAttribute("id", id);
   if (typeof config.cdm.dataClassTemplate !== "function") {
     config.cdm.dataClassTemplate = dataClassTemplate;
   }
-  const wrapper = config.cdm.dataClassTemplate(classModel);
+  const title = classSection.getAttribute("data-title");
+  classSection.removeAttribute("data-class");
+  classSection.removeAttribute("data-title");
+  const wrapper = config.cdm.dataClassTemplate(classModel, title);
   if (wrapper) {
     let target = null;
     Array.from(wrapper.childNodes).forEach(element => {
@@ -241,11 +243,13 @@ async function processClass(config, classSection, classModel) {
 async function processModel(config, section) {
   const modelId = section.getAttribute("data-model");
   const source = section.getAttribute("data-source") ?? config.cdm.source;
-  section.removeAttribute("data-source");
   const generateClasses =
     section.getAttribute("data-generate-classes") === "" ||
     !!section.getAttribute("data-generate-classes");
+  const title = section.getAttribute("data-title");
   section.removeAttribute("data-generate-classes");
+  section.removeAttribute("data-source");
+  section.removeAttribute("data-title");
   const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
     const id = section.getAttribute("id") ?? modelId;
@@ -253,7 +257,7 @@ async function processModel(config, section) {
     if (typeof config.cdm.dataModelTemplate !== "function") {
       config.cdm.dataModelTemplate = dataModelTemplate;
     }
-    const wrapper = config.cdm.dataModelTemplate(dataModel);
+    const wrapper = config.cdm.dataModelTemplate(dataModel, title);
     if (wrapper) {
       section.removeAttribute("data-model");
       let target = null;

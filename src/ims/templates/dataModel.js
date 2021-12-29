@@ -1,9 +1,10 @@
 // @ts-check
 import { html } from "../../core/import-maps.js";
 
-export default dataModel => {
+export default (dataModel, title) => {
   if (dataModel) {
-    return html`<h2>${dataModel.name} Data Model</h2>
+    title = title ?? `${dataModel.name} Data Model`;
+    return html`<h2>${title}</h2>
       <p>${dataModel.documentation.description}</p>`;
   }
 };
