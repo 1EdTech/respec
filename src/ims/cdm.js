@@ -70,6 +70,8 @@ async function getDataModel(config, source, id) {
         name
         documentation {
           description
+          notes
+          issues
         }
         classes {
           id
@@ -77,6 +79,9 @@ async function getDataModel(config, source, id) {
           stereoType
           documentation {
             description
+            notes
+            issues
+            packageName
           }
           properties {
             name
@@ -90,6 +95,8 @@ async function getDataModel(config, source, id) {
             }
             documentation {
               description
+              notes
+              issues
             }
           }
         }
@@ -219,17 +226,19 @@ async function processClass(config, classSection, classModel) {
   if (wrapper) {
     let target = null;
     Array.from(wrapper.childNodes).forEach(element => {
-      let thisElement = element;
-      if (element.nodeName === "#text") {
-        thisElement = document.createElement("text");
-        thisElement.innerHTML = element.nodeValue;
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          classSection.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
       }
-      if (target) {
-        target.insertAdjacentElement("afterend", thisElement);
-      } else {
-        classSection.insertAdjacentElement("afterbegin", thisElement);
-      }
-      target = thisElement;
     });
   }
 }
@@ -262,17 +271,19 @@ async function processModel(config, section) {
       section.removeAttribute("data-model");
       let target = null;
       Array.from(wrapper.childNodes).forEach(element => {
-        let thisElement = element;
-        if (element.nodeName === "#text") {
-          thisElement = document.createElement("text");
-          thisElement.innerHTML = element.nodeValue;
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
         }
-        if (target) {
-          target.insertAdjacentElement("afterend", thisElement);
-        } else {
-          section.insertAdjacentElement("afterbegin", thisElement);
-        }
-        target = thisElement;
       });
     }
     Array.from(dataModel.classes).map(async classModel => {

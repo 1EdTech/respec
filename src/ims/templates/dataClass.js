@@ -10,6 +10,8 @@ export default (classData, title) => {
       title = title ?? `${classData.name} Enumeration`;
       return html`<h3>${title}</h3>
         <p>${classData.documentation.description}</p>
+        ${classData.documentation.issues.map(renderIssue)}
+        ${classData.documentation.notes.map(renderNote)}
         <table>
           <thead>
             <tr>
@@ -33,6 +35,8 @@ export default (classData, title) => {
       title = title ?? `${classData.name}`;
       return html`<h3>${title}</h3>
         <p>${classData.documentation.description}</p>
+        ${classData.documentation.issues.map(renderIssue)}
+        ${classData.documentation.notes.map(renderNote)}
         <table>
           <thead>
             <tr>
@@ -63,6 +67,14 @@ function renderExtensions(property) {
   }
 }
 
+function renderIssue(issue) {
+  return html`<div class="issue">${issue}</div>`;
+}
+
+function renderNote(note) {
+  return html`<div class="note">${note}</div>`;
+}
+
 function renderProperty(property) {
   if (property.name === "extensions") {
     return html``;
@@ -70,7 +82,11 @@ function renderProperty(property) {
     return html` <tr>
       <td>${property.name}</td>
       <td>${renderType(property)}</td>
-      <td>${property.documentation.description}</td>
+      <td>
+        ${property.documentation.description}
+        ${property.documentation.issues.map(renderIssue)}
+        ${property.documentation.notes.map(renderNote)}
+      </td>
       <td>${renderRequired(property)}</td>
     </tr>`;
   }
@@ -83,7 +99,11 @@ function renderRequired(property) {
 function renderTerm(term) {
   return html`<tr>
     <td>${term.name}</td>
-    <td>${term.documentation.description}</td>
+    <td>
+      ${term.documentation.description}
+      ${term.documentation.issues.map(renderIssue)}
+      ${term.documentation.notes.map(renderNote)}
+    </td>
   </tr>`;
 }
 
