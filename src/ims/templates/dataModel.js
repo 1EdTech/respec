@@ -1,20 +1,20 @@
 // @ts-check
+import { renderIssue, renderNote } from "./utils.js";
 import { html } from "../../core/import-maps.js";
 
-export default (dataModel, title) => {
+/**
+ * @param {*} dataModel The CDM data model.
+ * @param {string} title The preferred title for this section.
+ * @param {string} id The unique header id to use so a data model
+ * can appear in multiple sections.
+ * @returns {HTMLElement[]} An array of HTML elements.
+ */
+export default (dataModel, title, id) => {
   if (dataModel) {
     title = title ?? `${dataModel.name} Data Model`;
-    return html`<h2>${title}</h2>
-      <p>${dataModel.documentation.description}</p>
+    id = (id ?? dataModel.id).replace(/\./g, "-");
+    return html`<h2 id="${id}">${title}</h2>
       ${dataModel.documentation.issues.map(renderIssue)}
       ${dataModel.documentation.notes.map(renderNote)}`;
   }
 };
-
-function renderIssue(issue) {
-  return html`<div class="issue">${issue}</div>`;
-}
-
-function renderNote(note) {
-  return html`<div class="note">${note}</div>`;
-}

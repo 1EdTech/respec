@@ -1,57 +1,28 @@
 // @ts-check
+import { renderIssue, renderNote } from "./utils.js";
 import { html } from "../../core/import-maps.js";
 
 export default (classData, title) => {
   if (classData && classData.properties) {
-    if (
-      classData.stereoType === "Enumeration" ||
-      classData.stereoType === "EnumExt"
-    ) {
-      title = title ?? `${classData.name} Enumeration`;
-      return html`<h3>${title}</h3>
-        <p>${classData.documentation.description}</p>
-        ${classData.documentation.issues.map(renderIssue)}
-        ${classData.documentation.notes.map(renderNote)}
-        <table>
-          <thead>
-            <tr>
-              <th>Term</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${classData.properties.map(renderTerm)}
-            ${classData.stereoType === "EnumExt"
-              ? html`<tr>
-                  <td colspan="2">
-                    This enumeration can be extended with new, proprietary
-                    terms. The new terms must start with the substring 'ext:'.
-                  </td>
-                </tr>`
-              : html``}
-          </tbody>
-        </table>`;
-    } else {
-      title = title ?? `${classData.name}`;
-      return html`<h3>${title}</h3>
-        <p>${classData.documentation.description}</p>
-        ${classData.documentation.issues.map(renderIssue)}
-        ${classData.documentation.notes.map(renderNote)}
-        <table>
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Required</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${classData.properties.map(renderProperty)}
-            ${classData.properties.map(renderExtensions)}
-          </tbody>
-        </table>`;
-    }
+    title = title ?? `${classData.name}`;
+    return html`<h3>${title}</h3>
+      <p>${classData.documentation.description}</p>
+      ${classData.documentation.issues.map(renderIssue)}
+      ${classData.documentation.notes.map(renderNote)}
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${classData.properties.map(renderProperty)}
+          ${classData.properties.map(renderExtensions)}
+        </tbody>
+      </table>`;
   }
 };
 
@@ -65,14 +36,6 @@ function renderExtensions(property) {
   } else {
     return html``;
   }
-}
-
-function renderIssue(issue) {
-  return html`<div class="issue">${issue}</div>`;
-}
-
-function renderNote(note) {
-  return html`<div class="note">${note}</div>`;
 }
 
 function renderProperty(property) {
@@ -94,17 +57,6 @@ function renderProperty(property) {
 
 function renderRequired(property) {
   return property.cardinality.value.includes("ZERO") ? "Optional" : "Required";
-}
-
-function renderTerm(term) {
-  return html`<tr>
-    <td>${term.name}</td>
-    <td>
-      ${term.documentation.description}
-      ${term.documentation.issues.map(renderIssue)}
-      ${term.documentation.notes.map(renderNote)}
-    </td>
-  </tr>`;
 }
 
 function renderType(property) {

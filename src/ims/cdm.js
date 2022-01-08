@@ -13,19 +13,12 @@ import { showError, showWarning } from "../core/utils.js";
 import { addFormats } from "./ajv-formats.js";
 import dataClassTemplate from "./templates/dataClass.js";
 import dataModelTemplate from "./templates/dataModel.js";
+import enumerationClassTemplate from "./templates/enumerationClass.js";
 import { html } from "../core/import-maps.js";
+import primitiveClassTemplate from "./templates/primitiveTypeClass.js";
 import { sub } from "../core/pubsubhub.js";
 
 export const name = "ims/cdm";
-
-function appendAppendix(appendix) {
-  const history = document.getElementById("history");
-  if (history) {
-    history.insertAdjacentElement("beforebegin", appendix);
-  } else {
-    document.body.append(appendix);
-  }
-}
 
 /**
  * Get the CDM API KEY from the configuration.
@@ -62,6 +55,9 @@ function getBaseUrl(config) {
  * @returns The data model as an object
  */
 async function getDataModel(config, source, id) {
+  const key = `${source}-${id}`;
+  const json = sessionStorage.getItem(key);
+  if (json) return JSON.parse(json);
   const query = JSON.stringify({
     query: `
     {
@@ -133,6 +129,7 @@ async function getDataModel(config, source, id) {
       );
       return null;
     }
+    sessionStorage.setItem(key, JSON.stringify(dataModel));
     return dataModel;
   } catch (error) {
     showError(`Could not get CDM model for ${id}: ${error}`, name);
@@ -209,20 +206,32 @@ async function getSchema(config, id) {
 /**
  * Process a single data model class definition.
  *
- * @param {*} config The respecConfig
  * @param {HTMLElement} classSection The class section element
  * @param {*} classModel The CDM class object
  */
-async function processClass(config, classSection, classModel) {
+async function processClass(classSection, classModel) {
   const id = classSection.getAttribute("id") ?? classModel.id;
   classSection.setAttribute("id", id);
-  if (typeof config.cdm.dataClassTemplate !== "function") {
-    config.cdm.dataClassTemplate = dataClassTemplate;
-  }
-  const title = classSection.getAttribute("data-title");
+  const title = classSection.getAttribute("title");
   classSection.removeAttribute("data-class");
-  classSection.removeAttribute("data-title");
-  const wrapper = config.cdm.dataClassTemplate(classModel, title);
+  // classSection.removeAttribute("title");
+  let wrapper;
+  switch (classModel.stereoType) {
+    case "DerivedType":
+      wrapper = primitiveClassTemplate(classModel, title);
+      break;
+    case "Enumeration":
+    case "EnumExt":
+      wrapper = enumerationClassTemplate(classModel, title);
+      break;
+    case "PrimitiveType":
+      wrapper = primitiveClassTemplate(classModel, title);
+      break;
+    default:
+      wrapper = dataClassTemplate(classModel, title);
+      break;
+  }
+
   if (wrapper) {
     let target = null;
     Array.from(wrapper.childNodes).forEach(element => {
@@ -244,31 +253,79 @@ async function processClass(config, classSection, classModel) {
 }
 
 /**
- * Process a single data model definition.
+ * Check that every class of every model in the document has been defined.
+ * @param {*} config The respecConfig which has the CDM source.
+ * @param {HTMLElement[]} sections An array of data-model sections.
+ */
+function auditModels(config, sections) {
+  const models = new Array();
+  sections.forEach(section => {
+    const modelId = section.getAttribute("data-model") ?? "";
+    const source = section.getAttribute("data-source") ?? config.cdm.source;
+    const key = `${source}-${modelId}`;
+    if (models.indexOf(key) === -1) {
+      models.push(key);
+      const model = JSON.parse(sessionStorage.getItem(key));
+      model.classes.forEach(classModel => {
+        const section = document.getElementById(classModel.id);
+        if (section === null) {
+          showError(
+            `AUDIT: Class definition for ${classModel.id} not found.`,
+            name
+          );
+        }
+      });
+    }
+  });
+}
+
+/**
+ * Process a single data model section. A model can be split
+ * across multiple sections (e.g. one section in the main content
+ * and one in the appendices). The data-package attribute, if
+ * present, acts as a filter for the section. Only classes in
+ * the named package will be expected or generated.
  *
  * @param {*} config The respecConfig.
- * @param {HTMLElement} section The CDM id for the model.
+ * @param {HTMLElement} section The model section element.
  */
 async function processModel(config, section) {
-  const modelId = section.getAttribute("data-model");
+  // The model id
+  const modelId = section.getAttribute("data-model") ?? "";
+
+  // The CDM source (CORE|SANDBOX)
   const source = section.getAttribute("data-source") ?? config.cdm.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
+    return;
+  }
+
+  // True if missing class definitions should be generated
   const generateClasses =
-    section.getAttribute("data-generate-classes") === "" ||
-    !!section.getAttribute("data-generate-classes");
-  const title = section.getAttribute("data-title");
-  section.removeAttribute("data-generate-classes");
-  section.removeAttribute("data-source");
-  section.removeAttribute("data-title");
+    section.getAttribute("data-generate") === "" ||
+    !!section.getAttribute("data-generate");
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  // The section's unique id (used to calculate a unique header id)
+  const id = section.getAttribute("id");
+
+  // The package name filter, if any
+  const packageName = section.getAttribute("data-package") ?? "";
+
+  // The stereotype filter, if any
+  const stereoType = section.getAttribute("data-stereotype") ?? "";
+
+  // Remove all the attributes
+  // section.removeAttribute("data-source");
+  // section.removeAttribute("data-generate");
+
   const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
-    const id = section.getAttribute("id") ?? modelId;
-    section.setAttribute("id", id);
-    if (typeof config.cdm.dataModelTemplate !== "function") {
-      config.cdm.dataModelTemplate = dataModelTemplate;
-    }
-    const wrapper = config.cdm.dataModelTemplate(dataModel, title);
+    const wrapper = dataModelTemplate(dataModel, title, id);
     if (wrapper) {
-      section.removeAttribute("data-model");
+      // section.removeAttribute("data-model");
       let target = null;
       Array.from(wrapper.childNodes).forEach(element => {
         if (element.nodeName !== "#comment") {
@@ -286,32 +343,36 @@ async function processModel(config, section) {
         }
       });
     }
-    Array.from(dataModel.classes).map(async classModel => {
+
+    let classes = Array.from(dataModel.classes);
+
+    if (packageName !== "") {
+      classes = classes.filter(
+        classModel => classModel.documentation.packageName === packageName
+      );
+    }
+
+    if (stereoType !== "") {
+      classes = classes.filter(
+        classModel => classModel.stereoType === stereoType
+      );
+    }
+
+    classes.forEach(async classModel => {
       let classSection = section.querySelector(
         `section[data-class="${classModel.id}"]`
       );
       if (classSection) {
-        if (classModel.stereoType === "PrimitiveType") {
-          showWarning(`Ignoring primitive class ${classModel.id}`, name);
-          classSection.remove();
-        } else if (classModel.stereoType === "DerivedType") {
-          showWarning(`Ignoring derived class ${classModel.id}`, name);
-          classSection.remove();
-        } else {
-          processClass(config, classSection, classModel);
-        }
-      } else if (
-        classModel.stereoType !== "PrimitiveType" &&
-        classModel.stereoType !== "DerivedType"
-      ) {
+        processClass(classSection, classModel);
+      } else {
         if (generateClasses) {
           classSection = html`<section></section>`;
-          processClass(config, classSection, classModel);
+          processClass(classSection, classModel);
           section.insertAdjacentElement("beforeend", classSection);
         } else {
           const message = `Class ${classModel.id} is defined in the data model, but does not
           appear in the document`;
-          showWarning(message, name);
+          showWarning(message, name, { elements: [section] });
           section.childNodes[0].insertAdjacentElement(
             "afterend",
             html`<div class="admonition warning">${message}.</div>`
@@ -319,83 +380,24 @@ async function processModel(config, section) {
         }
       }
     });
+
     const unknownSections = section.querySelectorAll("section[data-class]");
     if (unknownSections) {
-      Array.from(unknownSections).map(unknownSection => {
+      Array.from(unknownSections).forEach(unknownSection => {
         const classId = unknownSection.getAttribute("data-class");
-        const message = `Unknown or Duplicate Class ${classId}`;
-        showWarning(message, name);
+        const message = `Unknown or duplicate class ${classId}`;
+        showWarning(message, name, { elements: [unknownSection] });
         unknownSection.insertAdjacentHTML(
           "afterbegin",
           `<h3>${classId}</h3>
-            <div class="admonition warning">${message}.</div>`
+            <div class="issue">${message}.</div>`
         );
       });
     }
-    processDerivatives(dataModel);
-    processPrimitives(dataModel);
   } else {
     // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
   }
-}
-
-function processDerivatives(dataModel) {
-  if (!dataModel) return;
-  const derivatives = Array.from(dataModel.classes).filter(classModel => {
-    return classModel.stereoType === "DerivedType";
-  });
-  if (derivatives.length === 0) return;
-
-  const appendix = html`<section class="appendix">
-    <h1>${dataModel.name} Derived Types</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${derivatives.map(model => {
-          return html`<tr>
-            <td id="${model.id}">${model.name}</td>
-            <td>${model.documentation.description}</td>
-          </tr>`;
-        })}
-      </tbody>
-    </table>
-  </section>`;
-  appendAppendix(appendix);
-}
-
-function processPrimitives(dataModel) {
-  if (!dataModel) return;
-  const primitives = Array.from(dataModel.classes).filter(classModel => {
-    return classModel.stereoType === "PrimitiveType";
-  });
-  if (primitives.length === 0) return;
-
-  const appendix = html`<section class="appendix">
-    <h1>${dataModel.name} Primitive Types</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${primitives.map(model => {
-          return html`<tr>
-            <td id="${model.id}">${model.name}</td>
-            <td>${model.documentation.description}</td>
-          </tr>`;
-        })}
-      </tbody>
-    </table>
-  </section>`;
-  appendAppendix(appendix);
 }
 
 /**
@@ -499,16 +501,31 @@ async function validateExample(config, ajv, pre) {
  * @param {*} config respecConfig
  */
 export async function run(config) {
-  const dataModelSections = document.querySelectorAll("section[data-model]");
+  const sections = document.querySelectorAll("section[data-model]");
   const promises = new Array();
-  if (dataModelSections) {
+  let index = 0;
+  if (sections) {
     promises.push(
-      ...Array.from(dataModelSections).map(async section => {
-        const modelId = section.getAttribute("data-model");
-        try {
-          await processModel(config, section);
-        } catch (error) {
-          showError(`Cannot process model ${modelId}: ${error}`, name);
+      ...Array.from(sections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing model id</h2>`
+          );
+          showError(
+            "Cannot process data-model section without the data model id",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            await processModel(config, section);
+          } catch (error) {
+            showError(`Cannot process model ${modelId}: ${error}`, name);
+          }
         }
       })
     );
@@ -549,6 +566,8 @@ export async function run(config) {
   }
 
   await Promise.all(promises);
+
+  auditModels(config, sections);
 
   // Remove CDM config from initialUserConfig so API_KEY is not exposed
   sub("end-all", () => {
