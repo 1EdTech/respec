@@ -21,6 +21,26 @@ import { sub } from "../core/pubsubhub.js";
 export const name = "ims/cdm";
 
 /**
+ * Converts attribute value to boolean. Default is true.
+ * @param {String} string The attribute string to check.
+ */
+function stringToBoolean(string) {
+  if (string == null) {
+    return true;
+  } else {
+    switch (string.toLowerCase()) {
+      case "false":
+      case "no":
+      case "0":
+        return false;
+      case "":
+      default:
+        return true;
+    }
+  }
+}
+
+/**
  * Get the CDM API KEY from the configuration.
  *
  * @param {*} config The respecConfig
@@ -301,9 +321,9 @@ async function processModel(config, section) {
   }
 
   // True if missing class definitions should be generated
-  const generateClasses =
-    section.getAttribute("data-generate") === "" ||
-    !!section.getAttribute("data-generate");
+  const generateClasses = stringToBoolean(
+    section.getAttribute("data-generate")
+  );
 
   // The preferred section title
   const title = section.getAttribute("title");
@@ -313,9 +333,6 @@ async function processModel(config, section) {
 
   // The package name filter, if any
   const packageName = section.getAttribute("data-package") ?? "";
-
-  // The stereotype filter, if any
-  const stereoType = section.getAttribute("data-stereotype") ?? "";
 
   // Remove all the attributes
   // section.removeAttribute("data-source");
@@ -352,12 +369,6 @@ async function processModel(config, section) {
       );
     }
 
-    if (stereoType !== "") {
-      classes = classes.filter(
-        classModel => classModel.stereoType === stereoType
-      );
-    }
-
     classes.forEach(async classModel => {
       let classSection = section.querySelector(
         `section[data-class="${classModel.id}"]`
@@ -370,12 +381,14 @@ async function processModel(config, section) {
           processClass(classSection, classModel);
           section.insertAdjacentElement("beforeend", classSection);
         } else {
-          const message = `Class ${classModel.id} is defined in the data model, but does not
-          appear in the document`;
-          showWarning(message, name, { elements: [section] });
+          const message = `Class '${classModel.id}' is defined in the data model '${modelId}', 
+          but does not appear in this section and auto-generate is off. Either add
+          'data-class="${classModel.id}"' to this section, or remove 
+          'data-generate="false"' from this section.`;
+          showError(message, name, { elements: [section] });
           section.childNodes[0].insertAdjacentElement(
             "afterend",
-            html`<div class="admonition warning">${message}.</div>`
+            html`<div class="issue">${message}</div>`
           );
         }
       }
