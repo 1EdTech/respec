@@ -9,12 +9,12 @@
  *
  * The HTML created by the CDM parser is a table for each data class.
  */
-import { showError, showWarning } from "../core/utils.js";
 import { addFormats } from "./ajv-formats.js";
 import classTemplate from "./templates/classTemplate.js";
 import dataModelTemplate from "./templates/dataModelTemplate.js";
 import enumerationTemplate from "./templates/enumerationTemplate.js";
 import { html } from "../core/import-maps.js";
+import { showError } from "../core/utils.js";
 import { sub } from "../core/pubsubhub.js";
 import typeTemplate from "./templates/typeTemplate.js";
 
