@@ -1,5 +1,5 @@
 // @ts-check
-import { renderIssue, renderNote, renderTerm } from "./utils.js";
+import { renderIssue, renderNote, renderTerm } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
 export default (classData, title) => {

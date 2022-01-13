@@ -11,12 +11,12 @@
  */
 import { showError, showWarning } from "../core/utils.js";
 import { addFormats } from "./ajv-formats.js";
-import dataClassTemplate from "./templates/dataClass.js";
-import dataModelTemplate from "./templates/dataModel.js";
-import enumerationClassTemplate from "./templates/enumerationClass.js";
+import classTemplate from "./templates/classTemplate.js";
+import dataModelTemplate from "./templates/dataModelTemplate.js";
+import enumerationTemplate from "./templates/enumerationTemplate.js";
 import { html } from "../core/import-maps.js";
-import primitiveClassTemplate from "./templates/primitiveTypeClass.js";
 import { sub } from "../core/pubsubhub.js";
+import typeTemplate from "./templates/typeTemplate.js";
 
 export const name = "ims/cdm";
 
@@ -206,29 +206,28 @@ async function getSchema(config, id) {
 /**
  * Process a single data model class definition.
  *
- * @param {HTMLElement} classSection The class section element
+ * @param {HTMLElement} section The class section element
  * @param {*} classModel The CDM class object
  */
-async function processClass(classSection, classModel) {
-  const id = classSection.getAttribute("id") ?? classModel.id;
-  classSection.setAttribute("id", id);
-  const title = classSection.getAttribute("title");
-  classSection.removeAttribute("data-class");
+async function processClass(section, classModel) {
+  section.setAttribute("id", classModel.id);
+  const title = section.getAttribute("title");
+  // section.removeAttribute("data-class");
   // classSection.removeAttribute("title");
   let wrapper;
   switch (classModel.stereoType) {
     case "DerivedType":
-      wrapper = primitiveClassTemplate(classModel, title);
+      wrapper = typeTemplate(classModel, title);
       break;
     case "Enumeration":
     case "EnumExt":
-      wrapper = enumerationClassTemplate(classModel, title);
+      wrapper = enumerationTemplate(classModel, title);
       break;
     case "PrimitiveType":
-      wrapper = primitiveClassTemplate(classModel, title);
+      wrapper = typeTemplate(classModel, title);
       break;
     default:
-      wrapper = dataClassTemplate(classModel, title);
+      wrapper = classTemplate(classModel, title);
       break;
   }
 
@@ -244,7 +243,7 @@ async function processClass(classSection, classModel) {
         if (target) {
           target.insertAdjacentElement("afterend", thisElement);
         } else {
-          classSection.insertAdjacentElement("afterbegin", thisElement);
+          section.insertAdjacentElement("afterbegin", thisElement);
         }
         target = thisElement;
       }
@@ -267,7 +266,9 @@ function auditModels(config, sections) {
       models.push(key);
       const model = JSON.parse(sessionStorage.getItem(key));
       model.classes.forEach(classModel => {
-        const section = document.getElementById(classModel.id);
+        const section = document.querySelector(
+          `[data-class="${classModel.id}"]`
+        );
         if (section === null) {
           showError(
             `AUDIT: Class definition for ${classModel.id} not found.`,
@@ -352,25 +353,11 @@ async function processModel(config, section) {
         processClass(classSection, classModel);
       } else {
         // Auto-generate the class definition
-        classSection = html`<section></section>`;
+        classSection = html`<section data-class="${classModel.id}"></section>`;
         processClass(classSection, classModel);
         section.insertAdjacentElement("beforeend", classSection);
       }
     });
-
-    const unknownSections = section.querySelectorAll("section[data-class]");
-    if (unknownSections) {
-      Array.from(unknownSections).forEach(unknownSection => {
-        const classId = unknownSection.getAttribute("data-class");
-        const message = `Unknown or duplicate class ${classId}`;
-        showWarning(message, name, { elements: [unknownSection] });
-        unknownSection.insertAdjacentHTML(
-          "afterbegin",
-          `<h3>${classId}</h3>
-            <div class="issue">${message}.</div>`
-        );
-      });
-    }
   } else {
     // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
