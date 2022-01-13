@@ -221,6 +221,7 @@ async function processClass(section, classModel) {
       break;
     case "Enumeration":
     case "EnumExt":
+    case "Vocabulary":
       wrapper = enumerationTemplate(classModel, title);
       break;
     case "PrimitiveType":

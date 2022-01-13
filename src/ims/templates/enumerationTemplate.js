@@ -4,7 +4,9 @@ import { html } from "../../core/import-maps.js";
 
 export default (classData, title) => {
   if (classData && classData.properties) {
-    title = title ?? `${classData.name} Enumeration`;
+    const suffix =
+      classData.stereoType === "Vocabulary" ? "Vocabulary" : "Enumeration";
+    title = title ?? `${classData.name} ${suffix}`;
     return html`<h3>${title}</h3>
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
