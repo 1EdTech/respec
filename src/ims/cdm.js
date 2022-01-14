@@ -503,6 +503,15 @@ export async function run(config) {
 
   await Promise.all(promises);
 
+  // Clear the data model cache
+  Array.from(document.querySelectorAll("section[data-model]"))
+    .map(
+      section => `${config.cdm.source}-${section.getAttribute("data-model")}`
+    )
+    .forEach(key => {
+      sessionStorage.removeItem(key);
+    });
+
   // Remove CDM config from initialUserConfig so API_KEY is not exposed
   sub("end-all", () => {
     const script = document.getElementById("initialUserConfig");
