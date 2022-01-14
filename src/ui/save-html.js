@@ -68,7 +68,7 @@ const downloadLinks = [
     title: "CMS EXTRACT",
     type: "application/cms",
     get href() {
-      return rsDocToCmsDataURL(this.type);
+      return rsDocToCmsDataURL();
     },
   },
 ];

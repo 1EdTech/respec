@@ -55,7 +55,7 @@ async function toHTML(src, options = {}) {
     options.onWarning(warning);
   };
 
-  const userDataDir = await mkdtemp(`${tmpdir()}/respec2html-`);
+  const userDataDir = await mkdtemp(`${tmpdir()}/respec2cms-`);
   const args = [];
   if (disableSandbox) args.push("--no-sandbox");
 
@@ -260,7 +260,7 @@ async function evaluateHTML(version, timer) {
         reject(new Error(err.message));
       });
     });
-    const dataURL = rsDocToCmsDataURL("application/cms");
+    const dataURL = rsDocToCmsDataURL();
     const encodedString = dataURL.replace(/^data:\w+\/\w+;charset=utf-8,/, "");
     return decodeURIComponent(encodedString);
   }

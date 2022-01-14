@@ -25,51 +25,27 @@ const mimeTypes = new Map([
  * Creates a dataURI from a ReSpec document. It also cleans up the document
  * removing various things.
  *
- * @param {String} mimeType mimetype. one of `mimeTypes` above
  * @param {Document} doc document to export. useful for testing purposes
  * @returns a stringified data-uri of document that can be saved.
  */
-export function rsDocToCmsDataURL(mimeType, doc = document) {
-  const format = mimeTypes.get(mimeType);
-  if (!format) {
-    const validTypes = [...mimeTypes.values()].join(", ");
-    const msg = `Invalid format: ${mimeType}. Expected one of: ${validTypes}.`;
-    throw new TypeError(msg);
-  }
-  const data = serialize(format, doc);
+export function rsDocToCmsDataURL(doc = document) {
+  const data = serialize(doc);
   const encodedString = encodeURIComponent(data);
-  return `data:${mimeType};charset=utf-8,${encodedString}`;
+  return `data:text/html;charset=utf-8,${encodedString}`;
 }
 
-function serialize(format, doc) {
-  if (format === "cms") {
-    // Convert image urls to data uris before
-    // cloning the document. The clone does not
-    // have rendered images.
-    const images = doc.querySelectorAll("img");
-    images.forEach(img => {
-      img.setAttribute("src", getDataURL(img));
-    });
-  }
+function serialize(doc) {
+  // Convert image urls to data uris before
+  // cloning the document. The clone does not
+  // have rendered images.
+  const images = doc.querySelectorAll("img");
+  images.forEach(img => {
+    img.setAttribute("src", getDataURL(img));
+  });
   const cloneDoc = doc.cloneNode(true);
   cleanup(cloneDoc);
-  let result = "";
-  switch (format) {
-    case "xml":
-      result = new XMLSerializer().serializeToString(cloneDoc);
-      break;
-    case "cms":
-      createCmsExtract(cloneDoc.body);
-      result += cloneDoc.body.innerHTML;
-      break;
-    default: {
-      if (cloneDoc.doctype) {
-        result += new XMLSerializer().serializeToString(cloneDoc.doctype);
-      }
-      result += cloneDoc.documentElement.outerHTML;
-    }
-  }
-  return result;
+  createCmsExtract(cloneDoc.body);
+  return cloneDoc.body.innerHTML;
 }
 
 function cleanup(cloneDoc) {
@@ -155,7 +131,10 @@ function getDataURL(img) {
     context.drawImage(img, 0, 0, img.width, img.height);
     return canvas.toDataURL();
   } catch (err) {
-    showError(err.toString(), name);
+    const message = err.toString();
+    if (!message.startsWith("SecurityError")) {
+      showError(message, name);
+    }
     return img.src;
   }
 }
