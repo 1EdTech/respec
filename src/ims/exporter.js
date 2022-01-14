@@ -9,11 +9,12 @@
  * and will generate an HTML except suitable for Drupal or other CMS.
  */
 
-import { removeCommentNodes, removeReSpec } from "../core/utils.js";
+import { removeCommentNodes, removeReSpec, showError } from "../core/utils.js";
 import { expose } from "../core/expose-modules.js";
 import { html } from "../core/import-maps.js";
 import { pub } from "../core/pubsubhub.js";
 
+const name = "ims/exporter";
 const mimeTypes = new Map([
   ["text/html", "html"],
   ["application/xml", "xml"],
@@ -41,6 +42,15 @@ export function rsDocToCmsDataURL(mimeType, doc = document) {
 }
 
 function serialize(format, doc) {
+  if (format === "cms") {
+    // Convert image urls to data uris before
+    // cloning the document. The clone does not
+    // have rendered images.
+    const images = doc.querySelectorAll("img");
+    images.forEach(img => {
+      img.setAttribute("src", getDataURL(img));
+    });
+  }
   const cloneDoc = doc.cloneNode(true);
   cleanup(cloneDoc);
   let result = "";
@@ -129,4 +139,25 @@ function createCmsExtract(docBody) {
   });
 }
 
-expose("ims/exporter", { rsDocToCmsDataURL });
+/**
+ * Return a Data URL for the image. The Data URL will relace
+ * the image source URL. This makes it easier to update the CMS
+ * because there are no external image files to update.
+ *
+ * @param {HTMLImageElement} img
+ */
+function getDataURL(img) {
+  try {
+    const canvas = img.ownerDocument.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const context = canvas.getContext("2d");
+    context.drawImage(img, 0, 0, img.width, img.height);
+    return canvas.toDataURL();
+  } catch (err) {
+    showError(err.toString(), name);
+    return img.src;
+  }
+}
+
+expose(name, { rsDocToCmsDataURL });
