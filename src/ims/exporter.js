@@ -15,11 +15,6 @@ import { html } from "../core/import-maps.js";
 import { pub } from "../core/pubsubhub.js";
 
 const name = "ims/exporter";
-const mimeTypes = new Map([
-  ["text/html", "html"],
-  ["application/xml", "xml"],
-  ["application/cms", "cms"],
-]);
 
 /**
  * Creates a dataURI from a ReSpec document. It also cleans up the document
