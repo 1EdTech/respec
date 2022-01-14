@@ -253,35 +253,6 @@ async function processClass(section, classModel) {
 }
 
 /**
- * Check that every class of every model in the document has been defined.
- * @param {*} config The respecConfig which has the CDM source.
- * @param {HTMLElement[]} sections An array of data-model sections.
- */
-function auditModels(config, sections) {
-  const models = new Array();
-  sections.forEach(section => {
-    const modelId = section.getAttribute("data-model") ?? "";
-    const source = section.getAttribute("data-source") ?? config.cdm.source;
-    const key = `${source}-${modelId}`;
-    if (models.indexOf(key) === -1) {
-      models.push(key);
-      const model = JSON.parse(sessionStorage.getItem(key));
-      model.classes.forEach(classModel => {
-        const section = document.querySelector(
-          `[data-class="${classModel.id}"]`
-        );
-        if (section === null) {
-          showError(
-            `AUDIT: Class definition for ${classModel.id} not found.`,
-            name
-          );
-        }
-      });
-    }
-  });
-}
-
-/**
  * Process a single data model section. A model can be split
  * across multiple sections (e.g. one section in the main content
  * and one in the appendices). The data-package attribute, if
@@ -531,8 +502,6 @@ export async function run(config) {
   }
 
   await Promise.all(promises);
-
-  auditModels(config, sections);
 
   // Remove CDM config from initialUserConfig so API_KEY is not exposed
   sub("end-all", () => {

@@ -43,69 +43,7 @@
   </section>
 
   <!-- Start a data model section-->
-  <section data-model="org.1edtech.ob.v2p1.model">
-    <section data-class="org.1edtech.ob.v2p1.assertion.class">
-      <!-- Custom example with schema validation -->
-      <aside class="example" title="Sample assertion">
-        <pre class="json" data-schema="org.1edtech.ob.v2p1.assertion.class">
-          {
-            "id": "https://example.org/assertions/123",
-            "type": "Assertion",
-            "recipient": {
-              "type": "email",
-              "identity": "alice@example.org"
-            },
-            "issuedOn": "2016-12-31T23:59:59+00:00",
-            "verification": {
-              "type": "hosted"
-            },
-            "badge": {
-              "type": "BadgeClass",
-              "id": "https://example.org/badges/5",
-              "name": "3-D Printmaster",
-              "description": "This badge is awarded for passing the 3-D printing knowledge and safety test.",
-              "image": "https://example.org/badges/5/image",
-              "criteria": {
-                "narrative": "Students are tested on knowledge and safety, both through a paper test and a supervised performance evaluation on live equipment"
-              },
-              "issuer": {
-                "id": "https://example.org/issuer",
-                "type": "Profile",
-                "name": "Example Maker Society",
-                "url": "https://example.org",
-                "email": "contact@example.org",
-                "verification": {
-                  "allowedOrigins": "example.org"
-                }
-              }
-            }
-          }
-        </pre>
-      </aside>
-    </section>
-    <section data-class="org.1edtech.ob.v2p1.badgeclass.class">
-      <!-- Generated example -->
-      <aside data-sample="org.1edtech.ob.v2p1.badgeclass.class" 
-        class="example" title="Sample BadgeClass (Generated)"></aside>
-    </section>
-    <section data-class="org.1edtech.ob.v2p1.profile.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.issuer.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.identityobject.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.identitytype.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.verificationobject.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.hostedbadge.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.signedbadge.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.evidence.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.image.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.criteria.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.alignmentobject.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.revocationlist.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.cryptographickey.class"></section>
-    <section data-class="org.1edtech.ob.v2p1.endorsement.class"></section>
-
-    <!-- If you omit a class in the, it will show up as a Respec error -->
-    <!-- <section data-class="org.1edtech.ob.v2p1.assertionpayload.class"></section> -->
-  </section>
+  <section data-model="org.1edtech.clr.v2p0.model" data-package="ComprehensiveLearnerRecord"></section>
 
 </body>
 
