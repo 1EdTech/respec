@@ -6,6 +6,9 @@ import { toHTMLElement } from "./utils.js";
 export const name = "ims/issues-notes";
 
 /**
+ * Note: No longer required. core/issues-notes.js handles note|warning|issue
+ * just fine even if no github connection.
+ *
  * Handles admonitions, adding a top bar and a11y attrs
  * Types currently supported:
  * aside.note

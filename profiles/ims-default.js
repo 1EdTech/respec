@@ -34,6 +34,8 @@ const modules = [
   import("../src/core/dfn.js"),
   import("../src/core/pluralize.js"),
   import("../src/core/examples.js"),
+  import("../src/core/issues-notes.js"),
+  // Left in for legacy specs
   import("../src/ims/issues-notes.js"),
   import("../src/core/best-practices.js"),
   import("../src/core/figures.js"),
