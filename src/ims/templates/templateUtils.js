@@ -11,7 +11,7 @@ export function renderNote(note) {
 
 export function renderTerm(term) {
   return html`<tr>
-    <td>${term.name}</td>
+    <td id="${term.name.toLowerCase()}">${term.name}</td>
     <td>
       ${term.documentation.description}
       ${term.documentation.issues.map(renderIssue)}
