@@ -13,10 +13,9 @@ const modules = [
   import("../src/ims/compute.js"),
   // Process transcludes
   import("../src/ims/transclude.js"),
-  // Don't use github
-  // import("../src/core/github.js"),
+  import("../src/core/github.js"),
   import("../src/core/data-include.js"),
-  // Common Data Model plugins
+  // Common Data Model plugin
   import("../src/ims/cdm.js"),
   import("../src/core/markdown.js"),
   import("../src/ims/post-markdown.js"),
