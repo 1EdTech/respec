@@ -7,7 +7,7 @@ import { html } from "../../core/import-maps.js";
  * @returns The issue wrapped in a div with class="issue".
  */
 export function renderIssue(issue) {
-  return html`<div class="issue">${issue}</div>`;
+  return html`<div class="issue" title="${issue}"></div>`;
 }
 
 /**
