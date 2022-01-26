@@ -47,7 +47,7 @@ function showLink(link) {
   }
   return html`
     <tr class="${link.class ? link.class : null}">
-      <td>${link.key}:</td>
+      <td>${link.key}</td>
       ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
     </tr>
   `;
