@@ -8,14 +8,23 @@
   </title>
   <script src='../profiles/ims-default.js' type="module" class="remove"></script>
 
+  <!-- Load respec-vc add-on -->
+  <!-- <script class="remove" src="http://localhost:3000/dist/main.js"></script>
+  <script class="remove">
+    const url = "https://imsglobal.github.io/openbadges-specification/context.json";
+    fetch(url)
+    .then(res => res.json())
+    .then(context => window.respecVc.addContext(url, context));
+  </script> -->
+
   <!-- Load the CDM configuration -->
   <script class="remove" src="cdm-config.js"></script>
 
   <!-- Load ajv2019 (Another JSON Schema Validator) if you want your examples validated -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.8.2/ajv2019.bundle.min.js" 
-          integrity="sha512-9CfeXrjdW9wxGntWtQ4wE0k9RD8avpYxoPEKAGu+EP87RyqXYVQjed0l872XkNtQeIyYavZeqY+jzm69pmjEDw==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-          
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.8.2/ajv2019.bundle.min.js"
+    integrity="sha512-9CfeXrjdW9wxGntWtQ4wE0k9RD8avpYxoPEKAGu+EP87RyqXYVQjed0l872XkNtQeIyYavZeqY+jzm69pmjEDw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script class='remove'>
     var respecConfig = {
       specTitle: "Replace me with a real title",
@@ -26,12 +35,29 @@
       specNature: "normative",
       specType: "spec",
       skipCertGuideConformanceRef: true,
+      localBiblio: {
+        "DATA-INTEGRITY": {
+          title: "Data Integrity 1.0",
+          href: "https://w3c-ccg.github.io/data-integrity-spec/",
+          authors: [
+            "Manu Sporny",
+            "Dave Longley"
+          ],
+          status: "CG-DRAFT",
+          publisher: "Credentials Community Group"
+        },
+      },
 
       // GitHub support
       github: "https://github.com/IMSGlobal/ComprehensiveLearnerRecord",
 
       // Add the CDM configuration to respecConfig
       cdm: _cdm,
+
+      // Add VC proof examples
+      // postProcess: [
+      //   window.respecVc.createVcExamples
+      // ],
     };
   </script>
 </head>
@@ -47,15 +73,15 @@
 
   <!-- Start a data model section-->
   <section data-model="org.1edtech.clr.v2p0.model">
-    <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
+    <!-- <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
       <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
         {
           "@context": [
             "https://www.w3.org/2018/credentials/v1",
-            "https://purl.imsglobal.org/spec/clr/v2p0/context/clr_v2p0.jsonld"
+            "https://imsglobal.github.io/openbadges-specification/context.json"
           ],
           "id": "http://example.edu/credentials/3732",
-          "type": [ "VerifiableCredential", "ComprehensiveLearnerRecord" ],
+          "type": [ "VerifiableCredential", "ClrCredential" ],
           "issuer": {
             "id": "https://example.edu/issuers/565049",
             "type": "Publisher",
@@ -114,7 +140,7 @@
           }]
         }
       </pre>
-    </section>
+    </section> -->
   </section>
 
   <section id="issue-summary"></section>
