@@ -46,7 +46,76 @@
   </section>
 
   <!-- Start a data model section-->
-  <section data-model="org.1edtech.clr.v2p0.model"></section>
+  <section data-model="org.1edtech.clr.v2p0.model">
+    <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
+      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
+        {
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1",
+            "https://purl.imsglobal.org/spec/clr/v2p0/context/clr_v2p0.jsonld"
+          ],
+          "id": "http://example.edu/credentials/3732",
+          "type": [ "VerifiableCredential", "ComprehensiveLearnerRecord" ],
+          "issuer": {
+            "id": "https://example.edu/issuers/565049",
+            "type": "Publisher",
+            "name": "Example University"
+          },
+          "issuanceDate": "2010-01-01T00:00:00Z",
+          "associations": [
+            {
+              "associationType": "isParentOf",
+              "source": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+              "target": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
+            }
+          ],
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "assertions": [
+              {
+                "@context": [
+                  "https://www.w3.org/2018/credentials/v1",
+                  "https://purl.imsglobal.org/spec/ob/v3p0/context/ob_v3p0.jsonld"
+                ],
+                "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
+                "type": ["VerifiableCredential", "AssertionCredential"],
+                "issuer": {
+                  "id": "https://example.edu/issuers/565049",
+                  "type": "Publisher",
+                  "name": "Example University"
+                },
+                "issuanceDate": "2010-01-01T00:00:00Z",
+                "achievement": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                "credentialSubject": {
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+                },
+                "credentialSchema": [{ 
+                  "id": "https://purl.imsglobal.org/ClrCredential.json",
+                  "type": "JsonSchemaValidator2020"
+                }]
+              }
+            ],
+            "achievements": [
+              { 
+                "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                "creator": {},
+                "name": "Achievement 1"
+              },
+              { 
+                "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                "creator": {},
+                "name": "Achievement 2"
+              }
+            ]
+          },
+          "credentialSchema": [{
+            "id": "https://purl.imsglobal.org/AchievementCredential.json",
+            "type": "JsonSchemaValidator2020"
+          }]
+        }
+      </pre>
+    </section>
+  </section>
 
   <section id="issue-summary"></section>
 

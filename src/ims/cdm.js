@@ -396,13 +396,9 @@ async function validateExample(config, ajv, pre) {
     const validate = ajv.refs[schemaDef.$id].validate;
     const valid = validate(data);
     if (!valid) {
-      console.error(
-        `Schema validation errors for ${schemaId}:`,
-        validate.errors
-      );
       pre.insertAdjacentElement(
         "beforebegin",
-        html`<div class="admonition warning">
+        html`<div class="issue" title="Invalid JSON">
           <p>NOTE: This example contains invalid JSON for ${schemaId}.</p>
           <ul>
             ${validate.errors.map(error => {
@@ -418,10 +414,7 @@ async function validateExample(config, ajv, pre) {
           </ul>
         </div>`
       );
-      showError(
-        `Invalid example JSON for ${schemaId}. See console for details`,
-        name
-      );
+      showError(`Invalid example JSON for ${schemaId}.`, name);
     }
   } catch (error) {
     showError(`Cannot parse example JSON for ${schemaId}: ${error}`, name);
