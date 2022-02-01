@@ -145,11 +145,15 @@ export function run(conf) {
     return;
   }
 
-  // It is an IMS error if there is no conformance section found
   let conformance = document.querySelector("section#conformance");
   if (!conformance)
     conformance = document.querySelector("section#conformance-0");
   if (!conformance) {
+    if (conf.specType === "doc") {
+      // Conformance is optional for generic documents
+      return;
+    }
+    // Otherwise, the conformance section is required
     showError("error", "No section found with id 'conformance'");
     return;
   }
