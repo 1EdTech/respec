@@ -14,6 +14,7 @@
  */
 
 import { linkCSS, toKeyValuePairs } from "../core/utils.js";
+import css from "./styles/ims-base.css.js";
 
 export const name = "ims/style";
 
@@ -56,9 +57,12 @@ export async function run(conf) {
   linkW3cCSS();
 
   // Link to IMS stylesheet
-  let cssURL = "https://purl.imsglobal.org/spec/ims-base.css";
   if (conf.overrideCSSLocation) {
-    cssURL = conf.overrideCSSLocation;
+    const cssURL = conf.overrideCSSLocation;
+    linkCSS(document, cssURL);
+  } else {
+    const style = document.createElement("style");
+    style.textContent = css;
+    document.head.appendChild(style);
   }
-  linkCSS(document, cssURL);
 }
