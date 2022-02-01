@@ -1,0 +1,20 @@
+/* When an IMS spec is imported into Drupal, the <head> is removed */
+/* including all the stylesheets. So this SCSS is used to combine  */
+/* all the necessary stylesheets into one file that is served up   */
+/* by Drupal.                                                      */
+
+@import "base.scss";
+@import "respec.scss";
+@import "examples.scss";
+@import "issues-notes.scss";
+@import "dfn-panel.scss";
+@import "highlight.scss";
+@import "datatype.scss";
+
+/* ims-base.css has IMS overrides of previously defined styles    */
+/* and new styles so the spec displays better in Drupal.          */
+
+@import "ims-base.scss";
+
+/* styles used by respec-vc */
+@import "respec-vc.scss";
