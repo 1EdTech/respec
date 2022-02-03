@@ -24,12 +24,30 @@ const name = "ims/exporter";
  * @returns a stringified data-uri of document that can be saved.
  */
 export function rsDocToCmsDataURL(doc = document) {
-  const data = serialize(doc);
+  const data = serializeHTML(doc);
   const encodedString = encodeURIComponent(data);
   return `data:text/html;charset=utf-8,${encodedString}`;
 }
 
-function serialize(doc) {
+/**
+ * Creates a dataURI of the CSS in a ReSpec document.
+ *
+ * @param {Document} doc document to export from.
+ * @returns a stringified data-uri of stylesheet that can be saved.
+ */
+export async function rsDocToCssDataURL(doc = document) {
+  const data = await serializeCSS(doc);
+  const encodedString = encodeURIComponent(data);
+  return `data:text/css;charset=utf-8,${encodedString}`;
+}
+
+async function serializeCSS(doc) {
+  const cloneDoc = doc.cloneNode(true);
+  cleanup(cloneDoc);
+  return await createCssExtract(cloneDoc.head);
+}
+
+function serializeHTML(doc) {
   // Convert image urls to data uris before
   // cloning the document. The clone does not
   // have rendered images.
@@ -111,6 +129,34 @@ function createCmsExtract(docBody) {
 }
 
 /**
+ * Combine all the stylesheets in the document head
+ *
+ * @param {HTMLElement} docHead The document body element
+ * @returns A CSS stylesheet with all the styles combined
+ */
+async function createCssExtract(docHead) {
+  let css = "";
+  /** @type {NodeListOf<HTMLLinkElement>} */
+  const links = docHead.querySelectorAll("link[rel='stylesheet']");
+  await Promise.all(
+    Array.from(links).map(async link => {
+      try {
+        const fetcher = await fetch(link.href);
+        const data = await fetcher.text();
+        css += data;
+      } catch (err) {
+        showError(`Cannot retrieve stylesheet ${link.href}. ${err}.`, name);
+      }
+    })
+  );
+  const styles = docHead.querySelectorAll("style");
+  styles.forEach(style => {
+    css += style.innerText;
+  });
+  return css;
+}
+
+/**
  * Return a Data URL for the image. The Data URL will relace
  * the image source URL. This makes it easier to update the CMS
  * because there are no external image files to update.
@@ -134,4 +180,4 @@ function getDataURL(img) {
   }
 }
 
-expose(name, { rsDocToCmsDataURL });
+expose(name, { rsDocToCmsDataURL, rsDocToCssDataURL });
