@@ -9,7 +9,7 @@ export default (classData, title) => {
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
       ${classData.documentation.notes.map(renderNote)}
-      <table>
+      <table class="simple">
         <thead>
           <tr>
             <th>Property</th>
@@ -70,6 +70,6 @@ function renderType(property) {
   ) {
     name += " Enumeration";
   }
-  name = html`<a href="#${property.type.id}">${name}</a>`;
+  name = html`<a href="#${property.type.id}"><samp>${name}</samp></a>`;
   return name;
 }

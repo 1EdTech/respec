@@ -11,7 +11,7 @@ export default (classData, title) => {
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
       ${classData.documentation.notes.map(renderNote)}
-      <table>
+      <table class="simple">
         <thead>
           <tr>
             <th>Term</th>
