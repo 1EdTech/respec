@@ -9,13 +9,7 @@
   <script src='../profiles/ims-default.js' type="module" class="remove"></script>
 
   <!-- Load respec-vc add-on -->
-  <!-- <script class="remove" src="http://localhost:3000/dist/main.js"></script>
-  <script class="remove">
-    const url = "https://imsglobal.github.io/openbadges-specification/context.json";
-    fetch(url)
-    .then(res => res.json())
-    .then(context => window.respecVc.addContext(url, context));
-  </script> -->
+  <!-- <script class="remove" src="http://localhost:3000/dist/main.js"></script> -->
 
   <!-- Load the CDM configuration -->
   <script class="remove" src="cdm-config.js"></script>
@@ -73,12 +67,12 @@
 
   <!-- Start a data model section-->
   <section data-model="org.1edtech.clr.v2p0.model">
-    <!-- <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
-      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
+    <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
+      <!-- <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
         {
           "@context": [
             "https://www.w3.org/2018/credentials/v1",
-            "https://imsglobal.github.io/openbadges-specification/context.json"
+            "https://dc.imsglobal.org/draft/clr/v2p0/context"
           ],
           "id": "http://example.edu/credentials/3732",
           "type": [ "VerifiableCredential", "ClrCredential" ],
@@ -88,20 +82,13 @@
             "name": "Example University"
           },
           "issuanceDate": "2010-01-01T00:00:00Z",
-          "associations": [
-            {
-              "associationType": "isParentOf",
-              "source": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
-              "target": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
-            }
-          ],
           "credentialSubject": {
             "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
             "assertions": [
               {
                 "@context": [
                   "https://www.w3.org/2018/credentials/v1",
-                  "https://purl.imsglobal.org/spec/ob/v3p0/context/ob_v3p0.jsonld"
+                  "https://dc.imsglobal.org/draft/clr/v2p0/context"
                 ],
                 "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
                 "type": ["VerifiableCredential", "AssertionCredential"],
@@ -124,12 +111,16 @@
             "achievements": [
               { 
                 "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
-                "creator": {},
+                "creator": {
+                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5"
+                },
                 "name": "Achievement 1"
               },
               { 
                 "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
-                "creator": {},
+                "creator": {
+                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5"
+                },
                 "name": "Achievement 2"
               }
             ]
@@ -139,8 +130,8 @@
             "type": "JsonSchemaValidator2020"
           }]
         }
-      </pre>
-    </section> -->
+      </pre> -->
+    </section>
   </section>
 
   <section id="issue-summary"></section>
