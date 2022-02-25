@@ -389,7 +389,9 @@ async function validateExample(config, ajv, pre) {
   const schemaDef = await getSchema(config, schemaId);
   if (schemaDef === null) return;
   try {
-    const data = JSON.parse(pre.innerText);
+    let preText = pre.innerText;
+    preText = preText.replace(/\/\/ .*$/gm, "");
+    const data = JSON.parse(preText);
     if (ajv.refs[schemaDef.$id] === undefined) {
       ajv.compile(schemaDef);
     }
