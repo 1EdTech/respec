@@ -14,6 +14,9 @@ import classTemplate from "./templates/classTemplate.js";
 import dataModelTemplate from "./templates/dataModelTemplate.js";
 import enumerationTemplate from "./templates/enumerationTemplate.js";
 import { html } from "../core/import-maps.js";
+import interfaceTemplate from "./templates/interfaceTemplate.js";
+import operationTemplate from "./templates/operationTemplate.js";
+import serviceModelTemplate from "./templates/serviceModelTemplate.js";
 import { showError } from "../core/utils.js";
 import { sub } from "../core/pubsubhub.js";
 import typeTemplate from "./templates/typeTemplate.js";
@@ -24,7 +27,7 @@ export const name = "ims/cdm";
  * Get the CDM API KEY from the configuration.
  *
  * @param {*} config The respecConfig
- * @returns The CDM API KEY.
+ * @returns {string} The CDM API KEY.
  */
 function getApiKey(config) {
   if (config.cdm.apiKey) {
@@ -37,7 +40,7 @@ function getApiKey(config) {
  * Get the CDM server URL from the configuration.
  *
  * @param {*} config The respecConfig
- * @returns The CDM server URL.
+ * @returns {string} The CDM server URL.
  */
 function getBaseUrl(config) {
   if (config.cdm.serverUrl) {
@@ -47,15 +50,15 @@ function getBaseUrl(config) {
 }
 
 /**
- * Execute the API call to retrieve the CDM model.
+ * Execute the API call to retrieve the CDM data model (classes).
  *
  * @param {*} config The respecConfig
  * @param {string} source The source (CORE or SANDBOX) of the model
  * @param {string} id The id of the CDM model to retrieve
- * @returns The data model as an object
+ * @returns {JSON} The data model as an object
  */
 async function getDataModel(config, source, id) {
-  const key = `${source}-${id}`;
+  const key = `${source}-${id}-classes`;
   const json = sessionStorage.getItem(key);
   if (json) return JSON.parse(json);
   const query = JSON.stringify({
@@ -138,6 +141,186 @@ async function getDataModel(config, source, id) {
 }
 
 /**
+ * Execute the API call to retrieve the CDM service models (services).
+ *
+ * @param {*} config The respecConfig
+ * @param {string} source The source (CORE or SANDBOX) of the model
+ * @param {string} id The id of the CDM model to retrieve
+ * @returns {JSON} The data model as an object
+ */
+async function getServiceModels(config, source, id) {
+  const key = `${source}-${id}-services`;
+  const json = sessionStorage.getItem(key);
+  if (json) return JSON.parse(json);
+  const query = JSON.stringify({
+    query: `
+    {
+      modelByID(id: "${id}", source: ${source ?? "CORE"}) {
+        id
+        name
+        documentation {
+          description
+          notes
+          issues
+        }
+        services {
+          ... on RestService {
+            id
+            type
+            documentation {
+              description
+              notes
+              issues
+            }
+            rootPath
+            interfaces {
+              id
+              name
+              documentation {
+                description
+                notes
+                issues
+              }
+              operations {
+                id
+                name
+                documentation {
+                  description
+                  notes
+                  issues
+                }
+                method
+                request {
+                  id
+                  documentation {
+                    description
+                    notes
+                    issues
+                  }
+                  path
+                  bodies {
+                    documentation {
+                      description
+                      notes
+                      issues
+                    }
+                    type {
+                      id
+                      name
+                    }
+                    cardinality {
+                      value
+                    }
+                    contentType
+                  }
+                  parameters {
+                    id
+                    name
+                    documentation {
+                      description
+                      notes
+                      issues
+                    }
+                    type
+                    cardinality {
+                      value
+                    }
+                    value {
+                      id
+                      name
+                      stereoType
+                    }
+                  }
+                }
+                responses {
+                  id
+                  documentation {
+                    description
+                    notes
+                    issues
+                  }
+                  statusCode
+                  bodies {
+                    documentation {
+                      description
+                      notes
+                      issues
+                    }
+                    type {
+                      id
+                      name
+                      stereoType
+                    }
+                    cardinality {
+                      value
+                    }
+                    contentType
+                  }
+                  parameters {
+                    id
+                    name
+                    documentation {
+                      description
+                      notes
+                      issues
+                    }
+                    type
+                    cardinality {
+                      value
+                    }
+                    value {
+                      id
+                      name
+                      stereoType
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    `,
+  });
+
+  try {
+    const res = await fetch(`${getBaseUrl(config)}/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": getApiKey(config),
+      },
+      body: query,
+    });
+    if (!res.ok) {
+      showError(
+        `Could not get CDM model for ${id}. Please see the developer console for details.`,
+        name
+      );
+      return null;
+    }
+    const data = await res.json();
+    // console.log("fetched data", data);
+    const dataModel = data.data.modelByID;
+    if (!dataModel) {
+      showError(
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
+          config.cdm.source ?? "CORE"
+        }`,
+        name
+      );
+      return null;
+    }
+    sessionStorage.setItem(key, JSON.stringify(dataModel));
+    return dataModel;
+  } catch (error) {
+    showError(`Could not get CDM model for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
+/**
  * Async function that returns a sample JSON object for a single
  * Common Data Model class.
  *
@@ -145,7 +328,7 @@ async function getDataModel(config, source, id) {
  * @param {string} id Common Data Model class id
  * @param {boolean} includeOptionalFields True if the sample should
  * include all optional fields (the default is false)
- * @returns The sample JSON object
+ * @returns {JSON} The sample JSON object
  */
 async function getDataSample(config, id, includeOptionalFields = false) {
   try {
@@ -175,13 +358,13 @@ async function getDataSample(config, id, includeOptionalFields = false) {
 }
 
 /**
- * Async function that returns the schema for a class.
+ * Async function that returns the JSON Schema for a class.
  *
  * @param {*} config The respecConfig
- * @param {string} id Common Data Model class id
- * @returns The schema
+ * @param {string} id Common Data Model Class id
+ * @returns {JSON} The schema
  */
-async function getSchema(config, id) {
+async function getJsonSchema(config, id) {
   try {
     const res = await fetch(`${getBaseUrl(config)}/jsonschema/${id}`, {
       method: "GET",
@@ -207,7 +390,7 @@ async function getSchema(config, id) {
  * Process a single data model class definition.
  *
  * @param {HTMLElement} section The class section element
- * @param {*} classModel The CDM class object
+ * @param {*} classModel The CDM Class object
  */
 async function processClass(section, classModel) {
   section.setAttribute("id", classModel.id);
@@ -253,6 +436,93 @@ async function processClass(section, classModel) {
 }
 
 /**
+ * Process a single operation model.
+ *
+ * @param {HTMLElement} section The operation section element
+ * @param {string} rootPath The services root path
+ * @param {*} operation The CDM operation object
+ */
+async function processOperation(section, rootPath, operation) {
+  section.setAttribute("id", operation.id);
+  const title = section.getAttribute("title");
+  const wrapper = operationTemplate(rootPath, operation, title);
+  if (wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+  }
+}
+
+/**
+ * Process a single service interface model.
+ *
+ * @param {HTMLElement} section The service interface section element
+ * @param {*} serviceInterface The CDM service interface object
+ */
+async function processInterface(section, serviceInterface) {
+  const preferredId = section.getAttribute("id");
+  section.setAttribute("id", serviceInterface.id);
+  const title = section.getAttribute("title");
+  const wrapper = interfaceTemplate(serviceInterface, title, preferredId);
+  if (wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+
+    const operations = Array.from(serviceInterface.operations);
+    operations.forEach(async operation => {
+      let operationSection = section.querySelector(
+        `section[data-operation="${operation.id}"]`
+      );
+      if (operationSection) {
+        processOperation(
+          operationSection,
+          serviceInterface.rootPath,
+          operation
+        );
+      } else {
+        // Auto-generate the operation section
+        operationSection = html`<section
+          data-operation="${operation.id}"
+        ></section>`;
+        processOperation(
+          operationSection,
+          serviceInterface.rootPath,
+          operation
+        );
+        section.insertAdjacentElement("beforeend", operationSection);
+      }
+    });
+  }
+}
+
+/**
  * Process a single data model section. A model can be split
  * across multiple sections (e.g. one section in the main content
  * and one in the appendices). The data-package attribute, if
@@ -262,11 +532,11 @@ async function processClass(section, classModel) {
  * @param {*} config The respecConfig.
  * @param {HTMLElement} section The model section element.
  */
-async function processModel(config, section) {
+async function processDataModel(config, section) {
   // The model id
   const modelId = section.getAttribute("data-model") ?? "";
 
-  // The CDM source (CORE|SANDBOX)
+  // The CDM/MPS source (CORE|SANDBOX)
   const source = section.getAttribute("data-source") ?? config.cdm.source;
   if (source !== "CORE" && source !== "SANDBOX") {
     showError(`Invalid source ${source} for model ${modelId}`);
@@ -282,15 +552,10 @@ async function processModel(config, section) {
   // The package name filter, if any
   const packageName = section.getAttribute("data-package") ?? "";
 
-  // Remove all the attributes
-  // section.removeAttribute("data-source");
-  // section.removeAttribute("data-generate");
-
   const dataModel = await getDataModel(config, source, modelId);
   if (dataModel) {
     const wrapper = dataModelTemplate(dataModel, title, id);
     if (wrapper) {
-      // section.removeAttribute("data-model");
       let target = null;
       Array.from(wrapper.childNodes).forEach(element => {
         if (element.nodeName !== "#comment") {
@@ -310,7 +575,6 @@ async function processModel(config, section) {
     }
 
     let classes = Array.from(dataModel.classes);
-
     if (packageName !== "") {
       classes = classes.filter(
         classModel => classModel.documentation.packageName === packageName
@@ -328,6 +592,91 @@ async function processModel(config, section) {
         classSection = html`<section data-class="${classModel.id}"></section>`;
         processClass(classSection, classModel);
         section.insertAdjacentElement("beforeend", classSection);
+      }
+    });
+  } else {
+    // If there is no data model, add a header to satisfy Respec
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
+  }
+}
+
+/**
+ * Process a single ServiceModel section. A ServiceModel can be split
+ * across multiple sections (e.g. one section in the main content
+ * and one in the appendices). The data-interface-filter attribute, if
+ * present, acts as a filter for the section. Only operations in
+ * the identified interface will be generated.
+ *
+ * @param {*} config The respecConfig.
+ * @param {HTMLElement} section The model section element.
+ * @param {string?} preferredId The preferred id for this section. This be moved to the header.
+ */
+async function processServiceModel(config, section, preferredId) {
+  const modelId = section.getAttribute("data-model");
+  const serviceModelId = section.getAttribute("data-service-model");
+  const source = section.getAttribute("data-source") ?? config.cdm.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
+    return;
+  }
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  const serviceModels = await getServiceModels(config, source, modelId);
+  const serviceModel = serviceModels.services.find(
+    service => service.id === serviceModelId
+  );
+  if (serviceModel) {
+    const wrapper = serviceModelTemplate(serviceModel, title, preferredId);
+    if (wrapper) {
+      let target = null;
+      Array.from(wrapper.childNodes).forEach(element => {
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
+        }
+      });
+    }
+
+    // Merge service rootPath property into each interface for convenience
+    let serviceInterfaces = [];
+    serviceModel.interfaces.forEach(serviceInterface => {
+      serviceInterface.rootPath = serviceModel.rootPath;
+      serviceInterfaces.push(serviceInterface);
+    });
+
+    // The interface filter, if any
+    const interfaceId = section.getAttribute("data-interface-filter") ?? "";
+    if (interfaceId !== "") {
+      serviceInterfaces = serviceInterfaces.filter(
+        serviceInterface => serviceInterface.id === interfaceId
+      );
+    }
+
+    // Process each interface
+    serviceInterfaces.forEach(async serviceInterface => {
+      let interfaceSection = section.querySelector(
+        `section[data-interface="${serviceInterface.id}"]`
+      );
+      if (interfaceSection) {
+        processInterface(interfaceSection, serviceInterface);
+      } else {
+        // Auto-generate the service definition
+        interfaceSection = html`
+          <section data-interface="${serviceInterface.id}"></section>
+        `;
+        processInterface(interfaceSection, serviceInterface);
+        section.insertAdjacentElement("beforeend", interfaceSection);
       }
     });
   } else {
@@ -360,7 +709,7 @@ async function processSample(config, parentElem) {
   );
   if (sampleData) {
     // eslint-disable-next-line prettier/prettier
-      const sample = html`
+    const sample = html`
 <pre class="nohighlight">
 ${JSON.stringify(sampleData, null, 2)}
 </pre>`;
@@ -386,7 +735,7 @@ async function validateExample(config, ajv, pre) {
     showError("Example is missing a schema id", name);
     return;
   }
-  const schemaDef = await getSchema(config, schemaId);
+  const schemaDef = await getJsonSchema(config, schemaId);
   if (schemaDef === null) return;
   try {
     let preText = pre.innerText;
@@ -425,27 +774,41 @@ async function validateExample(config, ajv, pre) {
 }
 
 /**
- * Convert <section data-model> and <section data-class> elements into
- * a normative data model definition using information from the Common
- * Data Model.
+ * Render sections with a data-model attribute using informatoin from
+ * the Model Processing Service.
  *
  * @param {*} config respecConfig
  */
 export async function run(config) {
-  const sections = document.querySelectorAll("section[data-model]");
   const promises = new Array();
   let index = 0;
-  if (sections) {
+
+  // Find all unique Model sections.
+  const modelSections = Array.from(
+    document.querySelectorAll("section[data-model]")
+  );
+  if (modelSections.length === 0) return;
+
+  // Divide the Model sections into DataModel sections and ServiceModel sections.
+  const dataModelSections = modelSections.filter(
+    elem => !elem.getAttribute("data-service-model")
+  );
+  const serviceModelSections = modelSections.filter(elem =>
+    elem.getAttribute("data-service-model")
+  );
+
+  // Process the DataModel sections.
+  if (dataModelSections.length > 0) {
     promises.push(
-      ...Array.from(sections).map(async section => {
+      ...Array.from(dataModelSections).map(async section => {
         const modelId = section.getAttribute("data-model") ?? "";
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing model id</h2>`
+            html`<h2>Missing Model id</h2>`
           );
           showError(
-            "Cannot process data-model section without the data model id",
+            "Cannot process DataModel sections without the Model id",
             name,
             { elements: [section] }
           );
@@ -453,9 +816,49 @@ export async function run(config) {
           section.setAttribute("id", `${modelId}.${index}`);
           index++;
           try {
-            await processModel(config, section);
+            await processDataModel(config, section);
           } catch (error) {
-            showError(`Cannot process model ${modelId}: ${error}`, name);
+            showError(`Cannot process data model ${modelId}: ${error}`, name);
+          }
+        }
+      })
+    );
+  }
+
+  // Process the ServiceModel sections.
+  if (serviceModelSections.length > 0) {
+    promises.push(
+      ...Array.from(serviceModelSections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        const serviceModelId = section.getAttribute("data-service-model") ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing Model id</h2>`
+          );
+          showError(
+            "Cannot process ServiceModel section without the Model id",
+            name,
+            { elements: [section] }
+          );
+        } else if (serviceModelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing ServiceModel id</h2>`
+          );
+          showError(
+            "Cannot process ServiceModel section without the ServiceModel id",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          const preferredId = section.getAttribute("id");
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            await processServiceModel(config, section, preferredId);
+          } catch (error) {
+            showError(`Cannot process ServiceModel ${modelId}: ${error}`, name);
           }
         }
       })

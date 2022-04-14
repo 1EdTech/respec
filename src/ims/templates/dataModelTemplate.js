@@ -3,10 +3,11 @@ import { renderIssue, renderNote } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
 /**
- * @param {*} dataModel The CDM data model.
- * @param {string} title The preferred title for this section.
- * @param {string} id The unique header id to use so a data model
- * can appear in multiple sections.
+ * Render the header, notes, and issues for a MPS Model. This template
+ * is used when the Model includes MPS DataModels.
+ * @param {*} dataModel The CDM Model.
+ * @param {string?} title The preferred title for this section.
+ * @param {string?} id The unique header id to use so a model can appear in multiple sections.
  * @returns {HTMLElement[]} An array of HTML elements.
  */
 export default (dataModel, title, id) => {

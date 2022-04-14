@@ -2,6 +2,12 @@
 import { renderIssue, renderNote, renderTerm } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
+/**
+ * Render an Enumeration, ExtEnum, or Vocabulary class.
+ * @param {*} classData The MPS Class object.
+ * @param {string?} title The preferred title.
+ * @returns {HTMLElement[]} The entire section contents.
+ */
 export default (classData, title) => {
   if (classData && classData.properties) {
     const suffix =

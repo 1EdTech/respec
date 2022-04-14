@@ -65,8 +65,433 @@
     <h2>Conformance</h2>
   </section>
 
+  <!-- Start a service model section-->
+
+  <section id="api" data-model="org.1edtech.clr.v2p0.model" 
+           data-service-model="org.1edtech.clr.v2p0.rest.servicemodel"
+           data-interface-filter="org.1edtech.clr.v2p0.rest.clrcredentials.interface" 
+           title="CLR Standard API">
+    <p>
+      Some more information about the service.
+    </p>
+    <section>
+      <h3>Architecture</h3>
+    </section>
+    <section>
+      <h3>Security</h3>
+    </section>
+    <section data-interface="org.1edtech.clr.v2p0.rest.clrcredentials.interface">
+      <p>Some text about the interface.</p>
+      <section data-operation="org.1edtech.clr.v2p0.rest.getcredentials.operation">
+        <pre class="http example" title="Sample getCredentials Request">
+          GET ims/clr/v2p0/credentials?limit=2&offset=0 HTTP/1.1
+          Host: example.edu
+          Authorization: Bearer 863DF0B10F5D432EB2933C2A37CD3135A7BB7B07A68F65D92
+          Accept: application/json
+        </pre>
+        <pre class="http example" title="Sample getCredentials Response (line breaks for clarity)">
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+          X-Total-Count: 1
+          Link: &lt;https://example.edu/ims/clr/v2p0/credentials?limit=2&offset=2>; rel="next",
+                &lt;https://example.edu/ims/clr/v2p0/credentials?limit=2&offset=0>; rel="last",
+                &lt;https://example.edu/ims/clr/v2p0/credentials?limit=2&offset=0>; rel="first",
+                &lt;https://example.edu/ims/clr/v2p0/credentials?limit=2&offset=0>; rel="prev"
+
+          {
+            "credentials": [
+              {
+                "@context": [
+                  "https://www.w3.org/2018/credentials/v1",
+                  "https://dc.imsglobal.org/draft/clr/v2p0/context",
+                  "https://imsglobal.github.io/openbadges-specification/context.json",
+                  "https://w3id.org/security/suites/ed25519-2020/v1"
+                ],
+                "id": "http://example.edu/credentials/3732",
+                "type": [
+                  "VerifiableCredential",
+                  "ClrCredential"
+                ],
+                "issuer": {
+                  "id": "https://example.edu/issuers/565049",
+                  "name": "Example University"
+                },
+                "issuanceDate": "2010-01-01T00:00:00Z",
+                "credentialSubject": {
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+                  "assertions": [
+                    {
+                      "@context": [
+                        "https://www.w3.org/2018/credentials/v1",
+                        "https://imsglobal.github.io/openbadges-specification/context.json",
+                        "https://w3id.org/security/suites/ed25519-2020/v1"
+                      ],
+                      "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
+                      "type": [
+                        "VerifiableCredential",
+                        "AssertionCredential"
+                      ],
+                      "issuer": {
+                        "id": "https://example.edu/issuers/565049",
+                        "type": "Publisher",
+                        "name": "Example University"
+                      },
+                      "issuanceDate": "2010-01-01T00:00:00Z",
+                      "achievement": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                      "credentialSubject": {
+                        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+                      },
+                      "credentialSchema": [
+                        {
+                          "id": "https://purl.imsglobal.org/ClrCredential.json",
+                          "type": "JsonSchemaValidator2020"
+                        }
+                      ],
+                      "proof": {
+                        "type": "Ed25519Signature2020",
+                        "created": "2022-04-07T21:25:44Z",
+                        "verificationMethod": "did:key:undefined",
+                        "proofPurpose": "assertionMethod",
+                        "proofValue": "z2MVFHXZ8YK32d9zUfFk9hJsVNfdg3vDJsxSRqKpdaJ9T8WLAg1NcTHB91tfJrfDFkLBKtrRQFjqGkeTF3yqcz8ut"
+                      }
+                    }
+                  ],
+                  "achievements": [
+                    {
+                      "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                      "creator": {
+                        "id": "https://example.edu/issuers/565049"
+                      },
+                      "name": "Achievement 1",
+                      "description": "Achievement 1",
+                      "image": {
+                        "id": "https://example.edu/achievements/sample.png"
+                      }
+                    },
+                    {
+                      "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                      "creator": {
+                        "id": "https://example.edu/issuers/565049"
+                      },
+                      "name": "Achievement 2",
+                      "description": "Achievement 2",
+                      "image": {
+                        "id": "https://example.edu/achievements/sample.png"
+                      }
+                    }
+                  ],
+                  "associations": [
+                    {
+                      "associationType": "isParentOf",
+                      "sourceId": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                      "targetId": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
+                    }
+                  ]
+                },
+                "credentialSchema": [
+                  {
+                    "id": "https://purl.imsglobal.org/AchievementCredential.json",
+                    "type": "JsonSchemaValidator2020"
+                  }
+                ],
+                "proof": {
+                  "type": "Ed25519Signature2020",
+                  "created": "2022-04-07T21:25:44Z",
+                  "verificationMethod": "did:key:undefined",
+                  "proofPurpose": "assertionMethod",
+                  "proofValue": "zMkGPxkm3cxzEAxbjTW9MWyQEM6WZNigeoGpqA2MZhPFqotVnin6oBJSya8hqwqcFRCWMHPedDUKrn31VQGgE9BF"
+                }
+              }
+            ],
+            "compactJwsStrings": [
+              "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy5
+              3My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vZGMuaW1zZ2xvYmFsLm9yZy9kcmFmdC9
+              jbHIvdjJwMC9jb250ZXh0IiwiaHR0cHM6Ly9pbXNnbG9iYWwuZ2l0aHViLmlvL29wZW5iYWRnZXMtc3B
+              lY2lmaWNhdGlvbi9jb250ZXh0Lmpzb24iXSwiaWQiOiJodHRwOi8vZXhhbXBsZS5lZHUvY3JlZGVudGl
+              hbHMvMzczMiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJDbHJDcmVkZW50aWFsIl0sIml
+              zc3VlciI6eyJpZCI6Imh0dHBzOi8vZXhhbXBsZS5lZHUvaXNzdWVycy81NjUwNDkiLCJuYW1lIjoiRXh
+              hbXBsZSBVbml2ZXJzaXR5In0sImlzc3VhbmNlRGF0ZSI6IjIwMTAtMDEtMDFUMDA6MDA6MDBaIiwiY3J
+              lZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZXhhbXBsZTplYmZlYjFmNzEyZWJjNmYxYzI3NmUxMmV
+              jMjEiLCJhc3NlcnRpb25zIjpbImV5SmhiR2NpT2lKU1V6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUo
+              yWXlJNmV5SkFZMjl1ZEdWNGRDSTZXeUpvZEhSd2N6b3ZMM2QzZHk1M015NXZjbWN2TWpBeE9DOWpjbVZ
+              rWlc1MGFXRnNjeTkyTVNJc0ltaDBkSEJ6T2k4dmFXMXpaMnh2WW1Gc0xtZHBkR2gxWWk1cGJ5OXZjR1Z
+              1WW1Ga1oyVnpMWE53WldOcFptbGpZWFJwYjI0dlkyOXVkR1Y0ZEM1cWMyOXVJbDBzSW1sa0lqb2lkWEp
+              1T25WMWFXUTZPVEUxTXpka1ltRXROVFpqWWkweE1XVmpMV0ptTmpNdE1ESTBNbUZqTVRNd01EQXlJaXd
+              pZEhsd1pTSTZXeUpXWlhKcFptbGhZbXhsUTNKbFpHVnVkR2xoYkNJc0lrRnpjMlZ5ZEdsdmJrTnlaV1J
+              sYm5ScFlXd2lYU3dpYVhOemRXVnlJanA3SW1sa0lqb2lhSFIwY0hNNkx5OWxlR0Z0Y0d4bExtVmtkUzl
+              wYzNOMVpYSnpMelUyTlRBME9TSXNJblI1Y0dVaU9pSlFkV0pzYVhOb1pYSWlMQ0p1WVcxbElqb2lSWGh
+              oYlhCc1pTQlZibWwyWlhKemFYUjVJbjBzSW1semMzVmhibU5sUkdGMFpTSTZJakl3TVRBdE1ERXRNREZ
+              VTURBNk1EQTZNREJhSWl3aVlXTm9hV1YyWlcxbGJuUWlPaUoxY200NmRYVnBaRHBrWkRnNE4yWXdZUzA
+              xTm1OaUxURXhaV010WW1ZMk15MHdNalF5WVdNeE16QXdNRElpTENKamNtVmtaVzUwYVdGc1UzVmlhbVZ
+              qZENJNmV5SnBaQ0k2SW1ScFpEcGxlR0Z0Y0d4bE9tVmlabVZpTVdZM01USmxZbU0yWmpGak1qYzJaVEV
+              5WldNeU1TSjlMQ0pqY21Wa1pXNTBhV0ZzVTJOb1pXMWhJanBiZXlKcFpDSTZJbWgwZEhCek9pOHZjSFZ
+              5YkM1cGJYTm5iRzlpWVd3dWIzSm5MME5zY2tOeVpXUmxiblJwWVd3dWFuTnZiaUlzSW5SNWNHVWlPaUp
+              LYzI5dVUyTm9aVzFoVm1Gc2FXUmhkRzl5TWpBeU1DSjlYWDBzSW1semN5STZleUpwWkNJNkltaDBkSEJ
+              6T2k4dlpYaGhiWEJzWlM1bFpIVXZhWE56ZFdWeWN5ODFOalV3TkRraUxDSjBlWEJsSWpvaVVIVmliR2x
+              6YUdWeUlpd2libUZ0WlNJNklrVjRZVzF3YkdVZ1ZXNXBkbVZ5YzJsMGVTSjlMQ0p1WW1ZaU9qRXlOakl
+              6TURRd01EQXNJbXAwYVNJNkluVnlianAxZFdsa09qa3hOVE0zWkdKaExUVTJZMkl0TVRGbFl5MWlaall
+              6TFRBeU5ESmhZekV6TURBd01pSXNJbk4xWWlJNkltUnBaRHBsZUdGdGNHeGxPbVZpWm1WaU1XWTNNVEp
+              sWW1NMlpqRmpNamMyWlRFeVpXTXlNU0o5Lk9idmlwaTNyTVVvbWZHaEZwTlZ1WVk5ekpXVUtVSTg2SXJ
+              ZRlRtNDdScDJSc1hGYUlBYXJHZlE4X3ZVS0R1RVh0MDRma1liQUpxVno1UGhrYkpUTlZULWtGMXpWaXV
+              vdUNucXIwN1gzYmZfb2U0RUxKN2FEVXp6N2hKdEpKdmdCTzVlYzFSN3ZHVnBMc0kwYm1sbFlNVlFzeEs
+              xejFQS3lGdEFTTDM0WUo1N3NwQkVzbE1RNEc2RENiRTZOSktPM2lqZk1LTUxkT2RPbHVnb3hINjVyQnp
+              nWlRxWlI0RkMwbXpmWHJGQUhFeVFqdktlMHFJdWJLbjJsV3FKRTFNbDg5SDRSX3dzenFHTEtIOWpSdVJ
+              VcEE0REp5ZFd4Z0xSbjhTYXJSRl9WUWoxaktsdjNCWTZuUEtGSjN0VF81ZXBrUmQxQnF0MG94UHJhQjJ
+              UVzg1aFNuUSJdLCJhY2hpZXZlbWVudHMiOlt7ImlkIjoidXJuOnV1aWQ6YTc0NjdlZjYtNTZjYi0xMWV
+              jLWJmNjMtMDI0MmFjMTMwMDAyIiwiY3JlYXRvciI6eyJpZCI6Imh0dHBzOi8vZXhhbXBsZS5lZHUvaXN
+              zdWVycy81NjUwNDkifSwibmFtZSI6IkFjaGlldmVtZW50IDEiLCJkZXNjcmlwdGlvbiI6IkFjaGlldmV
+              tZW50IDEiLCJpbWFnZSI6eyJpZCI6Imh0dHBzOi8vZXhhbXBsZS5lZHUvYWNoaWV2ZW1lbnRzL3NhbXB
+              sZS5wbmcifX0seyJpZCI6InVybjp1dWlkOmRkODg3ZjBhLTU2Y2ItMTFlYy1iZjYzLTAyNDJhYzEzMDA
+              wMiIsImNyZWF0b3IiOnsiaWQiOiJodHRwczovL2V4YW1wbGUuZWR1L2lzc3VlcnMvNTY1MDQ5In0sIm5
+              hbWUiOiJBY2hpZXZlbWVudCAyIiwiZGVzY3JpcHRpb24iOiJBY2hpZXZlbWVudCAyIiwiaW1hZ2UiOns
+              iaWQiOiJodHRwczovL2V4YW1wbGUuZWR1L2FjaGlldmVtZW50cy9zYW1wbGUucG5nIn19XSwiYXNzb2N
+              pYXRpb25zIjpbeyJhc3NvY2lhdGlvblR5cGUiOiJpc1BhcmVudE9mIiwic291cmNlSWQiOiJ1cm46dXV
+              pZDphNzQ2N2VmNi01NmNiLTExZWMtYmY2My0wMjQyYWMxMzAwMDIiLCJ0YXJnZXRJZCI6InVybjp1dWl
+              kOmRkODg3ZjBhLTU2Y2ItMTFlYy1iZjYzLTAyNDJhYzEzMDAwMiJ9XX0sImNyZWRlbnRpYWxTY2hlbWE
+              iOlt7ImlkIjoiaHR0cHM6Ly9wdXJsLmltc2dsb2JhbC5vcmcvQWNoaWV2ZW1lbnRDcmVkZW50aWFsLmp
+              zb24iLCJ0eXBlIjoiSnNvblNjaGVtYVZhbGlkYXRvcjIwMjAifV19LCJpc3MiOnsiaWQiOiJodHRwczo
+              vL2V4YW1wbGUuZWR1L2lzc3VlcnMvNTY1MDQ5IiwibmFtZSI6IkV4YW1wbGUgVW5pdmVyc2l0eSJ9LCJ
+              uYmYiOjEyNjIzMDQwMDAsImp0aSI6Imh0dHA6Ly9leGFtcGxlLmVkdS9jcmVkZW50aWFscy8zNzMyIiw
+              ic3ViIjoiZGlkOmV4YW1wbGU6ZWJmZWIxZjcxMmViYzZmMWMyNzZlMTJlYzIxIn0.hb_qNMd6nQBU9T0
+              0ohxvQDJ95kcnPRd_RMZqvpvsgCqvzIzXV1HV1wZ7mxNkaIlNim-JA1MgFlh3C1I_s2iGRBn9jSZAHvT
+              JGyhiU_80Jhi1R8K2BymlB3T3o3_g0waCrsSIoAcN6NFnpDCR4Taop_JCBoC8msDG4qKskq0wEDYhR3N
+              09qvdl1kkJVmFJNc0R_5QK54kIk8YEzeClgo3ceh4q7ooPBRvfduehYButLZkhy3rQP9Y8kIyCMvrhL9
+              5FwlnEeIY3YVz52qlhrk_SXMX6e-pKY-beqcJa_i0AS_ZG6iz6bN0T99UOd9coczJDt6nzr5B2P8Iz6c
+              IcZmx2A"
+            ]
+          }
+        </pre>
+      </section>
+      <section data-operation="org.1edtech.clr.v2p0.rest.postcredential.operation">
+        <pre class="http example" title="Sample postCredential Request">
+          POST ims/clr/v2p0/credentials
+          Host: example.edu
+          Authorization: Bearer 863DF0B10F5D432EB2933C2A37CD3135A7BB7B07A68F65D92
+          Accept: application/json
+          Content-Type: application/json
+
+          {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://dc.imsglobal.org/draft/clr/v2p0/context",
+              "https://imsglobal.github.io/openbadges-specification/context.json",
+              "https://w3id.org/security/suites/ed25519-2020/v1"
+            ],
+            "id": "http://example.edu/credentials/3732",
+            "type": [
+              "VerifiableCredential",
+              "ClrCredential"
+            ],
+            "issuer": {
+              "id": "https://example.edu/issuers/565049",
+              "name": "Example University"
+            },
+            "issuanceDate": "2010-01-01T00:00:00Z",
+            "credentialSubject": {
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+              "assertions": [
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://imsglobal.github.io/openbadges-specification/context.json",
+                    "https://w3id.org/security/suites/ed25519-2020/v1"
+                  ],
+                  "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
+                  "type": [
+                    "VerifiableCredential",
+                    "AssertionCredential"
+                  ],
+                  "issuer": {
+                    "id": "https://example.edu/issuers/565049",
+                    "type": "Publisher",
+                    "name": "Example University"
+                  },
+                  "issuanceDate": "2010-01-01T00:00:00Z",
+                  "achievement": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                  "credentialSubject": {
+                    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+                  },
+                  "credentialSchema": [
+                    {
+                      "id": "https://purl.imsglobal.org/ClrCredential.json",
+                      "type": "JsonSchemaValidator2020"
+                    }
+                  ],
+                  "proof": {
+                    "type": "Ed25519Signature2020",
+                    "created": "2022-04-07T21:25:44Z",
+                    "verificationMethod": "did:key:undefined",
+                    "proofPurpose": "assertionMethod",
+                    "proofValue": "z2MVFHXZ8YK32d9zUfFk9hJsVNfdg3vDJsxSRqKpdaJ9T8WLAg1NcTHB91tfJrfDFkLBKtrRQFjqGkeTF3yqcz8ut"
+                  }
+                }
+              ],
+              "achievements": [
+                {
+                  "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                  "creator": {
+                    "id": "https://example.edu/issuers/565049"
+                  },
+                  "name": "Achievement 1",
+                  "description": "Achievement 1",
+                  "image": {
+                    "id": "https://example.edu/achievements/sample.png"
+                  }
+                },
+                {
+                  "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                  "creator": {
+                    "id": "https://example.edu/issuers/565049"
+                  },
+                  "name": "Achievement 2",
+                  "description": "Achievement 2",
+                  "image": {
+                    "id": "https://example.edu/achievements/sample.png"
+                  }
+                }
+              ],
+              "associations": [
+                {
+                  "associationType": "isParentOf",
+                  "sourceId": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                  "targetId": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
+                }
+              ]
+            },
+            "credentialSchema": [
+              {
+                "id": "https://purl.imsglobal.org/AchievementCredential.json",
+                "type": "JsonSchemaValidator2020"
+              }
+            ],
+            "proof": {
+              "type": "Ed25519Signature2020",
+              "created": "2022-04-07T21:25:44Z",
+              "verificationMethod": "did:key:undefined",
+              "proofPurpose": "assertionMethod",
+              "proofValue": "zMkGPxkm3cxzEAxbjTW9MWyQEM6WZNigeoGpqA2MZhPFqotVnin6oBJSya8hqwqcFRCWMHPedDUKrn31VQGgE9BF"
+            }
+          }
+        </pre>
+        <pre class="http example" title="Sample postCredential Response">
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+  
+          {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://dc.imsglobal.org/draft/clr/v2p0/context",
+              "https://imsglobal.github.io/openbadges-specification/context.json",
+              "https://w3id.org/security/suites/ed25519-2020/v1"
+            ],
+            "id": "http://example.edu/credentials/3732",
+            "type": [
+              "VerifiableCredential",
+              "ClrCredential"
+            ],
+            "issuer": {
+              "id": "https://example.edu/issuers/565049",
+              "name": "Example University"
+            },
+            "issuanceDate": "2010-01-01T00:00:00Z",
+            "credentialSubject": {
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+              "assertions": [
+                {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://imsglobal.github.io/openbadges-specification/context.json",
+                    "https://w3id.org/security/suites/ed25519-2020/v1"
+                  ],
+                  "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
+                  "type": [
+                    "VerifiableCredential",
+                    "AssertionCredential"
+                  ],
+                  "issuer": {
+                    "id": "https://example.edu/issuers/565049",
+                    "type": "Publisher",
+                    "name": "Example University"
+                  },
+                  "issuanceDate": "2010-01-01T00:00:00Z",
+                  "achievement": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                  "credentialSubject": {
+                    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+                  },
+                  "credentialSchema": [
+                    {
+                      "id": "https://purl.imsglobal.org/ClrCredential.json",
+                      "type": "JsonSchemaValidator2020"
+                    }
+                  ],
+                  "proof": {
+                    "type": "Ed25519Signature2020",
+                    "created": "2022-04-07T21:25:44Z",
+                    "verificationMethod": "did:key:undefined",
+                    "proofPurpose": "assertionMethod",
+                    "proofValue": "z2MVFHXZ8YK32d9zUfFk9hJsVNfdg3vDJsxSRqKpdaJ9T8WLAg1NcTHB91tfJrfDFkLBKtrRQFjqGkeTF3yqcz8ut"
+                  }
+                }
+              ],
+              "achievements": [
+                {
+                  "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                  "creator": {
+                    "id": "https://example.edu/issuers/565049"
+                  },
+                  "name": "Achievement 1",
+                  "description": "Achievement 1",
+                  "image": {
+                    "id": "https://example.edu/achievements/sample.png"
+                  }
+                },
+                {
+                  "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
+                  "creator": {
+                    "id": "https://example.edu/issuers/565049"
+                  },
+                  "name": "Achievement 2",
+                  "description": "Achievement 2",
+                  "image": {
+                    "id": "https://example.edu/achievements/sample.png"
+                  }
+                }
+              ],
+              "associations": [
+                {
+                  "associationType": "isParentOf",
+                  "sourceId": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
+                  "targetId": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
+                }
+              ]
+            },
+            "credentialSchema": [
+              {
+                "id": "https://purl.imsglobal.org/AchievementCredential.json",
+                "type": "JsonSchemaValidator2020"
+              }
+            ],
+            "proof": {
+              "type": "Ed25519Signature2020",
+              "created": "2022-04-07T21:25:44Z",
+              "verificationMethod": "did:key:undefined",
+              "proofPurpose": "assertionMethod",
+              "proofValue": "zMkGPxkm3cxzEAxbjTW9MWyQEM6WZNigeoGpqA2MZhPFqotVnin6oBJSya8hqwqcFRCWMHPedDUKrn31VQGgE9BF"
+            }
+          }
+        </pre>
+      </section>
+    </section>
+    <section>
+      <h5>Paging</h5>
+    </section>
+  </section>
+
   <!-- Start a data model section-->
   <section data-model="org.1edtech.clr.v2p0.model">
+    <p>
+      Some more information about the data model.
+    </p>
     <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
       <!-- <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
         {
