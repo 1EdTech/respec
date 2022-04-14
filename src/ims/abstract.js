@@ -1,8 +1,8 @@
 // @ts-check
 // Module ims/abstract
 // Handle the abstract section properly.
+import { html } from "../core/import-maps.js";
 import { showWarning } from "../core/utils.js";
-import { toHTMLNode } from "./utils.js";
 export const name = "ims/abstract";
 
 /**
@@ -14,10 +14,10 @@ export async function run() {
     const msg = `Document should have one element with \`id="abstract"`;
     showWarning(msg, name);
     // insert a temp abstract
-    const tempAbstract = toHTMLNode(
-      "<section id='abstract' class='introductory remove'><h2>To be removed</h2></section>"
-    );
-    document.body.prepend(tempAbstract);
+    abstract = html`<section id="abstract" class="introductory remove">
+      <h2>To be removed</h2>
+    </section>`;
+    document.body.prepend(abstract);
   }
 
   if (abstract.tagName.startsWith("H")) {

@@ -2,12 +2,7 @@
 
 /**
  * Module ims/cdm
- * Handles the optional Common Data Model processing.
- *
- * Markdown support is optional. It is enabled by setting the `data-format`
- * attribute of a section to 'cdm'.
- *
- * The HTML created by the CDM parser is a table for each data class.
+ * Handles the optional Model Processing Service.
  */
 import { addFormats } from "./ajv-formats.js";
 import classTemplate from "./templates/classTemplate.js";
@@ -21,40 +16,40 @@ import { showError } from "../core/utils.js";
 import { sub } from "../core/pubsubhub.js";
 import typeTemplate from "./templates/typeTemplate.js";
 
-export const name = "ims/cdm";
+export const name = "ims/mps";
 
 /**
- * Get the CDM API KEY from the configuration.
+ * Get the MPS API KEY from the configuration.
  *
  * @param {*} config The respecConfig
- * @returns {string} The CDM API KEY.
+ * @returns {string} The MPS API KEY.
  */
 function getApiKey(config) {
-  if (config.cdm.apiKey) {
-    return config.cdm.apiKey;
+  if (config.mps.apiKey) {
+    return config.mps.apiKey;
   }
-  throw "No CDM API KEY found";
+  throw "No MPS API KEY found";
 }
 
 /**
- * Get the CDM server URL from the configuration.
+ * Get the MPS server URL from the configuration.
  *
  * @param {*} config The respecConfig
- * @returns {string} The CDM server URL.
+ * @returns {string} The MPS server URL.
  */
 function getBaseUrl(config) {
-  if (config.cdm.serverUrl) {
-    return config.cdm.serverUrl;
+  if (config.mps.serverUrl) {
+    return config.mps.serverUrl;
   }
-  throw "No CDM server URL found";
+  throw "No MPS server URL found";
 }
 
 /**
- * Execute the API call to retrieve the CDM data model (classes).
+ * Execute the API call to retrieve the MPS data model (classes).
  *
  * @param {*} config The respecConfig
  * @param {string} source The source (CORE or SANDBOX) of the model
- * @param {string} id The id of the CDM model to retrieve
+ * @param {string} id The id of the MPS model to retrieve
  * @returns {JSON} The data model as an object
  */
 async function getDataModel(config, source, id) {
@@ -115,7 +110,7 @@ async function getDataModel(config, source, id) {
     });
     if (!res.ok) {
       showError(
-        `Could not get CDM model for ${id}. Please see the developer console for details.`,
+        `Could not get MPS model for ${id}. Please see the developer console for details.`,
         name
       );
       return null;
@@ -126,7 +121,7 @@ async function getDataModel(config, source, id) {
     if (!dataModel) {
       showError(
         `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
-          config.cdm.source ?? "CORE"
+          config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -135,17 +130,17 @@ async function getDataModel(config, source, id) {
     sessionStorage.setItem(key, JSON.stringify(dataModel));
     return dataModel;
   } catch (error) {
-    showError(`Could not get CDM model for ${id}: ${error}`, name);
+    showError(`Could not get MPS model for ${id}: ${error}`, name);
     return null;
   }
 }
 
 /**
- * Execute the API call to retrieve the CDM service models (services).
+ * Execute the API call to retrieve the MPS service models (services).
  *
  * @param {*} config The respecConfig
  * @param {string} source The source (CORE or SANDBOX) of the model
- * @param {string} id The id of the CDM model to retrieve
+ * @param {string} id The id of the MPS model to retrieve
  * @returns {JSON} The data model as an object
  */
 async function getServiceModels(config, source, id) {
@@ -295,7 +290,7 @@ async function getServiceModels(config, source, id) {
     });
     if (!res.ok) {
       showError(
-        `Could not get CDM model for ${id}. Please see the developer console for details.`,
+        `Could not get MPS model for ${id}. Please see the developer console for details.`,
         name
       );
       return null;
@@ -306,7 +301,7 @@ async function getServiceModels(config, source, id) {
     if (!dataModel) {
       showError(
         `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
-          config.cdm.source ?? "CORE"
+          config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -315,17 +310,16 @@ async function getServiceModels(config, source, id) {
     sessionStorage.setItem(key, JSON.stringify(dataModel));
     return dataModel;
   } catch (error) {
-    showError(`Could not get CDM model for ${id}: ${error}`, name);
+    showError(`Could not get MPS model for ${id}: ${error}`, name);
     return null;
   }
 }
 
 /**
- * Async function that returns a sample JSON object for a single
- * Common Data Model class.
+ * Async function that returns a sample JSON object for a single MPS class.
  *
  * @param {*} config The respecConfig
- * @param {string} id Common Data Model class id
+ * @param {string} id MPS class id
  * @param {boolean} includeOptionalFields True if the sample should
  * include all optional fields (the default is false)
  * @returns {JSON} The sample JSON object
@@ -361,7 +355,7 @@ async function getDataSample(config, id, includeOptionalFields = false) {
  * Async function that returns the JSON Schema for a class.
  *
  * @param {*} config The respecConfig
- * @param {string} id Common Data Model Class id
+ * @param {string} id MPS Class id
  * @returns {JSON} The schema
  */
 async function getJsonSchema(config, id) {
@@ -390,7 +384,7 @@ async function getJsonSchema(config, id) {
  * Process a single data model class definition.
  *
  * @param {HTMLElement} section The class section element
- * @param {*} classModel The CDM Class object
+ * @param {*} classModel The MPS Class object
  */
 async function processClass(section, classModel) {
   section.setAttribute("id", classModel.id);
@@ -440,7 +434,7 @@ async function processClass(section, classModel) {
  *
  * @param {HTMLElement} section The operation section element
  * @param {string} rootPath The services root path
- * @param {*} operation The CDM operation object
+ * @param {*} operation The MPS operation object
  */
 async function processOperation(section, rootPath, operation) {
   section.setAttribute("id", operation.id);
@@ -470,7 +464,7 @@ async function processOperation(section, rootPath, operation) {
  * Process a single service interface model.
  *
  * @param {HTMLElement} section The service interface section element
- * @param {*} serviceInterface The CDM service interface object
+ * @param {*} serviceInterface The MPS service interface object
  */
 async function processInterface(section, serviceInterface) {
   const preferredId = section.getAttribute("id");
@@ -536,8 +530,8 @@ async function processDataModel(config, section) {
   // The model id
   const modelId = section.getAttribute("data-model") ?? "";
 
-  // The CDM/MPS source (CORE|SANDBOX)
-  const source = section.getAttribute("data-source") ?? config.cdm.source;
+  // The MPS/MPS source (CORE|SANDBOX)
+  const source = section.getAttribute("data-source") ?? config.mps.source;
   if (source !== "CORE" && source !== "SANDBOX") {
     showError(`Invalid source ${source} for model ${modelId}`);
     return;
@@ -614,7 +608,7 @@ async function processDataModel(config, section) {
 async function processServiceModel(config, section, preferredId) {
   const modelId = section.getAttribute("data-model");
   const serviceModelId = section.getAttribute("data-service-model");
-  const source = section.getAttribute("data-source") ?? config.cdm.source;
+  const source = section.getAttribute("data-source") ?? config.mps.source;
   if (source !== "CORE" && source !== "SANDBOX") {
     showError(`Invalid source ${source} for model ${modelId}`);
     return;
@@ -818,7 +812,7 @@ export async function run(config) {
           try {
             await processDataModel(config, section);
           } catch (error) {
-            showError(`Cannot process data model ${modelId}: ${error}`, name);
+            showError(`Cannot process DataModel ${modelId}: ${error}`, name);
           }
         }
       })
@@ -904,13 +898,13 @@ export async function run(config) {
   // Clear the data model cache
   Array.from(document.querySelectorAll("section[data-model]"))
     .map(
-      section => `${config.cdm.source}-${section.getAttribute("data-model")}`
+      section => `${config.mps.source}-${section.getAttribute("data-model")}`
     )
     .forEach(key => {
       sessionStorage.removeItem(key);
     });
 
-  // Remove CDM config from initialUserConfig so API_KEY is not exposed
+  // Remove MPS config from initialUserConfig so API_KEY is not exposed
   sub("end-all", () => {
     const script = document.getElementById("initialUserConfig");
     const userConfig = JSON.parse(script.innerHTML);

@@ -5,7 +5,7 @@ import { html } from "../../core/import-maps.js";
 /**
  * Render the header, description, notes, and issues for a MPS RestOperation object.
  * @param {string} rootPath The root path for the service definition. For example, "ims/clr/v2p0".
- * @param {*} operation The RestOperation object from CDM/MPS.
+ * @param {*} operation The RestOperation object from MPS.
  * @param {string?} title Optional title for the section. By default it will be the operation name.
  * @returns {HTMLElement[]} Information about the operation.
  */

@@ -1,2 +1,2 @@
 .gitattributes !filter !diff
-ims-examples/cdm-config.js filter=git-crypt diff=git-crypt
+1edtech-examples/mps-config.js filter=git-crypt diff=git-crypt

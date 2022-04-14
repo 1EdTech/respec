@@ -2,8 +2,8 @@
 import { html } from "../../core/import-maps.js";
 
 /**
- * Render a CDM issue as a Respec issue.
- * @param {String} issue A CDM issue ("q:" in a .lines file).
+ * Render a MPS issue as a Respec issue.
+ * @param {String} issue A MPS issue ("q:" in a .lines file).
  * @returns The issue wrapped in a div with class="issue".
  */
 export function renderIssue(issue) {
@@ -11,8 +11,8 @@ export function renderIssue(issue) {
 }
 
 /**
- * Render a CDM note as a Respec note.
- * @param {String} note A CDM note ("n:" in a .lines file).
+ * Render a MPS note as a Respec note.
+ * @param {String} note A MPS note ("n:" in a .lines file).
  * @returns The note wrapped in a div with class="note".
  */
 export function renderNote(note) {
@@ -21,7 +21,7 @@ export function renderNote(note) {
 
 /**
  * Render a term as HTML.
- * @param {*} term A CDM model for a property representing an enumeration
+ * @param {*} term A MPS model for a property representing an enumeration
  * or vocabulary term.
  * @returns A table row with information about the term.
  */

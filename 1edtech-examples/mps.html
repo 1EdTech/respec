@@ -6,13 +6,13 @@
   <title>
     Replace me with a real title
   </title>
-  <script src='../profiles/ims-default.js' type="module" class="remove"></script>
+  <script src='../profiles/1edtech.js' type="module" class="remove"></script>
 
   <!-- Load respec-vc add-on -->
   <!-- <script class="remove" src="http://localhost:3000/dist/main.js"></script> -->
 
-  <!-- Load the CDM configuration -->
-  <script class="remove" src="cdm-config.js"></script>
+  <!-- Load the MPS configuration -->
+  <script class="remove" src="mps-config.js"></script>
 
   <!-- Load ajv2019 (Another JSON Schema Validator) if you want your examples validated -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.8.2/ajv2019.bundle.min.js"
@@ -45,8 +45,8 @@
       // GitHub support
       github: "https://github.com/IMSGlobal/ComprehensiveLearnerRecord",
 
-      // Add the CDM configuration to respecConfig
-      cdm: _cdm,
+      // Add the MPS configuration to respecConfig
+      mps: _mps,
 
       // Add VC proof examples
       // postProcess: [
@@ -63,6 +63,13 @@
   </section>
   <section id="conformance">
     <h2>Conformance</h2>
+  </section>
+  <section>
+    <h2>Terminology</h2>
+    <dl>
+      <dt><dfn>Resource Server</dfn></dt>
+      <dd>A resource server.</dd>
+    </dl>
   </section>
 
   <!-- Start a service model section-->
@@ -558,8 +565,6 @@
       </pre> -->
     </section>
   </section>
-
-  <section id="issue-summary"></section>
 
 </body>
 
