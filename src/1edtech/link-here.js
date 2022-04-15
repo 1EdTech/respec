@@ -1,6 +1,6 @@
 // @ts-check
 
-import { toHTMLElement } from "../ims/utils.js";
+import { toHTMLElement } from "./utils.js";
 
 export const name = "ims/link-here";
 
