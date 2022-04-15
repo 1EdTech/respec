@@ -1,6 +1,3 @@
-/**
- * Exports toHTML() method, allowing programmatic control of the spec generator.
- */
 const puppeteer = require("puppeteer");
 const path = require("path");
 const { mkdtemp, readFile } = require("fs").promises;
@@ -9,6 +6,7 @@ const { tmpdir } = require("os");
 const noop = () => {};
 
 /**
+ * 1EdTech
  * Fetches a ReSpec "src" URL, and writes the processed static HTML to an "out" path.
  * @param {string} src A URL or filepath that is the ReSpec source.
  * @param {object} [options]

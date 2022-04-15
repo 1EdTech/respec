@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /**
+ * 1EdTech
  * Clone of respec2html.js that converts a Respec document into
  * content appropriate for Drupal or other CMS.
  */
