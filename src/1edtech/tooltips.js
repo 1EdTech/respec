@@ -2,7 +2,7 @@
 
 import { toHTMLNode } from "./utils.js";
 
-export const name = "ims/tooltips";
+export const name = "1edtech/tooltips";
 
 /**
  * Attach tooltips script.

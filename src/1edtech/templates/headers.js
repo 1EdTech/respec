@@ -3,7 +3,7 @@
 import { html } from "../../core/import-maps.js";
 import { showWarning } from "../../core/utils.js";
 
-const name = "ims/templates/headers";
+const name = "1edtech/templates/headers";
 
 /**
  * @param {*} conf
@@ -20,7 +20,7 @@ function getStatusString(conf) {
   if (conf.specType === "proposal") {
     return "This is a proposal that may be revised at any time.";
   }
-  // specStatus: See ims/config.js for known values
+  // specStatus: See 1edtech/config.js for known values
   switch (conf.specStatus) {
     case "Proposal":
       return "This document is for review and comment by IMS Contributing Members.";
@@ -33,7 +33,7 @@ function getStatusString(conf) {
     case "IMS Final Release":
       return "This document is made available for adoption by the public community at large.";
     default:
-      // ims/config.js will issue error for unknown values
+      // 1edtech/config.js will issue error for unknown values
       return `Unknown <code>specStatus: "${conf.specStatus}"</code>`;
   }
 }

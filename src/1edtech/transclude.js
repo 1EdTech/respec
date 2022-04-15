@@ -3,7 +3,7 @@
 import { pub } from "../core/pubsubhub.js";
 import { toHTMLNodes } from "./utils.js";
 
-export const name = "ims/transclude";
+export const name = "1edtech/transclude";
 
 export async function run() {
   /*

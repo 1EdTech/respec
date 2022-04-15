@@ -11,7 +11,7 @@ This folder is where the pre-generated stylesheet 'drupal.css' lives!
 1. Run the `combine-styles` tool from the root of the repo:
 
    ```bash
-   node ./tools/combine-styles.js --localhost ./ims-examples/ims-basic.html ./src/ims/styles/drupal.css
+   node ./tools/combine-styles.js --localhost ./ims-examples/ims-basic.html ./src/1edtech/styles/drupal.css
    ```
 
 2. If `./drupal.css` changed, send `./drupal.css` to Lisa Mattson and let her know it is a replacement for Drupal's Respec stylesheet

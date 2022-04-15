@@ -5,7 +5,7 @@ import { flushIframes, makePluginDoc } from "../SpecHelper.js";
 describe("1EdTech - mps.js", () => {
   afterAll(flushIframes);
 
-  const plugins = ["/src/ims/mps.js"];
+  const plugins = ["/src/1edtech/mps.js"];
   const config = { format: "markdown" };
 
   it("Removes <md-only> blocks when format='markdown'", async () => {

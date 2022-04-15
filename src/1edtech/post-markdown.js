@@ -1,5 +1,5 @@
 // @ts-check
-export const name = "ims/post-markdown";
+export const name = "1edtech/post-markdown";
 
 /**
  * Post processing of markdown transcludes. Run after markdown.

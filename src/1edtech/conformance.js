@@ -1,5 +1,5 @@
 // @ts-check
-// Module ims/conformance
+// Module 1edtech/conformance
 //
 // Based on w3c/conformance with following differences:
 //
@@ -13,11 +13,11 @@ import { html } from "../core/import-maps.js";
 import { renderInlineCitation } from "../core/render-biblio.js";
 import { rfc2119Usage } from "../core/inlines.js";
 
-export const name = "ims/conformance";
+export const name = "1edtech/conformance";
 
 /**
  * core/inlines will count the actual occurances of each term and
- * both w3c/conformance and ims/conformance will only list the terms
+ * both w3c/conformance and 1edtech/conformance will only list the terms
  * that are in rfc2119Usage. But the current version of the normative
  * text refers to all the keywords, so this stuffs the list with all
  * the keywords.

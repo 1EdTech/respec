@@ -1,5 +1,5 @@
 // @ts-check
-export const name = "ims/cleanBody";
+export const name = "1edtech/cleanBody";
 
 /**
  * A snapshot-time body merciless script and inline css remover. Intended to

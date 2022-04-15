@@ -1,6 +1,6 @@
 // @ts-check
 
-export const name = "ims/compute";
+export const name = "1edtech/compute";
 
 /**
  * Compute misc variables used by multiple other modules and store them back in conf.

@@ -2,7 +2,7 @@
 /**
  * Sets the defaults for IMS specs
  */
-export const name = "ims/defaults";
+export const name = "1edtech/defaults";
 import { coreDefaults } from "../core/defaults.js";
 
 const imsDefaults = {};

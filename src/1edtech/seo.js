@@ -1,5 +1,5 @@
 // @ts-check
-export const name = "ims/seo";
+export const name = "1edtech/seo";
 
 /**
  * Add a canonical href

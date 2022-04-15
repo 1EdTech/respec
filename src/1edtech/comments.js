@@ -1,6 +1,6 @@
 // @ts-check
 
-export const name = "ims/comments";
+export const name = "1edtech/comments";
 
 /**
  * Remove all comment nodes.

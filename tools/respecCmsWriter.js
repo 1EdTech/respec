@@ -254,7 +254,7 @@ async function evaluateHTML(version, timer) {
     return exportDocument("html", "text/html");
   } else {
     const { rsDocToCmsDataURL } = await new Promise((resolve, reject) => {
-      require(["ims/exporter"], resolve, err => {
+      require(["1edtech/exporter"], resolve, err => {
         reject(new Error(err.message));
       });
     });

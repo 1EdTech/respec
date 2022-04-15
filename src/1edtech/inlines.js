@@ -12,7 +12,7 @@
 
 import { addId } from "../core/utils.js";
 
-export const name = "ims/inlines";
+export const name = "1edtech/inlines";
 
 /**
  * Find the Conformance section in parent and assign an id.

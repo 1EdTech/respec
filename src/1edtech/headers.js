@@ -1,11 +1,11 @@
 // @ts-check
 /**
- * Module ims/headers
+ * Module 1edtech/headers
  * Add IMS boilerplate front matter to the document.
  */
 import headersTmpl from "./templates/headers.js";
 
-export const name = "ims/headers";
+export const name = "1edtech/headers";
 
 /**
  * @param {*} conf

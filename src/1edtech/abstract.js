@@ -1,9 +1,9 @@
 // @ts-check
-// Module ims/abstract
+// Module 1edtech/abstract
 // Handle the abstract section properly.
 import { html } from "../core/import-maps.js";
 import { showWarning } from "../core/utils.js";
-export const name = "ims/abstract";
+export const name = "1edtech/abstract";
 
 /**
  * Handles checking for the abstract, and inserts a temp one if not present.

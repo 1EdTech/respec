@@ -3,7 +3,7 @@ import { addId } from "../core/utils.js";
 import { pub } from "../core/pubsubhub.js";
 import { toHTMLElement } from "./utils.js";
 
-export const name = "ims/issues-notes";
+export const name = "1edtech/issues-notes";
 
 /**
  * NOTE: No longer required. core/issues-notes.js handles note|warning|issue

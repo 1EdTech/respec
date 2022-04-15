@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 // @ts-check
 /**
- * Module ims/footers
+ * Module 1edtech/footers
  * 
  * Add IMS boilerplate back matter to the document.
  */
 
 import footersTmpl from "./templates/footers.js";
 
-export const name = "ims/footers";
+export const name = "1edtech/footers";
 
 /**
  * @param {*} conf

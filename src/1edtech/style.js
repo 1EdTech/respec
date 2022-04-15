@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Module ims/style
+ * Module 1edtech/style
  *
  * Inserts IMS stylesheet and replaces w3c/style.
  *
@@ -16,7 +16,7 @@
 import { linkCSS, toKeyValuePairs } from "../core/utils.js";
 import css from "./styles/ims-base.css.js";
 
-export const name = "ims/style";
+export const name = "1edtech/style";
 
 /**
  * From w3c/style

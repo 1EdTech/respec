@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 /**
- * Module ims/cdm
+ * Module 1edtech/cdm
  * Handles the optional Model Processing Service.
  */
 import { addFormats } from "./ajv-formats.js";
@@ -16,7 +16,7 @@ import { showError } from "../core/utils.js";
 import { sub } from "../core/pubsubhub.js";
 import typeTemplate from "./templates/typeTemplate.js";
 
-export const name = "ims/mps";
+export const name = "1edtech/mps";
 
 /**
  * Get the MPS API KEY from the configuration.

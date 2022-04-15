@@ -6,7 +6,7 @@
 
 import { humanDate, showError } from "../core/utils.js";
 
-export const name = "ims/config";
+export const name = "1edtech/config";
 
 /**
  * Returns true if value is not null or empty.

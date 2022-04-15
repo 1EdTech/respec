@@ -1,5 +1,5 @@
 // @ts-check
-export const name = "ims/scripts";
+export const name = "1edtech/scripts";
 
 /**
  * Attach fixup script.

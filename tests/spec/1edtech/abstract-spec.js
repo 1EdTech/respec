@@ -23,7 +23,7 @@ describe("1EdTech — Abstract", () => {
     const pill = doc.getElementById("respec-pill-warning");
     expect(pill).toBeTruthy();
     expect(pill.textContent).toEqual("1");
-    // ims/abstract will insert a blank, empty abstract
+    // 1edtech/abstract will insert a blank, empty abstract
     // with class "remove" so it should be missing
     const abs = doc.getElementById("abstract");
     expect(abs).toBeFalsy();

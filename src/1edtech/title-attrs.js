@@ -1,6 +1,6 @@
 // @ts-check
 
-export const name = "ims/title-attrs";
+export const name = "1edtech/title-attrs";
 
 /**
  * Adds title attributes to internal definition references. When the

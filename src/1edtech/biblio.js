@@ -12,7 +12,7 @@
 
 import { pub } from "../core/pubsubhub.js";
 
-export const name = "ims/biblio";
+export const name = "1edtech/biblio";
 
 /**
  * @param {*} conf

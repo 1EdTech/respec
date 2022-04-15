@@ -5,7 +5,7 @@ import { flushIframes, makePluginDoc } from "../SpecHelper.js";
 describe("IMS - post-markdown.js", () => {
   afterAll(flushIframes);
 
-  const plugins = ["/src/ims/post-markdown.js"];
+  const plugins = ["/src/1edtech/post-markdown.js"];
   const config = { format: "markdown" };
 
   it("Removes <md-only> blocks when format='markdown'", async () => {

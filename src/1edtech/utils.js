@@ -1,5 +1,5 @@
 // @ts-check
-export const name = "ims/utils";
+export const name = "1edtech/utils";
 
 /**
  * Returns the first Element in the string.

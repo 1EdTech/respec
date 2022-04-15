@@ -246,7 +246,7 @@ async function evaluateCSS(timer) {
   );
 
   const { rsDocToCssDataURL } = await new Promise((resolve, reject) => {
-    require(["ims/exporter"], resolve, err => {
+    require(["1edtech/exporter"], resolve, err => {
       reject(new Error(err.message));
     });
   });

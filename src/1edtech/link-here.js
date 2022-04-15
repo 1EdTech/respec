@@ -2,7 +2,7 @@
 
 import { toHTMLElement } from "./utils.js";
 
-export const name = "ims/link-here";
+export const name = "1edtech/link-here";
 
 /**
  * Add a link to the first header element of each section not
