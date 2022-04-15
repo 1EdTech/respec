@@ -1,6 +1,6 @@
 import { flushIframes, makeRSDoc, makeStandardImsOps } from "../SpecHelper.js";
 
-describe("IMS — Abstract", () => {
+describe("1EdTech — Abstract", () => {
   afterAll(flushIframes);
 
   it("includes a h2 and sets the class", async () => {

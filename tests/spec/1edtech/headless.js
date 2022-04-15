@@ -7,23 +7,23 @@ const serveHandler = require("serve-handler");
 const port = 5000;
 const timeout = 30; // seconds
 
-describe("IMS Headless", () => {
+describe("1EdTech Headless", () => {
   beforeAll(() => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout * 1000;
     const server = http.createServer(serveHandler);
     server.listen(port);
   });
 
-  it("builds ims-basic.html without errors", async () => {
+  it("builds basic.html without errors", async () => {
     const exe = toExecutable(
-      toRespecToHtml(`http://localhost:${port}/ims-examples/ims-basic.html`)
+      toRespecToHtml(`http://localhost:${port}/1edtech-examples/basic.html`)
     );
     await expectAsync(exe.run()).toBeResolved();
   });
 
-  it("builds ims-basic.txt without errors", async () => {
+  it("builds basic.txt without errors", async () => {
     const exe = toExecutable(
-      toRespecToCms(`http://localhost:${port}/ims-examples/ims-basic.html`)
+      toRespecToCms(`http://localhost:${port}/1edtech-examples/basic.html`)
     );
     await expectAsync(exe.run()).toBeResolved();
   });
