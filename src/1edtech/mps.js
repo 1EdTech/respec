@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 /**
- * Module 1edtech/cdm
+ * Module 1edtech/mps
  * Handles the optional Model Processing Service.
  */
 import { addFormats } from "./ajv-formats.js";
@@ -13,8 +13,8 @@ import interfaceTemplate from "./templates/interfaceTemplate.js";
 import operationTemplate from "./templates/operationTemplate.js";
 import serviceModelTemplate from "./templates/serviceModelTemplate.js";
 import { showError } from "../core/utils.js";
+import stereoTypeTemplate from "./templates/stereoTypeTemplate.js";
 import { sub } from "../core/pubsubhub.js";
-import typeTemplate from "./templates/typeTemplate.js";
 
 export const name = "1edtech/mps";
 
@@ -116,7 +116,6 @@ async function getDataModel(config, source, id) {
       return null;
     }
     const data = await res.json();
-    // console.log("fetched data", data);
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
@@ -296,7 +295,6 @@ async function getServiceModels(config, source, id) {
       return null;
     }
     const data = await res.json();
-    // console.log("fetched data", data);
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
@@ -343,7 +341,6 @@ async function getDataSample(config, id, includeOptionalFields = false) {
       return null;
     }
     const data = await res.json();
-    // console.log("fetched data", data);
     return data;
   } catch (error) {
     showError(`Could not get sample data for ${id}: ${error}`, name);
@@ -372,7 +369,6 @@ async function getJsonSchema(config, id) {
       return null;
     }
     const data = await res.json();
-    // console.log("fetched data", data);
     return data;
   } catch (error) {
     showError(`Could not get the schema for ${id}: ${error}`, name);
@@ -389,20 +385,12 @@ async function getJsonSchema(config, id) {
 async function processClass(section, classModel) {
   section.setAttribute("id", classModel.id);
   const title = section.getAttribute("title");
-  // section.removeAttribute("data-class");
-  // classSection.removeAttribute("title");
   let wrapper;
   switch (classModel.stereoType) {
-    case "DerivedType":
-      wrapper = typeTemplate(classModel, title);
-      break;
     case "Enumeration":
     case "EnumExt":
     case "Vocabulary":
       wrapper = enumerationTemplate(classModel, title);
-      break;
-    case "PrimitiveType":
-      wrapper = typeTemplate(classModel, title);
       break;
     default:
       wrapper = classTemplate(classModel, title);
@@ -525,11 +513,9 @@ async function processInterface(section, serviceInterface) {
  *
  * @param {*} config The respecConfig.
  * @param {HTMLElement} section The model section element.
+ * @param {string} modelId The MPS Model id.
  */
-async function processDataModel(config, section) {
-  // The model id
-  const modelId = section.getAttribute("data-model") ?? "";
-
+async function processDataModel(config, section, modelId) {
   // The MPS/MPS source (CORE|SANDBOX)
   const source = section.getAttribute("data-source") ?? config.mps.source;
   if (source !== "CORE" && source !== "SANDBOX") {
@@ -568,7 +554,12 @@ async function processDataModel(config, section) {
       });
     }
 
-    let classes = Array.from(dataModel.classes);
+    let classes = Array.from(dataModel.classes).filter(
+      classModel =>
+        classModel.stereoType !== "PrimitiveType" &&
+        classModel.stereoType !== "DerivedType"
+    );
+
     if (packageName !== "") {
       classes = classes.filter(
         classModel => classModel.documentation.packageName === packageName
@@ -588,6 +579,60 @@ async function processDataModel(config, section) {
         section.insertAdjacentElement("beforeend", classSection);
       }
     });
+  } else {
+    // If there is no data model, add a header to satisfy Respec
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
+  }
+}
+
+/**
+ * Process classes with a particular stereotype. Only the name and documentation of each class will be listed in a table.
+ * Typically used to render the DerivedTypes and PrimitiveTypes.
+ *
+ * @param {*} config The respecConfig.
+ * @param {HTMLElement} section The model section element.
+ * @param {string} The MPS Model id.
+ * @param {string} The MPS StereoType.
+ */
+async function processStereoType(config, section, modelId, stereoType) {
+  // The MPS/MPS source (CORE|SANDBOX)
+  const source = section.getAttribute("data-source") ?? config.mps.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
+    return;
+  }
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  // The section's unique id (used to calculate a unique header id)
+  const id = section.getAttribute("id");
+
+  const dataModel = await getDataModel(config, source, modelId);
+  if (dataModel) {
+    const wrapper = dataModelTemplate(dataModel, title, id);
+    if (wrapper) {
+      let target = null;
+      Array.from(wrapper.childNodes).forEach(element => {
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
+        }
+      });
+    }
+    const typeList = stereoTypeTemplate(dataModel, stereoType);
+    if (typeList) {
+      section.insertAdjacentElement("beforeend", typeList);
+    }
   } else {
     // If there is no data model, add a header to satisfy Respec
     section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
@@ -783,9 +828,15 @@ export async function run(config) {
   );
   if (modelSections.length === 0) return;
 
-  // Divide the Model sections into DataModel sections and ServiceModel sections.
+  // Divide the Model sections into DataModel sections, ServiceModel sections
+  // and simple type lists.
   const dataModelSections = modelSections.filter(
-    elem => !elem.getAttribute("data-service-model")
+    elem =>
+      !elem.getAttribute("data-service-model") &&
+      !elem.getAttribute("data-stereotype")
+  );
+  const stereoTypeSections = modelSections.filter(elem =>
+    elem.getAttribute("data-stereotype")
   );
   const serviceModelSections = modelSections.filter(elem =>
     elem.getAttribute("data-service-model")
@@ -810,9 +861,51 @@ export async function run(config) {
           section.setAttribute("id", `${modelId}.${index}`);
           index++;
           try {
-            await processDataModel(config, section);
+            await processDataModel(config, section, modelId);
           } catch (error) {
             showError(`Cannot process DataModel ${modelId}: ${error}`, name);
+          }
+        }
+      })
+    );
+  }
+
+  // Process the StereoType sections.
+  if (stereoTypeSections.length > 0) {
+    promises.push(
+      ...Array.from(stereoTypeSections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        const stereoType = section.getAttribute("data-stereotype") ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing Model id</h2>`
+          );
+          showError(
+            "Cannot process SteroType sections without the Model id",
+            name,
+            { elements: [section] }
+          );
+        } else if (stereoType === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing StereoType</h2>`
+          );
+          showError(
+            "Cannot process SteroType sections without the StereoType",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            await processStereoType(config, section, modelId, stereoType);
+          } catch (error) {
+            showError(
+              `Cannot process StereoType ${modelId} ${stereoType}: ${error}`,
+              name
+            );
           }
         }
       })

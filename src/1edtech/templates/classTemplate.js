@@ -59,8 +59,8 @@ function renderExtensions(property) {
  */
 function renderProperty(property) {
   if (
-    property.type.name !== "Namespace" &&
-    property.type.name !== "NamespaceLax"
+    property.type.name === "Namespace" ||
+    property.type.name === "NamespaceLax"
   ) {
     return html``;
   } else {
