@@ -21,7 +21,7 @@ export const name = "1edtech/mps";
 /**
  * Get the MPS API KEY from the configuration.
  *
- * @param {*} config The respecConfig
+ * @param {object} config The respecConfig
  * @returns {string} The MPS API KEY.
  */
 function getApiKey(config) {
@@ -34,7 +34,7 @@ function getApiKey(config) {
 /**
  * Get the MPS server URL from the configuration.
  *
- * @param {*} config The respecConfig
+ * @param {object} config The respecConfig
  * @returns {string} The MPS server URL.
  */
 function getBaseUrl(config) {
@@ -45,14 +45,14 @@ function getBaseUrl(config) {
 }
 
 /**
- * Execute the API call to retrieve the MPS data model (classes).
+ * Execute the API call to retrieve MPS DataModel Classes in a Model.
  *
- * @param {*} config The respecConfig
- * @param {string} source The source (CORE or SANDBOX) of the model
- * @param {string} id The id of the MPS model to retrieve
- * @returns {JSON} The data model as an object
+ * @param {object} config The respecConfig.
+ * @param {string} source The source (CORE or SANDBOX) of the Model.
+ * @param {string} id The id of the MPS Model to retrieve.
+ * @returns {object} The model as an object. Does not include ServiceModels.
  */
-async function getDataModel(config, source, id) {
+async function getDataModels(config, source, id) {
   const key = `${source}-${id}-classes`;
   const json = sessionStorage.getItem(key);
   if (json) return JSON.parse(json);
@@ -119,8 +119,7 @@ async function getDataModel(config, source, id) {
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
-        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
-          config.mps.source ?? "CORE"
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -135,12 +134,74 @@ async function getDataModel(config, source, id) {
 }
 
 /**
- * Execute the API call to retrieve the MPS service models (services).
+ * Async function that returns a sample JSON object for a single MPS Class.
  *
- * @param {*} config The respecConfig
- * @param {string} source The source (CORE or SANDBOX) of the model
- * @param {string} id The id of the MPS model to retrieve
- * @returns {JSON} The data model as an object
+ * @param {object} config The respecConfig.
+ * @param {string} id MPS Class id.
+ * @param {boolean} includeOptionalFields True if the sample should include all optional fields (the default is false).
+ * @returns {object} The sample JSON object.
+ */
+async function getDataSample(config, id, includeOptionalFields = false) {
+  try {
+    const res = await fetch(
+      `${getBaseUrl(
+        config
+      )}/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": getApiKey(config),
+        },
+      }
+    );
+    if (!res.ok) {
+      showError(`Could not get sampledata for ${id}: ${res.status}`, name);
+      return null;
+    }
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    showError(`Could not get sample data for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
+/**
+ * Async function that returns the JSON Schema for an MPS Class.
+ *
+ * @param {object} config The respecConfig.
+ * @param {string} id MPS Class id.
+ * @returns {object} The JSON Schema object.
+ */
+async function getJsonSchema(config, id) {
+  try {
+    const res = await fetch(`${getBaseUrl(config)}/jsonschema/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": getApiKey(config),
+      },
+    });
+    if (!res.ok) {
+      showError(`Could not get the schema for ${id}: ${res.status}`, name);
+      return null;
+    }
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    showError(`Could not get the schema for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
+/**
+ * Execute the API call to retrieve MPS ServiceModel Services in a Model.
+ *
+ * @param {object} config The respecConfig.
+ * @param {string} source The source (CORE or SANDBOX) of the Model.
+ * @param {string} id The id of the MPS Model to retrieve.
+ * @returns {object} The model as an object. Does not include DataModels.
  */
 async function getServiceModels(config, source, id) {
   const key = `${source}-${id}-services`;
@@ -298,8 +359,7 @@ async function getServiceModels(config, source, id) {
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
-        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
-          config.mps.source ?? "CORE"
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -314,73 +374,10 @@ async function getServiceModels(config, source, id) {
 }
 
 /**
- * Async function that returns a sample JSON object for a single MPS class.
+ * Process a single MPS Class model.
  *
- * @param {*} config The respecConfig
- * @param {string} id MPS class id
- * @param {boolean} includeOptionalFields True if the sample should
- * include all optional fields (the default is false)
- * @returns {JSON} The sample JSON object
- */
-async function getDataSample(config, id, includeOptionalFields = false) {
-  try {
-    const res = await fetch(
-      `${getBaseUrl(
-        config
-      )}/sample/${id}?includeOptionalFields=${includeOptionalFields}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": getApiKey(config),
-        },
-      }
-    );
-    if (!res.ok) {
-      showError(`Could not get sampledata for ${id}: ${res.status}`, name);
-      return null;
-    }
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    showError(`Could not get sample data for ${id}: ${error}`, name);
-    return null;
-  }
-}
-
-/**
- * Async function that returns the JSON Schema for a class.
- *
- * @param {*} config The respecConfig
- * @param {string} id MPS Class id
- * @returns {JSON} The schema
- */
-async function getJsonSchema(config, id) {
-  try {
-    const res = await fetch(`${getBaseUrl(config)}/jsonschema/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": getApiKey(config),
-      },
-    });
-    if (!res.ok) {
-      showError(`Could not get the schema for ${id}: ${res.status}`, name);
-      return null;
-    }
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    showError(`Could not get the schema for ${id}: ${error}`, name);
-    return null;
-  }
-}
-
-/**
- * Process a single data model class definition.
- *
- * @param {HTMLElement} section The class section element
- * @param {*} classModel The MPS Class object
+ * @param {HTMLElement} section The class section element.
+ * @param {object} classModel The MPS Class object.
  */
 async function processClass(section, classModel) {
   section.setAttribute("id", classModel.id);
@@ -418,100 +415,11 @@ async function processClass(section, classModel) {
 }
 
 /**
- * Process a single operation model.
+ * Process a single data model section. A model can be split across multiple sections (e.g. one section
+ * in the main content and one in the appendices). The data-package attribute, if present, acts as a
+ * filter for the section. Only classes in the named package will be expected or generated.
  *
- * @param {HTMLElement} section The operation section element
- * @param {string} rootPath The services root path
- * @param {*} operation The MPS operation object
- */
-async function processOperation(section, rootPath, operation) {
-  section.setAttribute("id", operation.id);
-  const title = section.getAttribute("title");
-  const wrapper = operationTemplate(rootPath, operation, title);
-  if (wrapper) {
-    let target = null;
-    Array.from(wrapper.childNodes).forEach(element => {
-      if (element.nodeName !== "#comment") {
-        let thisElement = element;
-        if (element.nodeName === "#text") {
-          thisElement = document.createElement("text");
-          thisElement.innerHTML = element.nodeValue;
-        }
-        if (target) {
-          target.insertAdjacentElement("afterend", thisElement);
-        } else {
-          section.insertAdjacentElement("afterbegin", thisElement);
-        }
-        target = thisElement;
-      }
-    });
-  }
-}
-
-/**
- * Process a single service interface model.
- *
- * @param {HTMLElement} section The service interface section element
- * @param {*} serviceInterface The MPS service interface object
- */
-async function processInterface(section, serviceInterface) {
-  const preferredId = section.getAttribute("id");
-  section.setAttribute("id", serviceInterface.id);
-  const title = section.getAttribute("title");
-  const wrapper = interfaceTemplate(serviceInterface, title, preferredId);
-  if (wrapper) {
-    let target = null;
-    Array.from(wrapper.childNodes).forEach(element => {
-      if (element.nodeName !== "#comment") {
-        let thisElement = element;
-        if (element.nodeName === "#text") {
-          thisElement = document.createElement("text");
-          thisElement.innerHTML = element.nodeValue;
-        }
-        if (target) {
-          target.insertAdjacentElement("afterend", thisElement);
-        } else {
-          section.insertAdjacentElement("afterbegin", thisElement);
-        }
-        target = thisElement;
-      }
-    });
-
-    const operations = Array.from(serviceInterface.operations);
-    operations.forEach(async operation => {
-      let operationSection = section.querySelector(
-        `section[data-operation="${operation.id}"]`
-      );
-      if (operationSection) {
-        processOperation(
-          operationSection,
-          serviceInterface.rootPath,
-          operation
-        );
-      } else {
-        // Auto-generate the operation section
-        operationSection = html`<section
-          data-operation="${operation.id}"
-        ></section>`;
-        processOperation(
-          operationSection,
-          serviceInterface.rootPath,
-          operation
-        );
-        section.insertAdjacentElement("beforeend", operationSection);
-      }
-    });
-  }
-}
-
-/**
- * Process a single data model section. A model can be split
- * across multiple sections (e.g. one section in the main content
- * and one in the appendices). The data-package attribute, if
- * present, acts as a filter for the section. Only classes in
- * the named package will be expected or generated.
- *
- * @param {*} config The respecConfig.
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The model section element.
  * @param {string} modelId The MPS Model id.
  */
@@ -532,7 +440,7 @@ async function processDataModel(config, section, modelId) {
   // The package name filter, if any
   const packageName = section.getAttribute("data-package") ?? "";
 
-  const dataModel = await getDataModel(config, source, modelId);
+  const dataModel = await getDataModels(config, source, modelId);
   if (dataModel) {
     const wrapper = dataModelTemplate(dataModel, title, id);
     if (wrapper) {
@@ -586,56 +494,125 @@ async function processDataModel(config, section, modelId) {
 }
 
 /**
- * Process classes with a particular stereotype. Only the name and documentation of each class will be listed in a table.
- * Typically used to render the DerivedTypes and PrimitiveTypes.
+ * Process a single service interface model.
  *
- * @param {*} config The respecConfig.
- * @param {HTMLElement} section The model section element.
- * @param {string} The MPS Model id.
- * @param {string} The MPS StereoType.
+ * @param {HTMLElement} section The service interface section element.
+ * @param {object} serviceInterface The MPS Interface object.
  */
-async function processStereoType(config, section, modelId, stereoType) {
-  // The MPS/MPS source (CORE|SANDBOX)
-  const source = section.getAttribute("data-source") ?? config.mps.source;
-  if (source !== "CORE" && source !== "SANDBOX") {
-    showError(`Invalid source ${source} for model ${modelId}`);
+async function processInterface(section, serviceInterface) {
+  const preferredId = section.getAttribute("id");
+  section.setAttribute("id", serviceInterface.id);
+  const title = section.getAttribute("title");
+  const wrapper = interfaceTemplate(serviceInterface, title, preferredId);
+  if (wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+
+    const operations = Array.from(serviceInterface.operations);
+    operations.forEach(async operation => {
+      let operationSection = section.querySelector(
+        `section[data-operation="${operation.id}"]`
+      );
+      if (operationSection) {
+        processOperation(
+          operationSection,
+          serviceInterface.rootPath,
+          operation
+        );
+      } else {
+        // Auto-generate the operation section
+        operationSection = html`<section
+          data-operation="${operation.id}"
+        ></section>`;
+        processOperation(
+          operationSection,
+          serviceInterface.rootPath,
+          operation
+        );
+        section.insertAdjacentElement("beforeend", operationSection);
+      }
+    });
+  }
+}
+
+/**
+ * Process a single MPS Operation model.
+ *
+ * @param {HTMLElement} section The operation section element.
+ * @param {string} rootPath The services root path.
+ * @param {object} operation The MPS Operation object.
+ */
+async function processOperation(section, rootPath, operation) {
+  section.setAttribute("id", operation.id);
+  const title = section.getAttribute("title");
+  const wrapper = operationTemplate(rootPath, operation, title);
+  if (wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+  }
+}
+
+/**
+ * Generate a sample. The schema is identified by the data-sample attribute.
+ *
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} parentElem The element that will contain the generated sample.
+ */
+async function processSample(config, parentElem) {
+  const classId = parentElem.getAttribute("data-sample");
+  if (classId === "") {
+    showError("Example is missing a schema id", name);
     return;
   }
-
-  // The preferred section title
-  const title = section.getAttribute("title");
-
-  // The section's unique id (used to calculate a unique header id)
-  const id = section.getAttribute("id");
-
-  const dataModel = await getDataModel(config, source, modelId);
-  if (dataModel) {
-    const wrapper = dataModelTemplate(dataModel, title, id);
-    if (wrapper) {
-      let target = null;
-      Array.from(wrapper.childNodes).forEach(element => {
-        if (element.nodeName !== "#comment") {
-          let thisElement = element;
-          if (element.nodeName === "#text") {
-            thisElement = document.createElement("text");
-            thisElement.innerHTML = element.nodeValue;
-          }
-          if (target) {
-            target.insertAdjacentElement("afterend", thisElement);
-          } else {
-            section.insertAdjacentElement("afterbegin", thisElement);
-          }
-          target = thisElement;
-        }
-      });
-    }
-    const typeList = stereoTypeTemplate(dataModel, stereoType);
-    if (typeList) {
-      section.insertAdjacentElement("beforeend", typeList);
-    }
+  const id = parentElem.getAttribute("id") ?? `example-${classId}`;
+  parentElem.setAttribute("id", id);
+  parentElem.removeAttribute("data-sample");
+  const includeOptionalFields =
+    parentElem.getAttribute("data-include-optional-fields") ?? "false";
+  const sampleData = await getDataSample(
+    config,
+    classId,
+    includeOptionalFields
+  );
+  if (sampleData) {
+    // eslint-disable-next-line prettier/prettier
+    const sample = html`
+<pre class="nohighlight">
+${JSON.stringify(sampleData, null, 2)}
+</pre>`;
+    parentElem.append(sample);
   } else {
-    // If there is no data model, add a header to satisfy Respec
-    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
+    parentElem.append(
+      html`<p>Could not get sample data. See developer console for details.</p>`
+    );
   }
 }
 
@@ -646,7 +623,7 @@ async function processStereoType(config, section, modelId, stereoType) {
  * present, acts as a filter for the section. Only operations in
  * the identified interface will be generated.
  *
- * @param {*} config The respecConfig.
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The model section element.
  * @param {string?} preferredId The preferred id for this section. This be moved to the header.
  */
@@ -725,38 +702,56 @@ async function processServiceModel(config, section, preferredId) {
 }
 
 /**
- * Generate a sample. The schema is identified by the data-sample attribute.
+ * Process classes with a particular stereotype. Only the name and documentation of each class will be listed in a table.
+ * Typically used to render the DerivedTypes and PrimitiveTypes.
  *
- * @param {*} config The respecConfig
- * @param {HTMLElement} parentElem The element that will contain the generated sample
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} section The model section element.
+ * @param {string} The MPS Model id.
+ * @param {string} The MPS StereoType.
  */
-async function processSample(config, parentElem) {
-  const classId = parentElem.getAttribute("data-sample");
-  if (classId === "") {
-    showError("Example is missing a schema id", name);
+async function processStereoType(config, section, modelId, stereoType) {
+  // The MPS/MPS source (CORE|SANDBOX)
+  const source = section.getAttribute("data-source") ?? config.mps.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
     return;
   }
-  const id = parentElem.getAttribute("id") ?? `example-${classId}`;
-  parentElem.setAttribute("id", id);
-  parentElem.removeAttribute("data-sample");
-  const includeOptionalFields =
-    parentElem.getAttribute("data-include-optional-fields") ?? "false";
-  const sampleData = await getDataSample(
-    config,
-    classId,
-    includeOptionalFields
-  );
-  if (sampleData) {
-    // eslint-disable-next-line prettier/prettier
-    const sample = html`
-<pre class="nohighlight">
-${JSON.stringify(sampleData, null, 2)}
-</pre>`;
-    parentElem.append(sample);
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  // The section's unique id (used to calculate a unique header id)
+  const id = section.getAttribute("id");
+
+  const dataModel = await getDataModels(config, source, modelId);
+  if (dataModel) {
+    const wrapper = dataModelTemplate(dataModel, title, id);
+    if (wrapper) {
+      let target = null;
+      Array.from(wrapper.childNodes).forEach(element => {
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
+        }
+      });
+    }
+    const typeList = stereoTypeTemplate(dataModel, stereoType);
+    if (typeList) {
+      section.insertAdjacentElement("beforeend", typeList);
+    }
   } else {
-    parentElem.append(
-      html`<p>Could not get sample data. See developer console for details.</p>`
-    );
+    // If there is no data model, add a header to satisfy Respec
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
   }
 }
 
@@ -764,9 +759,9 @@ ${JSON.stringify(sampleData, null, 2)}
  * Validate the JSON in a <pre> element. The schema is identified
  * by a data-schema attribute.
  *
- * @param {*} config The respecConfig
- * @param {Object} ajv An instance of ajv2019
- * @param {HTMLPreElement} pre The <pre> element that contains the JSON to be validated
+ * @param {object} config The respecConfig.
+ * @param {Object} ajv An instance of ajv2019.
+ * @param {HTMLPreElement} pre The <pre> element that contains the JSON to be validated.
  */
 async function validateExample(config, ajv, pre) {
   const schemaId = pre.getAttribute("data-schema");
@@ -792,15 +787,15 @@ async function validateExample(config, ajv, pre) {
           <p>NOTE: This example contains invalid JSON for ${schemaId}.</p>
           <ul>
             ${validate.errors.map(error => {
-              if (error.instancePath === "") error.instancePath = "class";
-              let message = `${error.instancePath}: ${error.message}`;
-              switch (error.keyword) {
-                case "additionalProperties":
-                  message += ` (additional property: "${error.params.additionalProperty})"`;
-                  break;
-              }
-              return `<li>${message}</li>`;
-            })}
+          if (error.instancePath === "") error.instancePath = "class";
+          let message = `${error.instancePath}: ${error.message}`;
+          switch (error.keyword) {
+            case "additionalProperties":
+              message += ` (additional property: "${error.params.additionalProperty})"`;
+              break;
+          }
+          return `<li>${message}</li>`;
+        })}
           </ul>
         </div>`
       );
@@ -813,10 +808,9 @@ async function validateExample(config, ajv, pre) {
 }
 
 /**
- * Render sections with a data-model attribute using informatoin from
- * the Model Processing Service.
+ * Render Model Processing Service objects.
  *
- * @param {*} config respecConfig
+ * @param {object} config respecConfig.
  */
 export async function run(config) {
   const promises = new Array();
