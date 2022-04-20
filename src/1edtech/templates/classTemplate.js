@@ -21,7 +21,7 @@ export default (classData, title) => {
             <th>Property</th>
             <th>Type</th>
             <th>Description</th>
-            <th>Required</th>
+            <th>Multiplicity</th>
           </tr>
         </thead>
         <tbody>
@@ -72,7 +72,7 @@ function renderProperty(property) {
         ${property.documentation.issues.map(renderIssue)}
         ${property.documentation.notes.map(renderNote)}
       </td>
-      <td>${renderRequired(property)}</td>
+      <td>${renderCardinality(property)}</td>
     </tr>`;
   }
 }
@@ -82,8 +82,21 @@ function renderProperty(property) {
  * @param {*} property The MPS Property object.
  * @returns {string} A string describing whether a property is required or not.
  */
-function renderRequired(property) {
-  return property.cardinality.value.includes("ZERO") ? "Optional" : "Required";
+function renderCardinality(property) {
+  switch (property.cardinality.value) {
+    case "ONE":
+      return "[1]";
+    case "ZERO_OR_ONE":
+      return "[0..1]";
+    case "ZERO_OR_MANY":
+      return "[0..*]";
+    case "ONE_OR_MANY":
+      return "[1..*]";
+    case "TWO":
+      return "[2]";
+    default:
+      break;
+  }
 }
 
 /**
@@ -93,9 +106,6 @@ function renderRequired(property) {
  */
 function renderType(property) {
   let name = property.type.name;
-  if (property.cardinality.value.includes("MANY")) {
-    name += "[]";
-  }
   if (
     property.type.stereoType === "Enumeration" ||
     property.type.stereoType === "EnumExt"
