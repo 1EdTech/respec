@@ -44,7 +44,7 @@ export default (dataModel, stereoType) => {
  */
 function renderType(type) {
   return html` <tr id="${type.id}">
-    <td>${type.name}</td>
+    <td id="${type.name.toLowerCase()}">${type.name}</td>
     <td>
       ${type.documentation.description}
       ${type.documentation.issues.map(renderIssue)}
