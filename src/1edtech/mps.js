@@ -119,7 +119,8 @@ async function getDataModels(config, source, id) {
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
-        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${config.mps.source ?? "CORE"
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
+          config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -359,7 +360,8 @@ async function getServiceModels(config, source, id) {
     const dataModel = data.data.modelByID;
     if (!dataModel) {
       showError(
-        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${config.mps.source ?? "CORE"
+        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
+          config.mps.source ?? "CORE"
         }`,
         name
       );
@@ -787,15 +789,15 @@ async function validateExample(config, ajv, pre) {
           <p>NOTE: This example contains invalid JSON for ${schemaId}.</p>
           <ul>
             ${validate.errors.map(error => {
-          if (error.instancePath === "") error.instancePath = "class";
-          let message = `${error.instancePath}: ${error.message}`;
-          switch (error.keyword) {
-            case "additionalProperties":
-              message += ` (additional property: "${error.params.additionalProperty})"`;
-              break;
-          }
-          return `<li>${message}</li>`;
-        })}
+              if (error.instancePath === "") error.instancePath = "class";
+              let message = `${error.instancePath}: ${error.message}`;
+              switch (error.keyword) {
+                case "additionalProperties":
+                  message += ` (additional property: "${error.params.additionalProperty})"`;
+                  break;
+              }
+              return `<li>${message}</li>`;
+            })}
           </ul>
         </div>`
       );
