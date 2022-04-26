@@ -409,5 +409,5 @@ figure, .figure, .sidefigure {
   display: block;
   padding: 0.5em 0 0.5em 0.5em;
 }
-/*# sourceMappingURL=ims-base.css.map */
+/*# sourceMappingURL=1edtech-base.css.map */
 `;
