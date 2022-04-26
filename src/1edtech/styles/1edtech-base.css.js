@@ -1,10 +1,10 @@
-/* IMS styles and overrides */
+/* 1EdTech styles and overrides */
 const css = String.raw;
 
 // prettier-ignore
 export default css`
 @charset "UTF-8";
-/* Base CSS for IMS Global specifications. This builds on and in some cases
+/* Base CSS for 1EdTech specifications. This builds on and in some cases
  * overrides the ReSpec and W3C/TR stylesheets:
  * - https://github.com/w3c/respec/assets/respec2.css
  * - https://www.w3.org/StyleSheets/TR/2016/base.css

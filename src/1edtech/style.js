@@ -2,19 +2,19 @@
 /**
  * Module 1edtech/style
  *
- * Inserts IMS stylesheet and replaces w3c/style.
+ * Inserts 1EdTech stylesheet and replaces w3c/style.
  *
  * The CSS documents are pulled from known locations so the spec documents
  * can be located anywhere. Overrides are available via respecConfig.
  *
  * CONFIGURATION
  *
- * - overrideCSSLocation: by default ims-base.css will be loaded from
- *   https://purl.imsglobal.org/spec/ims-base.css
+ * - overrideCSSLocation: by default 1edtech-base.css will be loaded from
+ *   ./styles/1edtech-base.css.js.
  */
 
 import { linkCSS, toKeyValuePairs } from "../core/utils.js";
-import css from "./styles/ims-base.css.js";
+import css from "./styles/1edtech-base.css.js";
 
 export const name = "1edtech/style";
 
