@@ -44,8 +44,8 @@ jobs:
       - run: npm run test:build
       - run: npm run build:w3c
       - run: npm run test:headless
-      - run: npm run build:ims
-      - run: npm run test:ims-headless
+      - run: npm run build:1edtech
+      - run: npm run test:1edtech-headless
 
   test-karma:
     name: Karma Unit Tests (${{ matrix.browser }})
