@@ -62,6 +62,8 @@
     "webidl2": "^24.1.2"
   },
   "scripts": {
+    "build:1edtech-debug": "npm run build:1edtech -- --debug",
+    "build:1edtech": "node ./tools/builder.js 1edtech",
     "build:aom-debug": "npm run build:aom -- --debug",
     "build:aom": "node ./tools/builder.js aom",
     "build:geonovum-debug": "npm run build:geonovum -- --debug",
