@@ -45,96 +45,6 @@ function getBaseUrl(config) {
 }
 
 /**
- * Execute the API call to retrieve MPS DataModel Classes in a Model.
- *
- * @param {object} config The respecConfig.
- * @param {string} source The source (CORE or SANDBOX) of the Model.
- * @param {string} id The id of the MPS Model to retrieve.
- * @returns {object} The model as an object. Does not include ServiceModels.
- */
-async function getDataModels(config, source, id) {
-  const key = `${source}-${id}-classes`;
-  const json = sessionStorage.getItem(key);
-  if (json) return JSON.parse(json);
-  const query = JSON.stringify({
-    query: `
-    {
-      modelByID(id: "${id}", source: ${source ?? "CORE"}) {
-        id
-        name
-        documentation {
-          description
-          notes
-          issues
-        }
-        classes {
-          id
-          name
-          stereoType
-          documentation {
-            description
-            notes
-            issues
-            packageName
-          }
-          properties {
-            name
-            type {
-              id
-              name
-              stereoType
-            }
-            cardinality {
-              value
-            }
-            documentation {
-              description
-              notes
-              issues
-            }
-          }
-        }
-      }
-    }
-    `,
-  });
-
-  try {
-    const res = await fetch(`${getBaseUrl(config)}/graphql`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": getApiKey(config),
-      },
-      body: query,
-    });
-    if (!res.ok) {
-      showError(
-        `Could not get MPS model for ${id}. Please see the developer console for details.`,
-        name
-      );
-      return null;
-    }
-    const data = await res.json();
-    const dataModel = data.data.modelByID;
-    if (!dataModel) {
-      showError(
-        `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
-          config.mps.source ?? "CORE"
-        }`,
-        name
-      );
-      return null;
-    }
-    sessionStorage.setItem(key, JSON.stringify(dataModel));
-    return dataModel;
-  } catch (error) {
-    showError(`Could not get MPS model for ${id}: ${error}`, name);
-    return null;
-  }
-}
-
-/**
  * Async function that returns a sample JSON object for a single MPS Class.
  *
  * @param {object} config The respecConfig.
@@ -197,15 +107,15 @@ async function getJsonSchema(config, id) {
 }
 
 /**
- * Execute the API call to retrieve MPS ServiceModel Services in a Model.
+ * Execute the API call to retrieve MPS Model Classes and Services.
  *
  * @param {object} config The respecConfig.
  * @param {string} source The source (CORE or SANDBOX) of the Model.
  * @param {string} id The id of the MPS Model to retrieve.
- * @returns {object} The model as an object. Does not include DataModels.
+ * @returns {object} The model as an object.
  */
-async function getServiceModels(config, source, id) {
-  const key = `${source}-${id}-services`;
+async function getModel(config, source, id) {
+  const key = `${source}-${id}`;
   const json = sessionStorage.getItem(key);
   if (json) return JSON.parse(json);
   const query = JSON.stringify({
@@ -213,11 +123,39 @@ async function getServiceModels(config, source, id) {
     {
       modelByID(id: "${id}", source: ${source ?? "CORE"}) {
         id
+        id
         name
         documentation {
           description
           notes
           issues
+        }
+        classes {
+          id
+          name
+          stereoType
+          documentation {
+            description
+            notes
+            issues
+            packageName
+          }
+          properties {
+            name
+            type {
+              id
+              name
+              stereoType
+            }
+            cardinality {
+              value
+            }
+            documentation {
+              description
+              notes
+              issues
+            }
+          }
         }
         services {
           ... on RestService {
@@ -357,8 +295,8 @@ async function getServiceModels(config, source, id) {
       return null;
     }
     const data = await res.json();
-    const dataModel = data.data.modelByID;
-    if (!dataModel) {
+    const model = data.data.modelByID;
+    if (!model) {
       showError(
         `Unknown model ${id} at ${getBaseUrl(config)}, source: ${
           config.mps.source ?? "CORE"
@@ -367,8 +305,8 @@ async function getServiceModels(config, source, id) {
       );
       return null;
     }
-    sessionStorage.setItem(key, JSON.stringify(dataModel));
-    return dataModel;
+    sessionStorage.setItem(key, JSON.stringify(model));
+    return model;
   } catch (error) {
     showError(`Could not get MPS model for ${id}: ${error}`, name);
     return null;
@@ -442,7 +380,7 @@ async function processDataModel(config, section, modelId) {
   // The package name filter, if any
   const packageName = section.getAttribute("data-package") ?? "";
 
-  const dataModel = await getDataModels(config, source, modelId);
+  const dataModel = await getModel(config, source, modelId);
   if (dataModel) {
     const wrapper = dataModelTemplate(dataModel, title, id);
     if (wrapper) {
@@ -641,7 +579,7 @@ async function processServiceModel(config, section, preferredId) {
   // The preferred section title
   const title = section.getAttribute("title");
 
-  const serviceModels = await getServiceModels(config, source, modelId);
+  const serviceModels = await getModel(config, source, modelId);
   const serviceModel = serviceModels.services.find(
     service => service.id === serviceModelId
   );
@@ -726,7 +664,7 @@ async function processStereoType(config, section, modelId, stereoType) {
   // The section's unique id (used to calculate a unique header id)
   const id = section.getAttribute("id");
 
-  const dataModel = await getDataModels(config, source, modelId);
+  const dataModel = await getModel(config, source, modelId);
   if (dataModel) {
     const wrapper = dataModelTemplate(dataModel, title, id);
     if (wrapper) {
@@ -815,7 +753,7 @@ async function validateExample(config, ajv, pre) {
  * @param {object} config respecConfig.
  */
 export async function run(config) {
-  const promises = new Array();
+  let promises = new Array();
   let index = 0;
 
   // Find all unique Model sections.
@@ -823,6 +761,25 @@ export async function run(config) {
     document.querySelectorAll("section[data-model]")
   );
   if (modelSections.length === 0) return;
+
+  // Preload the models so later async threads don't need to
+  const models = modelSections
+    .map(section => {
+      const modelId = section.getAttribute("data-model");
+      const source = section.getAttribute("data-source") ?? config.mps.source;
+      return `${source}-${modelId}`;
+    })
+    .filter((value, index, self) => self.indexOf(value) === index);
+  promises.push(
+    ...Array.from(
+      models.map(model => {
+        const params = model.split("-");
+        return getModel(config, params[0], params[1]);
+      })
+    )
+  );
+  await Promise.all(promises);
+  promises = new Array();
 
   // Divide the Model sections into DataModel sections, ServiceModel sections
   // and simple type lists.
