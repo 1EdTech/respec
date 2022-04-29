@@ -713,6 +713,7 @@ async function validateExample(config, ajv, pre) {
   const schemaDef = await getJsonSchema(config, schemaId);
   if (schemaDef === null) return;
   try {
+    // Remove comments from example
     let preText = pre.innerText;
     preText = preText.replace(/\/\/ .*$/gm, "");
     const data = JSON.parse(preText);
