@@ -26,7 +26,7 @@ export default (classData, title) => {
         </thead>
         <tbody>
           ${classData.properties.map(renderProperty)}
-          ${classData.properties.map(renderExtensions)}
+          ${renderExtensibility(classData)}
         </tbody>
       </table>`;
   }
@@ -34,14 +34,11 @@ export default (classData, title) => {
 
 /**
  * Render text that indicates the class is extensible.
- * @param {*} property The MPS Property object.
+ * @param {*} classData The MPS Class object.
  * @returns {HTMLTableRowElement?} A table row that can be appended to the properties table.
  */
-function renderExtensions(property) {
-  if (
-    property.type.name === "Namespace" ||
-    property.type.name === "NamespaceLax"
-  ) {
+function renderExtensibility(classData) {
+  if (classData.isExtensible) {
     return html` <tr>
       <td colspan="4">
         This class can be extended with additional properties.
@@ -58,23 +55,16 @@ function renderExtensions(property) {
  * @returns {HTMLTableRowElement?} A table row with property information.
  */
 function renderProperty(property) {
-  if (
-    property.type.name === "Namespace" ||
-    property.type.name === "NamespaceLax"
-  ) {
-    return html``;
-  } else {
-    return html` <tr>
-      <td>${property.name}</td>
-      <td>${renderType(property)}</td>
-      <td>
-        ${property.documentation.description}
-        ${property.documentation.issues.map(renderIssue)}
-        ${property.documentation.notes.map(renderNote)}
-      </td>
-      <td>${renderCardinality(property)}</td>
-    </tr>`;
-  }
+  return html` <tr>
+    <td>${property.name}</td>
+    <td>${renderType(property)}</td>
+    <td>
+      ${property.documentation.description}
+      ${property.documentation.issues.map(renderIssue)}
+      ${property.documentation.notes.map(renderNote)}
+    </td>
+    <td>${renderCardinality(property)}</td>
+  </tr>`;
 }
 
 /**

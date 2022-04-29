@@ -156,6 +156,7 @@ async function getModel(config, source, id) {
               issues
             }
           }
+          isExtensible
         }
         services {
           ... on RestService {
