@@ -2,7 +2,7 @@
 
 Normal Respec documents like `1edtech-examples/basic.html` are rendered on the fly when you first load the document. Every plug-in is run in order. Many plug-ins reformat or add content to the document. And many plug-ins add a stylesheet to the `<head>` of the document.
 
-When you export the document for CMS, only the `<body>` contents are exported and then imported into the CMS. That means all the stylesheets are thrown away. When Drupal renders the document, Drupal inserts is own pre-generated stylesheet.
+When you export the document for CMS, only a portion of the body is exported and then imported into the CMS. That means all the stylesheets are thrown away. When Drupal renders the document, Drupal inserts is own pre-generated stylesheet.
 
 This folder is where the pre-generated stylesheet 'drupal.css' lives!
 
