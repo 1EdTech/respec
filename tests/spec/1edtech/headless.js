@@ -36,7 +36,7 @@ function toRespecToHtml(src, { useLocal = false } = {}) {
   return `${command} ${options.join(" ")}`;
 }
 
-function toRespecToCms(src, { useLocal = false } = {}) {
+function toRespecToCms(src) {
   const command = `node ./tools/respec2cms.js ${src}`;
   const options = ["-e", `--timeout ${timeout}`, "--verbose"];
   // if (useLocal) options.push("--use-local");
