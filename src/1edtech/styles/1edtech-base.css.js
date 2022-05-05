@@ -409,5 +409,4 @@ figure, .figure, .sidefigure {
   display: block;
   padding: 0.5em 0 0.5em 0.5em;
 }
-/*# sourceMappingURL=1edtech-base.css.map */
 `;
