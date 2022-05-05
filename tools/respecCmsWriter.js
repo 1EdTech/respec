@@ -154,7 +154,7 @@ function isRespecScript(req) {
   switch (host) {
     case "www.w3.org":
       return (
-        path.startsWith("/Tools/respec/") && !path.includes("respec-highlight")
+        path.startsWith("/tools/respec/") && !path.includes("respec-highlight")
       );
     case "w3c.github.io":
       return path.startsWith("/respec/builds/");
