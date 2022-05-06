@@ -3,7 +3,7 @@
 // Saves content to HTML when asked to
 import { concatDate, getIntlData, showWarning } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import { rsDocToCmsDataURL } from "../ims/exporter.js";
+import { rsDocToCmsDataURL } from "../1edtech/exporter.js";
 import { rsDocToDataURL } from "../core/exporter.js";
 import { ui } from "../core/ui.js";
 
@@ -68,7 +68,7 @@ const downloadLinks = [
     title: "CMS EXTRACT",
     type: "application/cms",
     get href() {
-      return rsDocToCmsDataURL(this.type);
+      return rsDocToCmsDataURL();
     },
   },
 ];

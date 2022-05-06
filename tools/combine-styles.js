@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * 1EdTech
- * Clone of respec2html.js that converts a Respec document into
- * content appropriate for Drupal or other CMS.
+ * Renders a Respec document and exports a single CSS stylesheet with all
+ * the styles combined. This is for use in a CMS (like Drupal) that needs
+ * all the styles in one asset.
  */
 const path = require("path");
 const http = require("http");
@@ -13,7 +13,7 @@ const sade = require("sade");
 const colors = require("colors");
 const marked = require("marked");
 const { writeFile } = require("fs").promises;
-const { toHTML } = require("./respecCmsWriter.js");
+const { toCSS } = require("./respecCssWriter.js");
 
 class Renderer extends marked.Renderer {
   strong(text) {
@@ -142,31 +142,27 @@ class StaticServer {
   }
 }
 
-const cli = sade("respec2cms [source] [destination]", true)
+const cli = sade("combine-styles [source] [destination]", true)
   .describe(
-    "Converts a ReSpec source file to HTML, extracts the content from <header> through </footer>, and writes to destination."
+    "Converts a ReSpec source file to HTML, extracts the styles, and writes the combined styles to the destination stylesheet."
   )
-  .example(`input.html output.html ${colors.dim("# Output to a file.")}`)
+  .example(`input.html output.css ${colors.dim("# Output to a file.")}`)
   .example(
     `http://example.com/spec.html stdout ${colors.dim("# Output to stdout.")}`
   )
   .example(
-    `http://example.com/spec.html output.html -e -w ${colors.dim(
+    `http://example.com/spec.html output.css -e -w ${colors.dim(
       "# Halt on errors or warning."
     )}`
   )
-  .example("--src http://example.com/spec.html --out extract.html")
+  .example("--src http://example.com/spec.html --out extract.css")
   .example(
-    `--localhost index.html out.html ${colors.dim(
+    `--localhost index.html out.css ${colors.dim(
       "# Generate file using a local web server."
     )}`
   );
 
 cli
-  // For backward compatibility
-  .option("-s, --src", "URL to ReSpec source file.")
-  // For backward compatibility
-  .option("-o, --out", "Path to output file.")
   .option(
     "-t, --timeout",
     "How long to wait before timing out (in seconds).",
@@ -232,7 +228,7 @@ async function run(source, destination, options, log) {
     : new URL(source, `file://${process.cwd()}/`).href;
   log.info(`Processing resource: ${src} ...`, options.timeout * 1000);
 
-  const { html, errors, warnings } = await toHTML(src, {
+  const { css, errors, warnings } = await toCSS(src, {
     timeout: options.timeout * 1000,
     useLocal: options["use-local"],
     onError: log.error.bind(log),
@@ -250,29 +246,29 @@ async function run(source, destination, options, log) {
     );
   }
 
-  await write(destination, html);
+  await write(destination, css);
 
   if (staticServer) await staticServer.stop();
 }
 
 /**
  * @param {string | "stdout" | null | "" | undefined} destination
- * @param {string} html
+ * @param {string} css
  */
-async function write(destination, html) {
+async function write(destination, css) {
   switch (destination) {
     case "":
     case null:
     case undefined:
       break;
     case "stdout":
-      process.stdout.write(html);
+      process.stdout.write(css);
       break;
     default: {
       const newFilePath = path.isAbsolute(destination)
         ? destination
         : path.resolve(process.cwd(), destination);
-      await writeFile(newFilePath, html, "utf-8");
+      await writeFile(newFilePath, css, "utf-8");
     }
   }
 }

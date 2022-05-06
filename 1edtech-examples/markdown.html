@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <script src='../profiles/1edtech.js' type='module' class='remove'></script>
+  <script class='remove'>
+    var respecConfig = {
+      format: "markdown",
+      specTitle: "Example Markdown Specification",
+      shortName: "mdexample",
+      specStatus: "IMS Base Document",
+      specDate: "November 16th, 2017",
+      specVersion: "1.0",
+      specNature: "normative",
+      specType: "spec",
+      docVersion: "1.0",
+      overrideCSSLocation: "https://purl.imsglobal.org/spec/ims-base.css",
+      contributors: [
+        {
+          name: "First Last",
+          company: "Acme1 Co Inc (Sweden)",
+          companyURL: "www.example.com",
+          role: "Editor"
+        },
+        {
+          name: "Second Third",
+          company: "Acme2 Co Inc (UK)",
+          companyURL: "www.example.com",
+          role: "Editor"
+        }
+      ],
+    };
+  </script>
+</head>
+
+<body>
+
+## Using Markdown
+
+If all of your content is markdown (like this document), add `format: "markdown"`
+to your respecConfig. All of the content in the `<body></body>` of the document
+will be treated as markdown. And that means all block level HTML elements in the
+body must be flush left, not indented.
+
+There are ways to include markdown files into your document: 1) using the IMS transclude plugin,
+and 2) using the Respec include plugin. The IMS transclude plugin works
+when using a browser to open a Respec file on your local machine and when browsing
+a Respec file on a web server (can be a local web server). The
+Respec include plugin only works when browing a Respec file on a web server.
+
+Look at the source of this file for an example of both
+<pre>
+&lt;script class="transclude" data-id="mdbody" src="ims-markdown-part1.md">&lt;/script>
+&lt;div data-include="ims-markdown-part2.md" data-include-replace="true">&lt;/div>
+</pre>
+
+See [Using Markdown Fragments](#fragments) for advice on how to mix HTML and markdown content.
+
+<script class="transclude" data-id="mdbody" src="markdown-part1.md"></script>
+<div data-include="markdown-part2.md" data-include-replace="true"></div>
+
+## Using Markdown Fragments {#fragments}
+
+If you omit `format: "markdown"` from respecConfig Respec will treat the document as HTML.
+However, you can mix in markdown fragments by telling Respec to treat the fragments as markdown.
+For example,
+
+<pre>
+&lt;section data-format="markdown">
+## Header A
+
+Some markdown text.
+&lt;/section>
+</pre>
+
+You can also include markdown files using the IMS transclude and Respec include plugins. Note that
+the Respec include plugin must be told the included content is markdown using the `data-format-include="markdown"`
+attribute.
+
+<pre>
+&lt;section data-format="markdown">
+  &lt;script class="transclude" data-id="mdbody" src="ims-markdown-part1.md">&lt;/script>
+&lt;/section>
+&lt;div data-include="ims-markdown-part2.md" data-include-format="markdown" data-include-replace="true">&lt;/div>
+</pre>
+
+</body>
+
+</html>

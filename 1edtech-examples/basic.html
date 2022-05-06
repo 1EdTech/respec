@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>
+    Replace me with a real title
+  </title>
+  <!-- Load respec-vc add-on so this document can be used to generate drupal.css -->
+  <script class="remove" src="https://purl.imsglobal.org/spec/respec-dev/respec-vc.js"></script>
+  <script src='../profiles/1edtech.js' type="module" class="remove"></script>
+  <script class='remove'>
+    var respecConfig = {
+      specTitle: "Replace me with a real title",
+      shortName: "example",
+      specStatus: "IMS Base Document",
+      specVersion: "1.0",
+      docVersion: "0.1",
+      specNature: "normative",
+      specType: "spec",
+      contributors: [
+        {
+          name: "First Last",
+          company: "Acme1 Co Inc (Sweden)",
+          companyURL: "https://www.example.com",
+          role: "Editor"
+        }, {
+          name: "Second Third",
+          company: "Acme2 Co Inc (UK)",
+          companyURL: "https://www.example.com",
+          role: "Editor"
+        }
+      ],
+      iprs: [
+        { company: "Acme1 Co Inc", electionDate: "October 24, 2019", necessaryClaims: "No", type: "RF RAND (Required & Optional Elements)" }
+      ],
+      
+      // Force respec-vc stylesheet to be loaded
+      postProcess: [
+        window.respecVc.createVcExamples
+      ],
+    };
+  </script>
+</head>
+
+<body>
+  <section id='abstract'>
+    <h2>Abstract</h2>
+    <p>
+      This section is required for IMS spec documents.
+      <pre class="example" title="Abstract in HTML">
+        &lt;section id='abstract'>
+          &lt;h2>Abstract&lt;/h2>
+      </pre>
+      <pre class="example" title="Abstract in Markdown">
+        ## Abstract
+      </pre>
+    </p>
+  </section>
+  <section class="introductory" id="overview">
+    <h2>
+      Overview
+    </h2>
+    <p>
+      This section has a CSS class "<code>introductory</code>", which means
+      it will not appear in the <abbr title="Table of Contents">TOC</abbr>.
+      Example Link to Section <a href="#logo"></a>.
+    </p>
+    <p>
+      Does your application have a <a data-cite="infra">user agent</a> or
+      a <a data-cite="reporting" data-xref-for="report">user agent</a>?
+    </p>
+  </section>
+  <section class="informative" id="intro">
+    <h2>
+      Introduction
+    </h2>
+    <p>
+      This section has a CSS class "<code>informative</code>", so it is
+      listed in the TOC. ReSpec will list this reference as non-normative
+      since this is an informative section [[DOM]].
+    </p>
+  </section>
+  <section id="conformance">
+    <h2>Conformance</h2>
+    <p>
+      This section is required for IMS spec documents. The section will be
+      filled with boilerplate text, including a reference to the
+      Conformance and Certification Guide in a section with <code>id="document-set"</code>.
+      If you do not want to include the reference, set
+      <code>conf.skipCertGuideConformanceRef = true</code>
+    </p>
+  </section>
+  <section id="document-set">
+    <h2>Document Set</h2>
+    <p>
+      This is where you would list the documents for the
+      specification.
+    </p>
+  </section>
+  <section id="logo">
+    <h2>
+      Figure
+    </h2>
+    <figure id="figure">
+      <img src="figure.svg" alt="W3C Logo">
+      <figcaption>
+        The W3C logo
+      </figcaption>
+    </figure>
+    <p>
+      Link to <a href="#figure"></a>
+    </p>
+  </section>
+  <section>
+    <h2>ActivityState Object</h2>
+    <p>An
+      <code>ActivityState</code> object is to be used by the EPUB to store stateful information
+      on behalf of the student.</p>
+    <p>Examples of stateful data might be an incomplete multiple choice activity,
+      an incomplete essay or a even the current location in a streaming video.</p>
+
+    <div class="note" title="test">Example of text content of note aside</div>
+    <div class="warning" title="test">Example of text content of warning aside</div>
+    <div class="issue" title="test">Example of text content of issue aside</div>
+
+    <section id="issue-summary">
+      <h2>Issue Summary</h2>
+    </section>
+
+    <p>The properties of the ActivityState object are defined below.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Data&nbsp;Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>type</td>
+          <td>String</td>
+          <td>yes</td>
+          <td>MUST be set to 'ActivityState'</td>
+        </tr>
+        <tr>
+          <td>createdTime</td>
+          <td>ISO 8601</td>
+          <td>yes</td>
+          <td>The date when the ActivityState object was created. The format MUST be
+            <code>yyyy-MM-ddTHH:mm:ss.SSSZ</code> [[ISO8601]].</td>
+        </tr>
+        <tr>
+          <td>activityId</td>
+          <td>String</td>
+          <td>yes</td>
+          <td>References the
+            <code>data-activityId</code> value in the EPUB markup</td>
+        </tr>
+        <tr>
+          <td>data</td>
+          <td>Object</td>
+          <td>yes</td>
+          <td>An object used to store data. The object structure is purposively arbitrary;
+            the
+            <code>profile</code> property below can be used to inform Reading Systems
+            of the object's format.</td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td>String</td>
+          <td>no</td>
+          <td>A standards-based or vendor-specific identifier that can be used to specify
+            the format of the
+            <code>data</code> object and/or indicate the availability of one or more
+            <code>extensions</code> properties. For example, "ims.qti_v2p1.choice" might
+            be used to specify that the
+            <code>data</code> object conforms to the schema of a qti 2.1 Choice Activity.</td>
+        </tr>
+        <tr>
+          <td>extensions</td>
+          <td>Object</td>
+          <td>no</td>
+          <td>A map of arbitrary vendor-specific extensions to support non-standard
+            reading system functionality. Keys should start with
+            <code>vnd.</code> followed by the vendor name to avoid naming conflicts.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <strong>Example</strong>
+    </p>
+    <figure class="example">
+      <pre><code>
+      {
+        "type": "ActivityState",
+        "createdTime": new Date().toISOString(),
+        "activityId": "unit_1_activity_5",
+        "data": {
+          "choice": "blue",
+          "directionLine": "What color is the sky?",
+          "choices": ["blue","red","green"],
+          "correct": "blue"
+        },
+        "profile": "ims.qti_v2p1.choice",
+        "extensions": {
+          "vnd.vst.timesync_offset": 42000
+        }
+      }
+      </code></pre>
+      <figcaption>Example of the ActivityState object.</span>
+      </figcaption>
+    </figure>
+  </section>
+  <section id="idl-index" class="appendix">
+    <h2>
+      IDL Index
+    </h2>
+    <p>
+      All the Web IDL in this specification is collected in this section.
+    </p>
+  </section>
+  <section id="tof" class="informative appendix"></section>
+</body>
+
+</html>

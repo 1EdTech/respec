@@ -1,0 +1,630 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head>
+<meta charset="utf-8">
+<meta name="generator" content="ReSpec Developer Edition">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Replace me with a real title 1.0 
+    IMS Base Document</title>
+<link rel="stylesheet" href="../src/1edtech/styles/drupal.css">
+</head>
+
+<body class="toc-inline"><header>
+    <div class="header-top">
+      <h1 class="title" id="title">Replace me with a real title</h1>
+      <a href="https://www.imsglobal.org" id="ims-logo">
+        <img src="https://www.imsglobal.org/sites/default/files/IMSglobalreg2_2.png" alt="IMS logo" height="80" width="300">
+      </a>
+    </div>
+    <div class="subtitle">
+        IMS Base Document<br>Spec Version 1.0
+      </div> <span class="statusPD" data-content="IMS Base Document">IMS Base Document</span>
+    <table id="version-table" title="Version/Release Details" summary="Details about the version and release.">
+    <tbody>
+      <tr>
+        <td>Document Version:</td>
+        <td>0.1</td>
+      </tr>
+      <tr>
+        <td>Date Issued:</td>
+        <td>01 February 2022</td>
+      </tr>
+      <tr>
+        <td>Status:</td>
+        <td>This document is for review and comment by IMS Contributing Members.</td>
+      </tr>
+      <tr>
+        <td>This version:</td>
+        <td><a href="https://www.imsglobal.org/spec/example/v1p0/">https://www.imsglobal.org/spec/example/v1p0/</a></td>
+      </tr>
+      <tr>
+                <td>Latest version:</td>
+                <td><a href="https://www.imsglobal.org/spec/example/latest/">https://www.imsglobal.org/spec/example/latest/</a></td>
+              </tr><tr>
+                <td>Errata:</td>
+                <td><a href="https://www.imsglobal.org/spec/example/v1p0/errata/">https://www.imsglobal.org/spec/example/v1p0/errata/</a></td>
+              </tr>
+      
+    </tbody>
+  </table> <div id="ipr">
+      <h2>IPR and Distribution Notice</h2>
+      <p>
+        Recipients of this document are requested to submit, with their
+        comments, notification of any relevant patent claims or other
+        intellectual property rights of which they may be aware that might be
+        infringed by any implementation of the specification set forth in this
+        document, and to provide supporting documentation.
+      </p>
+      <p>
+        IMS takes no position regarding the validity or scope of any
+        intellectual property or other rights that might be claimed to pertain
+        implementation or use of the technology described in this document or
+        the extent to which any license under such rights might or might not be
+        available; neither does it represent that it has made any effort to
+        identify any such rights. Information on IMS's procedures with respect
+        to rights in IMS specifications can be found at the IMS Intellectual
+        Property Rights webpage:
+        <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">
+          http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf </a>.
+      </p>
+    </div><p>
+        The following participating organizations have made explicit license
+        commitments to this specification:
+      </p><table>
+      <thead>
+        <tr>
+          <th>Org name</th>
+          <th>Date election made</th>
+          <th>Necessary claims</th>
+          <th>Type</th>
+        
+      </tr></thead>
+      <tbody>
+      <tr>
+    <td>Acme1 Co Inc</td>
+    <td>October 24, 2019</td>
+    <td>No</td>
+    <td>RF RAND (Required &amp; Optional Elements)</td>
+  </tr>
+      </tbody>
+      </table> <div id="disclosure">
+      <p>
+        Use of this specification to develop products or services is governed by
+        the license with IMS found on the IMS website:
+        <a href="http://www.imsglobal.org/speclicense.html">
+          http://www.imsglobal.org/speclicense.html</a>.
+      </p>
+      <p>
+        Permission is granted to all parties to use excerpts from this document
+        as needed in producing requests for proposals.
+      </p>
+      <p>
+        The limited permissions granted above are perpetual and will not be
+        revoked by IMS or its successors or assigns.
+      </p>
+      <p>
+        THIS SPECIFICATION IS BEING OFFERED WITHOUT ANY WARRANTY WHATSOEVER, AND
+        IN PARTICULAR, ANY WARRANTY OF NONINFRINGEMENT IS EXPRESSLY DISCLAIMED.
+        ANY USE OF THIS SPECIFICATION <em class="rfc2119">SHALL</em> BE MADE ENTIRELY AT THE
+        IMPLEMENTER'S OWN RISK, AND NEITHER THE CONSORTIUM, NOR ANY OF ITS
+        MEMBERS OR SUBMITTERS, <em class="rfc2119">SHALL</em> HAVE ANY LIABILITY WHATSOEVER TO ANY
+        IMPLEMENTER OR THIRD PARTY FOR ANY DAMAGES OF ANY NATURE WHATSOEVER,
+        DIRECTLY OR INDIRECTLY, ARISING FROM THE USE OF THIS SPECIFICATION.
+      </p>
+      <p>
+        Public contributions, comments and questions can be posted here:
+        <a href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources">
+          http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources
+        </a>.
+      </p>
+    </div>
+    <div id="cpr">
+    <p>
+      © 2022 IMS Global Learning Consortium, Inc. All
+      Rights Reserved.
+    </p>
+    <p>
+      Trademark information:
+      <a href="http://www.imsglobal.org/copyright.html">http://www.imsglobal.org/copyright.html
+      </a>
+    </p>
+  </div>
+  </header>
+  <section id="abstract" class="introductory">
+    <h2 id="abstract-0">Abstract<a class="self-link" aria-label="§" href="#abstract"></a></h2>
+    <p>
+      This section is required for IMS spec documents.
+      </p><div class="example" id="example-abstract-in-html">
+        <div class="marker">
+    <a class="self-link" href="#example-abstract-in-html">Example<bdi> 1</bdi></a><span class="example-title">: Abstract in HTML</span>
+  </div> <pre aria-busy="false"><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">id</span>=<span class="hljs-string">'abstract'</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Abstract<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span></code></pre>
+      </div>
+      <div class="example" id="example-abstract-in-markdown">
+        <div class="marker">
+    <a class="self-link" href="#example-abstract-in-markdown">Example<bdi> 2</bdi></a><span class="example-title">: Abstract in Markdown</span>
+  </div> <pre aria-busy="false"><code class="hljs">## Abstract</code></pre>
+      </div>
+    <p></p>
+  </section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#abstract-0">Abstract<span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#overview">
+      Overview
+    </a></li><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>
+      Introduction
+    <span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#conformance-0"><bdi class="secno">2. </bdi>Conformance<span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#document-set-0"><bdi class="secno">3. </bdi>Document Set<span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#figure-0"><bdi class="secno">4. </bdi>
+      Figure
+    <span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#activitystate-object"><bdi class="secno">5. </bdi>ActivityState Object<span class="formerLink" aria-label="§"></span></a><ol class="toc"><li class="tocline"><a class="tocxref" href="#issue-summary-0"><bdi class="secno">5.1 </bdi>Issue Summary<span class="formerLink" aria-label="§"></span></a></li></ol></li><li class="tocline"><a class="tocxref" href="#idl-index-0"><bdi class="secno">A. </bdi>
+      IDL Index
+    <span class="formerLink" aria-label="§"></span></a></li><li class="tocline"><a class="tocxref" href="#tof"><bdi class="secno">B. </bdi>List of Figures</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">C. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><bdi class="secno">C.1 </bdi>Normative references</a></li><li class="tocline"><a class="tocxref" href="#informative-references"><bdi class="secno">C.2 </bdi>Informative references</a></li></ol></li><li class="tocline"><a class="tocxref" href="#contributors"><bdi class="secno">D. </bdi>List of Contributors</a></li></ol></nav>
+  <section class="introductory" id="overview">
+    <h2>
+      Overview
+    </h2>
+    <p>
+      This section has a CSS class "<code>introductory</code>", which means
+      it will not appear in the <abbr title="Table of Contents">TOC</abbr>.
+      Example Link to Section <a href="#logo" class="sec-ref">§&nbsp;<bdi class="secno">4. </bdi>
+      Figure</a>.
+    </p>
+    <p>
+      Does your application have a <cite><a href="https://infra.spec.whatwg.org/">user agent</a></cite> or
+      a <cite><a data-xref-for="report" href="https://www.w3.org/TR/reporting-1/">user agent</a></cite>?
+    </p>
+  </section>
+  <section class="informative" id="intro">
+    <h2 id="introduction"><bdi class="secno">1. </bdi>
+      Introduction
+    <a class="self-link" aria-label="§" href="#intro"></a><a class="self-link" aria-label="§" href="#introduction"></a></h2><p><em>This section is non-normative.</em></p>
+    <p>
+      This section has a CSS class "<code>informative</code>", so it is
+      listed in the <abbr title="Table of Contents">TOC</abbr>. ReSpec will list this reference as non-normative
+      since this is an informative section [<cite><a class="bibref" data-link-type="biblio" href="#bib-dom" title="DOM Standard">DOM</a></cite>].
+    </p>
+  </section>
+  <section id="conformance">
+    <h2 id="conformance-0"><bdi class="secno">2. </bdi>Conformance<a class="self-link" aria-label="§" href="#conformance"></a><a class="self-link" aria-label="§" href="#conformance-0"></a></h2>
+    <p>
+      This section is required for IMS spec documents. The section will be
+      filled with boilerplate text, including a reference to the
+      Conformance and Certification Guide in a section with <code>id="document-set"</code>.
+      If you do not want to include the reference, set
+      <code>conf.skipCertGuideConformanceRef = true</code>
+    </p>
+  <p>
+      As well as sections marked as non-normative, all authoring guidelines,
+      diagrams, examples, and notes in this specification are non-normative.
+      Everything else in this specification is normative.
+    </p><p>
+            The key words <em class="rfc2119">MAY</em>, <em class="rfc2119">MUST</em>, <em class="rfc2119">MUST NOT</em>, <em class="rfc2119">OPTIONAL</em>, <em class="rfc2119">RECOMMENDED</em>, <em class="rfc2119">REQUIRED</em>, <em class="rfc2119">SHALL</em>, <em class="rfc2119">SHALL NOT</em>, <em class="rfc2119">SHOULD</em>, and <em class="rfc2119">SHOULD NOT</em> in this document
+            are to be interpreted as described in
+            [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">RFC2119</a></cite>].
+          </p><p>
+      An implementation of this specification that fails to implement a
+      MUST/REQUIRED/SHALL requirement or fails to abide by a MUST NOT/SHALL NOT
+      prohibition is considered nonconformant. SHOULD/SHOULD NOT/RECOMMENDED
+      statements constitute a best practice. Ignoring a best practice does not
+      violate conformance but a decision to disregard such guidance should be
+      carefully considered. MAY/OPTIONAL statements indicate that implementers
+      are entirely free to choose whether or not to implement the option.
+    </p><p>
+      The <a href="#document-set">Conformance and Certification Guide</a>
+      for this specification may introduce greater normative constraints than
+      those defined here for specific service or implementation categories.
+    </p></section>
+  <section id="document-set">
+    <h2 id="document-set-0"><bdi class="secno">3. </bdi>Document Set<a class="self-link" aria-label="§" href="#document-set"></a><a class="self-link" aria-label="§" href="#document-set-0"></a></h2>
+    <p>
+      This is where you would list the documents for the
+      specification.
+    </p>
+  </section>
+  <section id="logo">
+    <h2 id="figure-0"><bdi class="secno">4. </bdi>
+      Figure
+    <a class="self-link" aria-label="§" href="#logo"></a><a class="self-link" aria-label="§" href="#figure-0"></a></h2>
+    <figure id="figure">
+      <img src="figure.svg" alt="W3C Logo" height="114" width="212">
+      <figcaption>Figure <bdi class="figno">1</bdi> <span class="fig-title">
+        The W3C logo
+      </span></figcaption>
+    </figure>
+    <p>
+      Link to <a href="#figure" class="fig-ref" title="The W3C logo">Figure <bdi class="figno">1</bdi></a>
+    </p>
+  </section>
+  <section id="activitystate-object-0">
+    <h2 id="activitystate-object"><bdi class="secno">5. </bdi>ActivityState Object<a class="self-link" aria-label="§" href="#activitystate-object"></a><a class="self-link" aria-label="§" href="#activitystate-object"></a></h2>
+    <p>An
+      <code>ActivityState</code> object is to be used by the EPUB to store stateful information
+      on behalf of the student.</p>
+    <p>Examples of stateful data might be an incomplete multiple choice activity,
+      an incomplete essay or a even the current location in a streaming video.</p>
+
+    <div class="note" role="note" id="issue-container-generatedID"><div role="heading" class="note-title marker" id="h-note" aria-level="3"><span>Note</span><span class="issue-label">: test</span></div><div class="">Example of text content of note aside</div></div>
+    <div class="warning" id="issue-container-generatedID-0"><div role="heading" class="warning-title marker" id="h-warning" aria-level="3"><span>Warning</span><span class="issue-label">: test</span></div><div class="">Example of text content of warning aside</div></div>
+    <div class="issue" id="issue-container-number-1"><div role="heading" class="issue-title marker" id="h-issue" aria-level="3"><span>Issue 1</span><span class="issue-label">: test</span></div><div class="">Example of text content of issue aside</div></div>
+
+    <section id="issue-summary">
+      <h3 id="issue-summary-0"><bdi class="secno">5.1 </bdi>Issue Summary<a class="self-link" aria-label="§" href="#issue-summary"></a><a class="self-link" aria-label="§" href="#issue-summary-0"></a></h3>
+    <ul><li><a href="#issue-container-number-1">Issue 1</a><span style="text-transform: none">: test</span></li></ul></section>
+
+    <p>The properties of the ActivityState object are defined below.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Data&nbsp;Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>type</td>
+          <td>String</td>
+          <td>yes</td>
+          <td><em class="rfc2119">MUST</em> be set to 'ActivityState'</td>
+        </tr>
+        <tr>
+          <td>createdTime</td>
+          <td>ISO 8601</td>
+          <td>yes</td>
+          <td>The date when the ActivityState object was created. The format <em class="rfc2119">MUST</em> be
+            <code>yyyy-MM-ddTHH:mm:ss.SSSZ</code> [<cite><a class="bibref" data-link-type="biblio" href="#bib-iso8601" title="Representation of dates and times. ISO 8601:2004.">ISO8601</a></cite>].</td>
+        </tr>
+        <tr>
+          <td>activityId</td>
+          <td>String</td>
+          <td>yes</td>
+          <td>References the
+            <code>data-activityId</code> value in the EPUB markup</td>
+        </tr>
+        <tr>
+          <td>data</td>
+          <td>Object</td>
+          <td>yes</td>
+          <td>An object used to store data. The object structure is purposively arbitrary;
+            the
+            <code>profile</code> property below can be used to inform Reading Systems
+            of the object's format.</td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td>String</td>
+          <td>no</td>
+          <td>A standards-based or vendor-specific identifier that can be used to specify
+            the format of the
+            <code>data</code> object and/or indicate the availability of one or more
+            <code>extensions</code> properties. For example, "ims.qti_v2p1.choice" might
+            be used to specify that the
+            <code>data</code> object conforms to the schema of a qti 2.1 Choice Activity.</td>
+        </tr>
+        <tr>
+          <td>extensions</td>
+          <td>Object</td>
+          <td>no</td>
+          <td>A map of arbitrary vendor-specific extensions to support non-standard
+            reading system functionality. Keys should start with
+            <code>vnd.</code> followed by the vendor name to avoid naming conflicts.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <strong>Example</strong>
+    </p>
+    <figure class="example" id="fig-example-of-the-activitystate-object">
+      <pre><code aria-busy="false" class="hljs json">
+      {
+        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"ActivityState"</span>,
+        <span class="hljs-attr">"createdTime"</span>: new Date().toISOString(),
+        <span class="hljs-attr">"activityId"</span>: <span class="hljs-string">"unit_1_activity_5"</span>,
+        <span class="hljs-attr">"data"</span>: {
+          <span class="hljs-attr">"choice"</span>: <span class="hljs-string">"blue"</span>,
+          <span class="hljs-attr">"directionLine"</span>: <span class="hljs-string">"What color is the sky?"</span>,
+          <span class="hljs-attr">"choices"</span>: [<span class="hljs-string">"blue"</span>,<span class="hljs-string">"red"</span>,<span class="hljs-string">"green"</span>],
+          <span class="hljs-attr">"correct"</span>: <span class="hljs-string">"blue"</span>
+        },
+        <span class="hljs-attr">"profile"</span>: <span class="hljs-string">"ims.qti_v2p1.choice"</span>,
+        <span class="hljs-attr">"extensions"</span>: {
+          <span class="hljs-attr">"vnd.vst.timesync_offset"</span>: <span class="hljs-number">42000</span>
+        }
+      }
+      </code></pre>
+      <figcaption>Figure <bdi class="figno">2</bdi> <span class="fig-title">Example of the ActivityState object.
+      </span></figcaption>
+    </figure>
+  </section>
+  <section id="idl-index" class="appendix">
+    <h2 id="idl-index-0"><bdi class="secno">A. </bdi>
+      IDL Index
+    <a class="self-link" aria-label="§" href="#idl-index"></a><a class="self-link" aria-label="§" href="#idl-index-0"></a></h2>
+    <p>
+      All the Web IDL in this specification is collected in this section.
+    </p>
+  </section>
+  <section id="tof" class="informative appendix"><h2 id="b-list-of-figures"><bdi class="secno">B. </bdi>List of Figures<a class="self-link" aria-label="§" href="#tof"></a></h2><p><em>This section is non-normative.</em></p><ul class="tof">
+        <li class="tofline">
+    <a class="tocxref" href="#figure">Figure <bdi class="figno">1</bdi> <span class="fig-title">
+        The W3C logo
+      </span></a>
+  </li><li class="tofline">
+    <a class="tocxref" href="#fig-example-of-the-activitystate-object">Figure <bdi class="figno">2</bdi> <span class="fig-title">Example of the ActivityState object.
+      </span></a>
+  </li>
+      </ul></section>
+
+
+<section id="references" class="appendix"><h2 id="c-references"><bdi class="secno">C. </bdi>References<a class="self-link" aria-label="§" href="#references"></a></h2><section id="normative-references">
+    <h3 id="c-1-normative-references"><bdi class="secno">C.1 </bdi>Normative references<a class="self-link" aria-label="§" href="#normative-references"></a></h3>
+    <dl class="bibliography"><dt id="bib-iso8601">[ISO8601]</dt><dd><a href="http://www.iso.org/iso/catalogue_detail?csnumber=40874"><cite>Representation of dates and times. ISO 8601:2004.</cite></a>.  International Organization for Standardization (ISO). 2004. ISO 8601:2004. URL: <a href="http://www.iso.org/iso/catalogue_detail?csnumber=40874">http://www.iso.org/iso/catalogue_detail?csnumber=40874</a></dd><dt id="bib-rfc2119">[RFC2119]</dt><dd><a href="https://www.rfc-editor.org/rfc/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. S. Bradner.  IETF. March 1997. Best Current Practice. URL: <a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a></dd></dl>
+  </section><section id="informative-references">
+    <h3 id="c-2-informative-references"><bdi class="secno">C.2 </bdi>Informative references<a class="self-link" aria-label="§" href="#informative-references"></a></h3>
+    <dl class="bibliography"><dt id="bib-dom">[DOM]</dt><dd><a href="https://dom.spec.whatwg.org/"><cite>DOM Standard</cite></a>. Anne van Kesteren.  WHATWG. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a></dd><dt id="bib-infra">[infra]</dt><dd><a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Anne van Kesteren; Domenic Denicola.  WHATWG. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a></dd><dt id="bib-reporting">[reporting]</dt><dd><a href="https://www.w3.org/TR/reporting-1/"><cite>Reporting API</cite></a>. Douglas Creager; Ilya Grigorik; Paul Meyer; Mike West.  W3C. 25 September 2018. W3C Working Draft. URL: <a href="https://www.w3.org/TR/reporting-1/">https://www.w3.org/TR/reporting-1/</a></dd></dl>
+  </section></section><section id="contributors" class="appendix">
+    <h2 id="d-list-of-contributors"><bdi class="secno">D. </bdi>List of Contributors<a class="self-link" aria-label="§" href="#contributors"></a></h2>
+    <p>The following individuals contributed to the development of this document:</p>
+    <table class="contributors" title="List of Contributors" summary="The list of contributors to this work.">
+      <thead>
+        <tr><th>Name</th>
+        <th>Organization</th>
+        <th>Role</th>
+      </tr></thead>
+      <tbody>
+          <tr><td class="name">First Last</td><td class="co">Acme1 Co Inc (Sweden)</td><td class="role">Editor</td></tr><tr><td class="name">Second Third</td><td class="co">Acme2 Co Inc (UK)</td><td class="role">Editor</td></tr>
+      </tbody>
+    </table>
+    </section><p role="navigation" id="back-to-top">
+    <a href="#title"><abbr title="Back to Top">↑</abbr></a>
+  </p><script id="respec-dfn-panel">// @ts-check
+if (document.respec) {
+  document.respec.ready.then(setupPanel);
+} else {
+  setupPanel();
+}
+
+function setupPanel() {
+  const listener = panelListener();
+  document.body.addEventListener("keydown", listener);
+  document.body.addEventListener("click", listener);
+}
+
+function panelListener() {
+  /** @type {HTMLElement} */
+  let panel = null;
+  return event => {
+    const { target, type } = event;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    // For keys, we only care about Enter key to activate the panel
+    // otherwise it's activated via a click.
+    if (type === "keydown" && event.key !== "Enter") return;
+
+    const action = deriveAction(event);
+
+    switch (action) {
+      case "show": {
+        hidePanel(panel);
+        /** @type {HTMLElement} */
+        const dfn = target.closest("dfn, .index-term");
+        panel = document.getElementById(`dfn-panel-for-${dfn.id}`);
+        const coords = deriveCoordinates(event);
+        displayPanel(dfn, panel, coords);
+        break;
+      }
+      case "dock": {
+        panel.style.left = null;
+        panel.style.top = null;
+        panel.classList.add("docked");
+        break;
+      }
+      case "hide": {
+        hidePanel(panel);
+        panel = null;
+        break;
+      }
+    }
+  };
+}
+
+/**
+ * @param {MouseEvent|KeyboardEvent} event
+ */
+function deriveCoordinates(event) {
+  const target = /** @type HTMLElement */ (event.target);
+
+  // We prevent synthetic AT clicks from putting
+  // the dialog in a weird place. The AT events sometimes
+  // lack coordinates, so they have clientX/Y = 0
+  const rect = target.getBoundingClientRect();
+  if (
+    event instanceof MouseEvent &&
+    event.clientX >= rect.left &&
+    event.clientY >= rect.top
+  ) {
+    // The event probably happened inside the bounding rect...
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  // Offset to the middle of the element
+  const x = rect.x + rect.width / 2;
+  // Placed at the bottom of the element
+  const y = rect.y + rect.height;
+  return { x, y };
+}
+
+/**
+ * @param {Event} event
+ */
+function deriveAction(event) {
+  const target = /** @type {HTMLElement} */ (event.target);
+  const hitALink = !!target.closest("a");
+  if (target.closest("dfn:not([data-cite]), .index-term")) {
+    return hitALink ? "none" : "show";
+  }
+  if (target.closest(".dfn-panel")) {
+    if (hitALink) {
+      return target.classList.contains("self-link") ? "hide" : "dock";
+    }
+    const panel = target.closest(".dfn-panel");
+    return panel.classList.contains("docked") ? "hide" : "none";
+  }
+  if (document.querySelector(".dfn-panel:not([hidden])")) {
+    return "hide";
+  }
+  return "none";
+}
+
+/**
+ * @param {HTMLElement} dfn
+ * @param {HTMLElement} panel
+ * @param {{ x: number, y: number }} clickPosition
+ */
+function displayPanel(dfn, panel, { x, y }) {
+  panel.hidden = false;
+  // distance (px) between edge of panel and the pointing triangle (caret)
+  const MARGIN = 20;
+
+  const dfnRects = dfn.getClientRects();
+  // Find the `top` offset when the `dfn` can be spread across multiple lines
+  let closestTop = 0;
+  let minDiff = Infinity;
+  for (const rect of dfnRects) {
+    const { top, bottom } = rect;
+    const diffFromClickY = Math.abs((top + bottom) / 2 - y);
+    if (diffFromClickY < minDiff) {
+      minDiff = diffFromClickY;
+      closestTop = top;
+    }
+  }
+
+  const top = window.scrollY + closestTop + dfnRects[0].height;
+  const left = x - MARGIN;
+  panel.style.left = `${left}px`;
+  panel.style.top = `${top}px`;
+
+  // Find if the panel is flowing out of the window
+  const panelRect = panel.getBoundingClientRect();
+  const SCREEN_WIDTH = Math.min(window.innerWidth, window.screen.width);
+  if (panelRect.right > SCREEN_WIDTH) {
+    const newLeft = Math.max(MARGIN, x + MARGIN - panelRect.width);
+    const newCaretOffset = left - newLeft;
+    panel.style.left = `${newLeft}px`;
+    /** @type {HTMLElement} */
+    const caret = panel.querySelector(".caret");
+    caret.style.left = `${newCaretOffset}px`;
+  }
+
+  // As it's a dialog, we trap focus.
+  // TODO: when <dialog> becomes a implemented, we should really
+  // use that.
+  trapFocus(panel, dfn);
+}
+
+/**
+ * @param {HTMLElement} panel
+ * @param {HTMLElement} dfn
+ * @returns
+ */
+function trapFocus(panel, dfn) {
+  /** @type NodeListOf<HTMLAnchorElement> elements */
+  const anchors = panel.querySelectorAll("a[href]");
+  // No need to trap focus
+  if (!anchors.length) return;
+
+  // Move focus to first anchor element
+  const first = anchors.item(0);
+  first.focus();
+
+  const trapListener = createTrapListener(anchors, panel, dfn);
+  panel.addEventListener("keydown", trapListener);
+
+  // Hiding the panel releases the trap
+  const mo = new MutationObserver(records => {
+    const [record] = records;
+    const target = /** @type HTMLElement */ (record.target);
+    if (target.hidden) {
+      panel.removeEventListener("keydown", trapListener);
+      mo.disconnect();
+    }
+  });
+  mo.observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+}
+
+/**
+ *
+ * @param {NodeListOf<HTMLAnchorElement>} anchors
+ * @param {HTMLElement} panel
+ * @param {HTMLElement} dfn
+ * @returns
+ */
+function createTrapListener(anchors, panel, dfn) {
+  const lastIndex = anchors.length - 1;
+  let currentIndex = 0;
+  return event => {
+    switch (event.key) {
+      // Hitting "Tab" traps us in a nice loop around elements.
+      case "Tab": {
+        event.preventDefault();
+        currentIndex += event.shiftKey ? -1 : +1;
+        if (currentIndex < 0) {
+          currentIndex = lastIndex;
+        } else if (currentIndex > lastIndex) {
+          currentIndex = 0;
+        }
+        anchors.item(currentIndex).focus();
+        break;
+      }
+
+      // Hitting "Enter" on an anchor releases the trap.
+      case "Enter":
+        hidePanel(panel);
+        break;
+
+      // Hitting "Escape" returns focus to dfn.
+      case "Escape":
+        hidePanel(panel);
+        dfn.focus();
+        return;
+    }
+  };
+}
+
+/** @param {HTMLElement} panel */
+function hidePanel(panel) {
+  if (!panel) return;
+  panel.hidden = true;
+  panel.classList.remove("docked");
+}
+</script><script type="text/javascript" src="https://purl.imsglobal.org/spec/fixup.js"></script><footer>
+    <div id="endWarranty">
+      <p>
+        IMS Global Learning Consortium, Inc. ("IMS Global") is publishing the
+        information contained in this document ("Specification") for purposes of
+        scientific, experimental, and scholarly collaboration only.
+      </p>
+      <p>
+        IMS Global makes no warranty or representation regarding the accuracy or
+        completeness of the Specification.
+      </p>
+      <p>This material is provided on an "As Is" and "As Available" basis.</p>
+      <p>
+        The Specification is at all times subject to change and revision without
+        notice.
+      </p>
+      <p>
+        It is your sole responsibility to evaluate the usefulness, accuracy, and
+        completeness of the Specification as it relates to you.
+      </p>
+      <p>
+        IMS Global would appreciate receiving your comments and suggestions.
+      </p>
+      <p>
+        Please contact IMS Global through our website at
+        http://www.imsglobal.org.
+      </p>
+      <p>
+        Please refer to Document Name: Replace me with a real title
+        1.0
+      </p>
+      <p>Date: 01 February 2022</p>
+      <div></div>
+    </div>
+  </footer></body></html>

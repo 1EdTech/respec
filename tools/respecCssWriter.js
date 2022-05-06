@@ -2,12 +2,13 @@ const puppeteer = require("puppeteer");
 const path = require("path");
 const { mkdtemp, readFile } = require("fs").promises;
 const { tmpdir } = require("os");
+const CleanCSS = require("clean-css");
 
 const noop = () => {};
 
 /**
  * 1EdTech
- * Fetches a ReSpec "src" URL, and writes the processed static HTML to an "out" path.
+ * Fetches a ReSpec "src" URL, extracts the CSS from the processed static HTML, and writes it to an "out" path.
  * @param {string} src A URL or filepath that is the ReSpec source.
  * @param {object} [options]
  * @param {number} [options.timeout] Milliseconds before processing should timeout.
@@ -17,10 +18,10 @@ const noop = () => {};
  * @param {(msg: string, timeRemaining: number) => void} [options.onProgress]
  * @param {boolean} [options.disableSandbox] See https://peter.sh/experiments/chromium-command-line-switches/#no-sandbox
  * @param {boolean} [options.devtools] Show the Chromium window with devtools open for debugging.
- * @return {Promise<{ html: string, errors: RsError[], warnings: RsError[] }>}
+ * @return {Promise<{ css: string, errors: RsError[], warnings: RsError[] }>}
  * @throws {Error} If failed to process.
  */
-async function toHTML(src, options = {}) {
+async function toCSS(src, options = {}) {
   const {
     timeout = 300000,
     disableSandbox = false,
@@ -53,7 +54,7 @@ async function toHTML(src, options = {}) {
     options.onWarning(warning);
   };
 
-  const userDataDir = await mkdtemp(`${tmpdir()}/respec2cms-`);
+  const userDataDir = await mkdtemp(`${tmpdir()}/combine-styles-`);
   const args = [];
   if (disableSandbox) args.push("--no-sandbox");
 
@@ -87,7 +88,15 @@ async function toHTML(src, options = {}) {
     log(`Using ReSpec v${version.join(".")}`);
 
     log("Processing ReSpec document...");
-    const html = await generateHTML(page, timer, version, url);
+    const source = await generateCSS(page, timer, version, url);
+    log("Compressing CSS...");
+    let css;
+    new CleanCSS({ inline: ["all"] }).minify(source, (error, output) => {
+      if (error) {
+        log(error);
+      }
+      css = output.styles;
+    });
     log("Processed document.");
 
     // Race condition: Wait before page close for all console messages to be logged
@@ -95,7 +104,7 @@ async function toHTML(src, options = {}) {
     await page.close();
     log("Done.");
 
-    return { html, errors, warnings };
+    return { css, errors, warnings };
   } finally {
     await browser.close();
   }
@@ -154,7 +163,7 @@ function isRespecScript(req) {
   switch (host) {
     case "www.w3.org":
       return (
-        path.startsWith("/tools/respec/") && !path.includes("respec-highlight")
+        path.startsWith("/Tools/respec/") && !path.includes("respec-highlight")
       );
     case "w3c.github.io":
       return path.startsWith("/respec/builds/");
@@ -214,11 +223,11 @@ async function checkIfReSpec(page) {
  * @param {ReSpecVersion} version
  * @param {URL} url
  */
-async function generateHTML(page, timer, version, url) {
+async function generateCSS(page, timer, version, url) {
   try {
-    return await page.evaluate(evaluateHTML, version, timer);
+    return await page.evaluate(evaluateCSS, timer);
   } catch (err) {
-    const msg = `\n😭  Sorry, there was an error generating the HTML. Please report this issue!\n${`${
+    const msg = `\n😭  Sorry, there was an error generating the CSS. Please report this issue!\n${`${
       `Specification: ${url}\n` +
       `ReSpec version: ${version.join(".")}\n` +
       "File a bug: https://github.com/w3c/respec/\n"
@@ -228,40 +237,22 @@ async function generateHTML(page, timer, version, url) {
 }
 
 /**
- * @param {ReSpecVersion} version
  * @param {ReturnType<typeof createTimer>} timer
  */
-async function evaluateHTML(version, timer) {
+async function evaluateCSS(timer) {
   await timeout(
     document.respec ? document.respec.ready : document.respecIsReady,
     timer.remaining
   );
 
-  const [major, minor] = version;
-  if (major < 20 || (major === 20 && minor < 10)) {
-    console.warn(
-      "👴🏽  Ye Olde ReSpec version detected! Please update to 20.10.0 or above. " +
-        `Your version: ${window.respecVersion}.`
-    );
-    // Document references an older version of ReSpec that does not yet
-    // have the "core/exporter" module. Try with the old "ui/save-html"
-    // module.
-    const { exportDocument } = await new Promise((resolve, reject) => {
-      require(["ui/save-html"], resolve, err => {
-        reject(new Error(err.message));
-      });
+  const { rsDocToCssDataURL } = await new Promise((resolve, reject) => {
+    require(["1edtech/exporter"], resolve, err => {
+      reject(new Error(err.message));
     });
-    return exportDocument("html", "text/html");
-  } else {
-    const { rsDocToCmsDataURL } = await new Promise((resolve, reject) => {
-      require(["1edtech/exporter"], resolve, err => {
-        reject(new Error(err.message));
-      });
-    });
-    const dataURL = rsDocToCmsDataURL();
-    const encodedString = dataURL.replace(/^data:\w+\/\w+;charset=utf-8,/, "");
-    return decodeURIComponent(encodedString);
-  }
+  });
+  const dataURL = await rsDocToCssDataURL();
+  const encodedString = dataURL.replace(/^data:\w+\/\w+;charset=utf-8,/, "");
+  return decodeURIComponent(encodedString);
 
   function timeout(promise, ms) {
     return new Promise((resolve, reject) => {
@@ -342,4 +333,4 @@ function createTimer(duration) {
   };
 }
 
-exports.toHTML = toHTML;
+exports.toCSS = toCSS;
