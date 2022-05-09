@@ -1,4 +1,4 @@
-name: IMS CI (PR)
+name: 1EdTech CI (PR)
 on:
   pull_request:
     paths-ignore:
