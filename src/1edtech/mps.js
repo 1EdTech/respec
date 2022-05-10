@@ -10,6 +10,9 @@ import dataModelTemplate from "./templates/dataModelTemplate.js";
 import enumerationTemplate from "./templates/enumerationTemplate.js";
 import { html } from "../core/import-maps.js";
 import interfaceTemplate from "./templates/interfaceTemplate.js";
+import jsonSchemaTemplate from "./templates/jsonSchemaTemplate.js";
+import jsonSchemasTemplate from "./templates/jsonSchemasTemplate.js";
+import openApiSchemaTemplate from "./templates/openApiSchemaTemplate.js";
 import operationTemplate from "./templates/operationTemplate.js";
 import serviceModelTemplate from "./templates/serviceModelTemplate.js";
 import { showError } from "../core/utils.js";
@@ -315,6 +318,43 @@ async function getModel(config, source, id) {
 }
 
 /**
+ * Async function that returns the OpenAPI Schema for an MPS Model.
+ *
+ * @param {object} config The respecConfig.
+ * @param {string} id MPS Model id.
+ * @param {string} binding The OpenAPI Schema file format (YAML or JSON).
+ * @returns {object} The OpenAPI Schema text.
+ */
+async function getOpenApiSchema(config, id, binding) {
+  binding = binding ?? "yaml";
+  try {
+    const res = await fetch(
+      `${getBaseUrl(
+        config
+      )}/openapischema/${id}?binding=${binding.toLowerCase()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": getApiKey(config),
+        },
+      }
+    );
+    if (!res.ok) {
+      showError(
+        `Could not get the OpenAPI schema for ${id}: ${res.status}`,
+        name
+      );
+      return null;
+    }
+    const data = await res.text();
+    return data;
+  } catch (error) {
+    showError(`Could not get the OpenAPI schema for ${id}: ${error}`, name);
+    return null;
+  }
+}
+/**
  * Process a single MPS Class model.
  *
  * @param {HTMLElement} section The class section element.
@@ -487,6 +527,170 @@ async function processInterface(section, serviceInterface) {
         section.insertAdjacentElement("beforeend", operationSection);
       }
     });
+  }
+}
+
+/**
+ * Process the JSON Schema for single MPS Class model.
+ *
+ * @param {HTMLElement} section The class section element.
+ * @param {object} classModel The MPS Class object.
+ */
+async function processJsonSchema(config, section, classModel) {
+  section.setAttribute("id", `${classModel.id}-schema`);
+  const title = section.getAttribute("title");
+  const schema = await getJsonSchema(config, classModel.id);
+  const wrapper = jsonSchemaTemplate(classModel, schema, title);
+  if (schema && wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+  }
+}
+
+/**
+ * Process a JSON Schemas schemas section. Schemas can be split across multiple sections (e.g. one section
+ * in the main content and one in the appendices). The data-package attribute, if present, acts as a
+ * filter for the section. Only classes in the named package will be expected or generated.
+ *
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} section The schema section element.
+ * @param {string} modelId The MPS Model id.
+ */
+async function processJsonSchemas(config, section, modelId) {
+  // The MPS/MPS source (CORE|SANDBOX)
+  const source = section.getAttribute("data-source") ?? config.mps.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
+    return;
+  }
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  // The section's unique id (used to calculate a unique header id)
+  const id = section.getAttribute("id");
+
+  // The package name filter, if any
+  const packageName = section.getAttribute("data-package") ?? "";
+
+  const dataModel = await getModel(config, source, modelId);
+  if (dataModel) {
+    const wrapper = jsonSchemasTemplate(dataModel, title, id);
+    if (wrapper) {
+      let target = null;
+      Array.from(wrapper.childNodes).forEach(element => {
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
+        }
+      });
+    }
+
+    let classes = Array.from(dataModel.classes).filter(
+      classModel =>
+        classModel.stereoType !== "PrimitiveType" &&
+        classModel.stereoType !== "DerivedType"
+    );
+
+    if (packageName !== "") {
+      classes = classes.filter(
+        classModel => classModel.documentation.packageName === packageName
+      );
+    }
+
+    classes.forEach(async classModel => {
+      let classSection = section.querySelector(
+        `section[data-class="${classModel.id}"]`
+      );
+      if (classSection) {
+        processJsonSchema(config, classSection, classModel);
+      } else {
+        // Auto-generate the class definition
+        classSection = html`<section data-class="${classModel.id}"></section>`;
+        processJsonSchema(config, classSection, classModel);
+        section.insertAdjacentElement("beforeend", classSection);
+      }
+    });
+  } else {
+    // If there is no data model, add a header to satisfy Respec
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
+  }
+}
+
+/**
+ * Process an OpenAPI Schema section.
+ *
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} section The schema section element.
+ * @param {string} modelId The MPS Model id.
+ */
+async function processOpenApiSchema(config, section, modelId) {
+  // The MPS/MPS source (CORE|SANDBOX)
+  const source = section.getAttribute("data-source") ?? config.mps.source;
+  if (source !== "CORE" && source !== "SANDBOX") {
+    showError(`Invalid source ${source} for model ${modelId}`);
+    return;
+  }
+
+  // The preferred section title
+  const title = section.getAttribute("title");
+
+  // The section's unique id (used to calculate a unique header id)
+  const id = section.getAttribute("id");
+
+  // The preferred schema binding
+  const binding = section.getAttribute("data-binding");
+
+  const dataModel = await getModel(config, source, modelId);
+
+  const schema = await getOpenApiSchema(config, modelId, binding);
+
+  if (dataModel && schema) {
+    const wrapper = openApiSchemaTemplate(dataModel, schema, title, id);
+    if (wrapper) {
+      let target = null;
+      Array.from(wrapper.childNodes).forEach(element => {
+        if (element.nodeName !== "#comment") {
+          let thisElement = element;
+          if (element.nodeName === "#text") {
+            thisElement = document.createElement("text");
+            thisElement.innerHTML = element.nodeValue;
+          }
+          if (target) {
+            target.insertAdjacentElement("afterend", thisElement);
+          } else {
+            section.insertAdjacentElement("afterbegin", thisElement);
+          }
+          target = thisElement;
+        }
+      });
+    }
+  } else {
+    // If there is no schema, add a header to satisfy Respec
+    section.insertAdjacentElement("afterbegin", html`<h3>${modelId}</h3>`);
   }
 }
 
@@ -788,13 +992,17 @@ export async function run(config) {
   const dataModelSections = modelSections.filter(
     elem =>
       !elem.getAttribute("data-service-model") &&
-      !elem.getAttribute("data-stereotype")
+      !elem.getAttribute("data-stereotype") &&
+      !elem.getAttribute("data-schema-format")
   );
   const stereoTypeSections = modelSections.filter(elem =>
     elem.getAttribute("data-stereotype")
   );
   const serviceModelSections = modelSections.filter(elem =>
     elem.getAttribute("data-service-model")
+  );
+  const schemaSections = modelSections.filter(elem =>
+    elem.getAttribute("data-schema-format")
   );
 
   // Process the DataModel sections.
@@ -861,6 +1069,40 @@ export async function run(config) {
               `Cannot process StereoType ${modelId} ${stereoType}: ${error}`,
               name
             );
+          }
+        }
+      })
+    );
+  }
+
+  // Process the Schema sections.
+  if (schemaSections.length > 0) {
+    promises.push(
+      ...Array.from(schemaSections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        const schemaFormat =
+          section.getAttribute("data-schema-format")?.toLowerCase() ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing Model id</h2>`
+          );
+          showError(
+            "Cannot process Schema sections without the Model id",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            if (schemaFormat === "" || schemaFormat === "json") {
+              await processJsonSchemas(config, section, modelId);
+            } else {
+              await processOpenApiSchema(config, section, modelId);
+            }
+          } catch (error) {
+            showError(`Cannot process Schema for ${modelId}: ${error}`, name);
           }
         }
       })
