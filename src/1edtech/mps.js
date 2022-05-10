@@ -956,8 +956,8 @@ export async function run(config) {
   sub("end-all", () => {
     const script = document.getElementById("initialUserConfig");
     const userConfig = JSON.parse(script.innerHTML);
-    if ("cdm" in userConfig) {
-      delete userConfig.cdm;
+    if ("mps" in userConfig) {
+      delete userConfig.mdm;
       script.innerHTML = JSON.stringify(userConfig, null, 2);
     }
   });
