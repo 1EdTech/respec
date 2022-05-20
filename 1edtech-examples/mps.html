@@ -516,7 +516,8 @@
       Some more information about the data model.
     </p>
     <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
-      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" title="Sample ClrCredential">
+      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" 
+        data-allowAdditionalProperties="true" title="Sample ClrCredential">
         {
           "@context": [
             "https://www.w3.org/2018/credentials/v1",
@@ -527,13 +528,14 @@
           "name": "A sample ClrCredential",
           "issuer": {
             "id": "https://example.edu/issuers/565049",
-            "type": "Publisher",
+            "type": ["Profile"],
             "name": "Example University"
           },
           "issuanceDate": "2010-01-01T00:00:00Z",
           "credentialSubject": {
             "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-            "achievementCredentials": [
+            "type": ["ClrSubject"],
+            "verifiableCredential": [
               {
                 "@context": [
                   "https://www.w3.org/2018/credentials/v1",
@@ -544,7 +546,7 @@
                 "name": "A sample AchievementCredential",
                 "issuer": {
                   "id": "https://example.edu/issuers/565049",
-                  "type": "Publisher",
+                  "type": ["Profile"],
                   "name": "Example University"
                 },
                 "issuanceDate": "2010-01-01T00:00:00Z",
@@ -558,12 +560,13 @@
                 }]
               }
             ],
-            "achievements": [
+            "achievement": [
               { 
                 "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
-                "type": "Achievement",
+                "type": ["Achievement"],
                 "creator": {
-                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5"
+                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5",
+                  "type": ["Profile"]
                 },
                 "name": "Achievement 1",
                 "description": "A simple description",
@@ -573,9 +576,10 @@
               },
               { 
                 "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
-                "type": "Achievement",
+                "type": ["Achievement"],
                 "creator": {
-                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5"
+                  "id": "urn:uuid:033026ea-371e-456c-81e1-867b951075b5",
+                  "type": ["Profile"]
                 },
                 "name": "Achievement 2",
                 "description": "A simple description",
