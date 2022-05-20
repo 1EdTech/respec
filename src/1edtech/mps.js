@@ -86,17 +86,23 @@ async function getDataSample(config, id, includeOptionalFields = false) {
  *
  * @param {object} config The respecConfig.
  * @param {string} id MPS Class id.
+ * @param {boolean} allowAdditionalProperties If true or omitted, the generated schema will reflect the MPS model. If false, the generated schema will never allow additional properties. Use false to check examples for typos.
  * @returns {object} The JSON Schema object.
  */
-async function getJsonSchema(config, id) {
+async function getJsonSchema(config, id, allowAdditionalProperties = true) {
   try {
-    const res = await fetch(`${getBaseUrl(config)}/jsonschema/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": getApiKey(config),
-      },
-    });
+    const res = await fetch(
+      `${getBaseUrl(
+        config
+      )}/jsonschema/${id}?allowAdditionalProperties=${allowAdditionalProperties}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": getApiKey(config),
+        },
+      }
+    );
     if (!res.ok) {
       showError(`Could not get the schema for ${id}: ${res.status}`, name);
       return null;
@@ -910,11 +916,17 @@ async function processStereoType(config, section, modelId, stereoType) {
  */
 async function validateExample(config, ajv, pre) {
   const schemaId = pre.getAttribute("data-schema");
+  const allowAdditionalProperties =
+    pre.getAttribute("data-allowAdditionalProperties") ?? true;
   if (schemaId === "") {
     showError("Example is missing a schema id", name);
     return;
   }
-  const schemaDef = await getJsonSchema(config, schemaId);
+  const schemaDef = await getJsonSchema(
+    config,
+    schemaId,
+    allowAdditionalProperties
+  );
   if (schemaDef === null) return;
   try {
     // Remove comments from example
