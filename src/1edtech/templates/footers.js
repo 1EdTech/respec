@@ -5,9 +5,9 @@ export default conf => {
   return html`<footer>
     <div id="endWarranty">
       <p>
-        1EdTech Consortium, Inc. ("1EdTech") is publishing the
-        information contained in this document ("Specification") for purposes of
-        scientific, experimental, and scholarly collaboration only.
+        1EdTech Consortium, Inc. ("1EdTech") is publishing the information
+        contained in this document ("Specification") for purposes of scientific,
+        experimental, and scholarly collaboration only.
       </p>
       <p>
         1EdTech makes no warranty or representation regarding the accuracy or
@@ -22,12 +22,10 @@ export default conf => {
         It is your sole responsibility to evaluate the usefulness, accuracy, and
         completeness of the Specification as it relates to you.
       </p>
-      <p>
-        1EdTech would appreciate receiving your comments and suggestions.
-      </p>
+      <p>1EdTech would appreciate receiving your comments and suggestions.</p>
       <p>
         Please contact 1EdTech through our website at
-        http://www.imsglobal.org.
+        <a href="https://www.1edtech.org">www.1edtech.org</a>.
       </p>
       <p>
         Please refer to Document Name: ${conf.specTitle.replace("<br/>", " ")}
