@@ -210,7 +210,7 @@ export function makeBasicConfig(profile = "w3c") {
         mainSpecBiblioKey: "IMS",
         specTitle: "Replace me with a real title",
         shortName: "example",
-        specStatus: "IMS Base Document",
+        specStatus: "1EdTech Base Document",
         specVersion: "1.0",
         docVersion: "0.1",
         specNature: "normative",

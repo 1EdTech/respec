@@ -28,15 +28,15 @@ export async function run(conf) {
   // check and warn for issue admons in late process stages
   const issues = document.body.querySelectorAll("aside.issue, div.aside.issue");
   if (issues.length > 0) {
-    if (conf.specStatus == "IMS Final Release") {
+    if (conf.specStatus == "1EdTech Final Release") {
       pub(
         "error",
-        "Issue asides must not be present when the status is 'IMS Final Release'"
+        "Issue asides must not be present when the status is '1EdTech Final Release'"
       );
-    } else if (conf.specStatus == "IMS Candidate Final") {
+    } else if (conf.specStatus == "1EdTech Candidate Final") {
       pub(
         "warn",
-        "Issue asides should not be present when the status is 'IMS Candidate Final'"
+        "Issue asides should not be present when the status is '1EdTech Candidate Final'"
       );
     }
   }

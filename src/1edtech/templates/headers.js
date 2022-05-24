@@ -24,13 +24,13 @@ function getStatusString(conf) {
   switch (conf.specStatus) {
     case "Proposal":
       return "This document is for review and comment by IMS Contributing Members.";
-    case "IMS Base Document":
+    case "1EdTech Base Document":
       return "This document is for review and comment by IMS Contributing Members.";
-    case "IMS Candidate Final":
+    case "1EdTech Candidate Final":
       return "This document is for review and adoption by the IMS membership.";
-    case "IMS Candidate Final Public":
+    case "1EdTech Candidate Final Public":
       return "This document is for review and adoption by the IMS membership.";
-    case "IMS Final Release":
+    case "1EdTech Final Release":
       return "This document is made available for adoption by the public community at large.";
     default:
       // 1edtech/config.js will issue error for unknown values
@@ -72,7 +72,7 @@ function renderSpecVersion(conf) {
 function renderSpecStatus(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<span
-      class="statusPD${conf.specStatus === "IMS Final Release" ? " final" : ""}"
+      class="statusPD${conf.specStatus === "1EdTech Final Release" ? " final" : ""}"
       data-content="${conf.specStatus}"
       >${conf.specStatus}</span
     >`;
