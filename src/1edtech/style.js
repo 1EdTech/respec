@@ -56,7 +56,7 @@ export async function run(conf) {
   attachMetaViewport();
   linkW3cCSS();
 
-  // Link to IMS stylesheet
+  // Link to 1EdTech stylesheet
   if (conf.overrideCSSLocation) {
     const cssURL = conf.overrideCSSLocation;
     linkCSS(document, cssURL);

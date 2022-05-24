@@ -3,8 +3,8 @@
 //
 // Based on w3c/conformance with following differences:
 //
-// IMS version:
-// - Skip if specType == 'Errata' (IMS Errata documents do not have a conformance section).
+// 1EdTech version:
+// - Skip if specType == 'Errata' (1EdTech Errata documents do not have a conformance section).
 // - Use slightly modified conformance text.
 //
 // Note: Run after inlines so the conformance section has an id and NormativeReferences is available.
@@ -140,7 +140,7 @@ function processConformance(conformance, conf) {
  * @param {*} conf
  */
 export function run(conf) {
-  // No conformance section in IMS Errata documents
+  // No conformance section in 1EdTech Errata documents
   if (conf.specType === "errata") {
     return;
   }
@@ -158,12 +158,12 @@ export function run(conf) {
     return;
   }
 
-  // Use IMS specNature to determine conformance text
+  // Use 1EdTech specNature to determine conformance text
   if (!conf.specNature) {
     showError("error", "Document must have config.specNature set");
   }
 
-  // IMS standard is to have a Conformance heading
+  // 1EdTech standard is to have a Conformance heading
   if (conformance.tagName === "SECTION") {
     const conformanceHeading = conformance.querySelector(
       "h1, h2, h3, h4, h5, h6"

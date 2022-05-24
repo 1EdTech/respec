@@ -8,7 +8,7 @@ export const name = "1edtech/scripts";
  */
 export async function run(conf) {
   if (!conf.noSideBarTOC) {
-    // IMS canonical location
+    // 1EdTech canonical location
     let fixupURL = "https://purl.imsglobal.org/spec/fixup.js";
     if (conf.overrideFixupLocation) {
       fixupURL = conf.overrideFixupLocation;

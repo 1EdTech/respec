@@ -207,7 +207,7 @@ export function makeBasicConfig(profile = "w3c") {
     case "ims":
       return {
         mainSpecTitle: "Main Spec",
-        mainSpecBiblioKey: "IMS",
+        mainSpecBiblioKey: "1EdTech",
         specTitle: "Replace me with a real title",
         shortName: "example",
         specStatus: "1EdTech Base Document",

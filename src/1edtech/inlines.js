@@ -52,7 +52,7 @@ function findConformanceSection(parent) {
  * @param {*} conf
  */
 export async function run(conf) {
-  // No conformance section in IMS Errata documents
+  // No conformance section in 1EdTech Errata documents
   if (conf.specType == "errata") {
     return;
   }

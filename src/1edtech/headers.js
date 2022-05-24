@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * Module 1edtech/headers
- * Add IMS boilerplate front matter to the document.
+ * Add 1EdTech boilerplate front matter to the document.
  */
 import headersTmpl from "./templates/headers.js";
 

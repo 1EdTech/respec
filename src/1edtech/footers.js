@@ -3,7 +3,7 @@
 /**
  * Module 1edtech/footers
  * 
- * Add IMS boilerplate back matter to the document.
+ * Add 1EdTech boilerplate back matter to the document.
  */
 
 import footersTmpl from "./templates/footers.js";
