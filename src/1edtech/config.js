@@ -39,7 +39,7 @@ export async function run(conf) {
   }
 
   if (!check(conf.specDate)) {
-    if (conf.specStatus === "1EdTech Base Document") {
+    if (conf.specStatus === "Base Document") {
       conf.specDate = humanDate();
     } else {
       showError(
@@ -82,25 +82,25 @@ export async function run(conf) {
   if (!check(conf.specStatus)) {
     showError(
       "head config must have the <code>specStatus</code> property set to " +
-        "one of '1EdTech Base Document', '1EdTech Candidate Final', 1EdTech Candidate Final Public', " +
-        "or '1EdTech Final Release'",
+        "one of 'Base Document', 'Candidate Final', Candidate Final Public', " +
+        "or 'Final Release'",
       name
     );
     conf.specStatus = "@@@FIXME(conf.specStatus)";
   }
 
   const statusValues = [
-    "1EdTech Base Document",
-    "1EdTech Candidate Final",
-    "1EdTech Candidate Final Public",
-    "1EdTech Final Release",
+    "Base Document",
+    "Candidate Final",
+    "Candidate Final Public",
+    "Final Release",
     "Proposal",
   ];
   if (statusValues.indexOf(conf.specStatus) == -1) {
     showError(
       "head config must have the <code>specStatus</code> property set to " +
-        "one of '1EdTech Base Document', '1EdTech Candidate Final', '1EdTech Candidate Final Public', " +
-        "'1EdTech Final Release', or 'Proposal'",
+        "one of 'Base Document', 'Candidate Final', 'Candidate Final Public', " +
+        "'Final Release', or 'Proposal'",
       name
     );
   }

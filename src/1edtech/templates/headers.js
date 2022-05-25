@@ -24,13 +24,13 @@ function getStatusString(conf) {
   switch (conf.specStatus) {
     case "Proposal":
       return "This document is for review and comment by 1EdTech Contributing Members.";
-    case "1EdTech Base Document":
+    case "Base Document":
       return "This document is for review and comment by 1EdTech Contributing Members.";
-    case "1EdTech Candidate Final":
+    case "Candidate Final":
       return "This document is for review and adoption by the 1EdTech membership.";
-    case "1EdTech Candidate Final Public":
+    case "Candidate Final Public":
       return "This document is for review and adoption by the 1EdTech membership.";
-    case "1EdTech Final Release":
+    case "Final Release":
       return "This document is made available for adoption by the public community at large.";
     default:
       // 1edtech/config.js will issue error for unknown values
@@ -72,7 +72,7 @@ function renderSpecVersion(conf) {
 function renderSpecStatus(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<span
-      class="statusPD${conf.specStatus === "1EdTech Final Release" ? " final" : ""}"
+      class="statusPD${conf.specStatus === "Final Release" ? " final" : ""}"
       data-content="${conf.specStatus}"
       >${conf.specStatus}</span
     >`;
@@ -262,9 +262,10 @@ export default conf => {
   return html`<header>
     <div class="header-top">
       <h1 class="title" id="title">${conf.specTitle}</h1>
-      <a href="https://www.imsglobal.org" id="ims-logo">
+      <a href="https://www.1edtech.org" id="1edtech-logo" style="margin-left:27px">
         <img
-          src="https://www.imsglobal.org/sites/default/files/IMSglobalreg2_2.png"
+          src="1EDTECH logo color with tagline.svg"
+          width="300"
           alt="1EdTech logo"
         />
       </a>
