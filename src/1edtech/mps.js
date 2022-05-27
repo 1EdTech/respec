@@ -164,6 +164,10 @@ async function getModel(config, source, id) {
               notes
               issues
             }
+            parentClass {
+              id
+              name
+            }
           }
           isExtensible
         }

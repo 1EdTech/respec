@@ -26,8 +26,9 @@ export function renderNote(note) {
  * @returns A table row with information about the term.
  */
 export function renderTerm(term) {
+  const id = `${term.parentClass.name}.${term.name}`.toLowerCase();
   return html`<tr>
-    <td id="${term.name.toLowerCase()}">${term.name}</td>
+    <td id="${id}">${term.name}</td>
     <td>
       ${term.documentation.description}
       ${term.documentation.issues.map(renderIssue)}

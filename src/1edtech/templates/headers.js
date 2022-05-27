@@ -48,7 +48,13 @@ function showLink(link) {
   return html`
     <tr class="${link.class ? link.class : null}">
       <td>${link.key}</td>
-      ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
+      <td>
+        <table style="margin:0;border:none">
+          <tr>
+            ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
+          </tr>
+        </table>
+      </td>
     </tr>
   `;
 }
@@ -83,8 +89,7 @@ function renderVersionTable(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<table
   id="version-table"
-  title="Version/Release Details"
-  summary="Details about the version and release.">
+  title="Version/Release Details">
     <tbody>
       <tr>
         <td>Document Version:</td>
@@ -119,8 +124,7 @@ function renderVersionTable(conf) {
   } else {
     return html`<table
       id="version-table"
-      title="Version/Release Details"
-      summary="Details about the version and release.">
+      title="Version/Release Details">
       <tbody>
         <tr>
           <td>Date Issued:</td>
@@ -138,8 +142,7 @@ function renderVersionTable(conf) {
 function renderCopyright() {
   return html`<div id="cpr">
     <p>
-      © ${new Date().getFullYear()} 1EdTech Consortium, Inc. All
-      Rights Reserved.
+      © ${new Date().getFullYear()} 1EdTech&trade; Consortium, Inc. All Rights Reserved.
     </p>
     <p>
       Trademark information:
@@ -264,8 +267,8 @@ export default conf => {
       <h1 class="title" id="title">${conf.specTitle}</h1>
       <a href="https://www.1edtech.org" id="1edtech-logo" style="margin-left:27px">
         <img
-          src="1EDTECH logo color with tagline.svg"
-          width="300"
+          src="https://purl.imsglobal.org/respec/1EDTECH_logo_color_with_tagline.svg"
+          width="300" height="105"
           alt="1EdTech logo"
         />
       </a>

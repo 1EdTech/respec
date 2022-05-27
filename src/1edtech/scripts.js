@@ -26,7 +26,6 @@ export async function run(conf) {
  */
 function attachScript(url) {
   const script = document.createElement("script");
-  script.type = "text/javascript";
   script.addEventListener(
     "load",
     () => {

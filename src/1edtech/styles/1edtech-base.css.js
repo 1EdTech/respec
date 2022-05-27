@@ -2,8 +2,7 @@
 const css = String.raw;
 
 // prettier-ignore
-export default css`
-@charset "UTF-8";
+export default css`@charset "UTF-8";
 /* Base CSS for 1EdTech specifications. This builds on and in some cases
  * overrides the ReSpec and W3C/TR stylesheets:
  * - https://github.com/w3c/respec/assets/respec2.css

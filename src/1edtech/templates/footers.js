@@ -5,9 +5,9 @@ export default conf => {
   return html`<footer>
     <div id="endWarranty">
       <p>
-        1EdTech Consortium, Inc. ("1EdTech") is publishing the information
-        contained in this document ("Specification") for purposes of scientific,
-        experimental, and scholarly collaboration only.
+        1EdTech&trade; Consortium, Inc. ("1EdTech") is publishing the
+        information contained in this document ("Specification") for purposes of
+        scientific, experimental, and scholarly collaboration only.
       </p>
       <p>
         1EdTech makes no warranty or representation regarding the accuracy or
