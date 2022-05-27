@@ -267,7 +267,7 @@ export default conf => {
       <h1 class="title" id="title">${conf.specTitle}</h1>
       <a href="https://www.1edtech.org" id="1edtech-logo" style="margin-left:27px">
         <img
-          src="https://purl.imsglobal.org/respec/1EDTECH_logo_color_with_tagline.svg"
+          src="https://purl.imsglobal.org/respec/1edtech_logo_color_with_tagline.svg"
           width="300" height="105"
           alt="1EdTech logo"
         />
