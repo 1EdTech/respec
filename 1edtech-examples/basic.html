@@ -7,13 +7,13 @@
     Replace me with a real title
   </title>
   <!-- Load respec-vc add-on so this document can be used to generate drupal.css -->
-  <script class="remove" src="https://purl.imsglobal.org/spec/respec-dev/respec-vc.js"></script>
+  <script class="remove" src="https://purl.imsglobal.org/respec/respec-vc.js"></script>
   <script src='../profiles/1edtech.js' type="module" class="remove"></script>
   <script class='remove'>
     var respecConfig = {
       specTitle: "Replace me with a real title",
       shortName: "example",
-      specStatus: "1EdTech Base Document",
+      specStatus: "Base Document",
       specVersion: "1.0",
       docVersion: "0.1",
       specNature: "normative",
@@ -34,6 +34,14 @@
       iprs: [
         { company: "Acme1 Co Inc", electionDate: "October 24, 2019", necessaryClaims: "No", type: "RF RAND (Required & Optional Elements)" }
       ],
+      localBiblio: {
+        "CLR-20": {
+          title: "Comprehensive Learner Record 2.0",
+          href: "https://www.imsglobal.org/spec/clr/v2p0/",
+          status: "Base Doument",
+          publisher: "1EdTech&trade; Consortium, Inc."
+        }
+      },
       
       // Force respec-vc stylesheet to be loaded
       postProcess: [
@@ -97,6 +105,10 @@
       This is where you would list the documents for the
       specification.
     </p>
+    <ul>
+      <li>[[[SEC-11]]]</li>
+      <li>[[[CLR-20]]]</li>
+    </ul>
   </section>
   <section id="logo">
     <h2>
