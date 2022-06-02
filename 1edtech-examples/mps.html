@@ -539,23 +539,20 @@
               {
                 "@context": [
                   "https://www.w3.org/2018/credentials/v1",
-                  "https://dc.imsglobal.org/draft/clr/v2p0/context",
-                  "https://imsglobal.github.io/openbadges-specification/context.json"
+                  "https://dc.imsglobal.org/draft/clr/v2p0/context"
                 ],
                 "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
                 "type": ["VerifiableCredential", "AchievementCredential"],
+                "name": "A sample AchievementCredential",
                 "issuer": {
                   "id": "https://example.edu/issuers/565049",
                   "type": ["Profile"],
                   "name": "Example University"
                 },
                 "issuanceDate": "2010-01-01T00:00:00Z",
+                "achievement": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
                 "credentialSubject": {
-                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-                  "type": ["AchievementSubject"],
-                  "achievement": {
-                    "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
-                  }
+                  "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
                 },
                 "credentialSchema": [{ 
                   "id": "https://purl.imsglobal.org/ClrCredential.json",
@@ -597,9 +594,6 @@
             "type": "JsonSchemaValidator2020"
           }]
         }
-      </pre>
-      <pre data-sample="org.1edtech.clr.v2p0.clrcredential.class" title="Generated ClrCredential"
-        data-include-optional-fields="false" class="json example">
       </pre>
     </section>
   </section>
