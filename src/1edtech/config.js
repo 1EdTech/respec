@@ -39,7 +39,7 @@ export async function run(conf) {
   }
 
   if (!check(conf.specDate)) {
-    if (conf.specStatus === "IMS Base Document") {
+    if (conf.specStatus === "Base Document") {
       conf.specDate = humanDate();
     } else {
       showError(
@@ -82,25 +82,25 @@ export async function run(conf) {
   if (!check(conf.specStatus)) {
     showError(
       "head config must have the <code>specStatus</code> property set to " +
-        "one of 'IMS Base Document', 'IMS Candidate Final', IMS Candidate Final Public', " +
-        "or 'IMS Final Release'",
+        "one of 'Base Document', 'Candidate Final', Candidate Final Public', " +
+        "or 'Final Release'",
       name
     );
     conf.specStatus = "@@@FIXME(conf.specStatus)";
   }
 
   const statusValues = [
-    "IMS Base Document",
-    "IMS Candidate Final",
-    "IMS Candidate Final Public",
-    "IMS Final Release",
+    "Base Document",
+    "Candidate Final",
+    "Candidate Final Public",
+    "Final Release",
     "Proposal",
   ];
   if (statusValues.indexOf(conf.specStatus) == -1) {
     showError(
       "head config must have the <code>specStatus</code> property set to " +
-        "one of 'IMS Base Document', 'IMS Candidate Final', 'IMS Candidate Final Public', " +
-        "'IMS Final Release', or 'Proposal'",
+        "one of 'Base Document', 'Candidate Final', 'Candidate Final Public', " +
+        "'Final Release', or 'Proposal'",
       name
     );
   }

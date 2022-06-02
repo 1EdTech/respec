@@ -2,7 +2,7 @@
 
 import { flushIframes, makePluginDoc } from "../SpecHelper.js";
 
-describe("IMS - post-markdown.js", () => {
+describe("1EdTech - post-markdown.js", () => {
   afterAll(flushIframes);
 
   const plugins = ["/src/1edtech/post-markdown.js"];

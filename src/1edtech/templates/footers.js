@@ -5,12 +5,12 @@ export default conf => {
   return html`<footer>
     <div id="endWarranty">
       <p>
-        IMS Global Learning Consortium, Inc. ("IMS Global") is publishing the
+        1EdTech&trade; Consortium, Inc. ("1EdTech") is publishing the
         information contained in this document ("Specification") for purposes of
         scientific, experimental, and scholarly collaboration only.
       </p>
       <p>
-        IMS Global makes no warranty or representation regarding the accuracy or
+        1EdTech makes no warranty or representation regarding the accuracy or
         completeness of the Specification.
       </p>
       <p>This material is provided on an "As Is" and "As Available" basis.</p>
@@ -22,12 +22,10 @@ export default conf => {
         It is your sole responsibility to evaluate the usefulness, accuracy, and
         completeness of the Specification as it relates to you.
       </p>
+      <p>1EdTech would appreciate receiving your comments and suggestions.</p>
       <p>
-        IMS Global would appreciate receiving your comments and suggestions.
-      </p>
-      <p>
-        Please contact IMS Global through our website at
-        http://www.imsglobal.org.
+        Please contact 1EdTech through our website at
+        <a href="https://www.1edtech.org">www.1edtech.org</a>.
       </p>
       <p>
         Please refer to Document Name: ${conf.specTitle.replace("<br/>", " ")}

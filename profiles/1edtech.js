@@ -38,7 +38,7 @@ const modules = [
   import("../src/1edtech/issues-notes.js"),
   import("../src/core/best-practices.js"),
   import("../src/core/figures.js"),
-  // Import IMS biblio
+  // Import 1EdTech biblio
   import("../src/1edtech/biblio.js"),
   import("../src/core/biblio.js"),
   import("../src/core/link-to-dfn.js"),
@@ -72,11 +72,11 @@ const modules = [
   import("../src/1edtech/cleanBody.js"),
   // Add title attributes to internal definition references
   import("../src/1edtech/title-attrs.js"),
-  // Insert IMS stylesheet
+  // Insert 1EdTech stylesheet
   import("../src/1edtech/scripts.js"),
   // Remove all comment nodes
   import("../src/1edtech/comments.js"),
-  // Add the IMS footer
+  // Add the 1EdTech footer
   import("../src/1edtech/footers.js"),
   /* Linters must be the last thing to run */
   import("../src/core/linter-rules/check-charset.js"),

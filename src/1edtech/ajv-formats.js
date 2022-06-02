@@ -1,5 +1,5 @@
 /**
- * Add formats to ajv validator. These are the formats used by IMS modeling tools.
+ * Add formats to ajv validator. These are the formats used by 1EdTech modeling tools.
  *
  * @param {Object} ajv Instance of ajv
  */

@@ -15,7 +15,7 @@ function getStatusString(conf) {
   }
   // for generic docs, have a generic desc
   if (conf.specType === "doc") {
-    return "This is an informative IMS Global document that may be revised at any time.";
+    return "This is an informative 1EdTech document that may be revised at any time.";
   }
   if (conf.specType === "proposal") {
     return "This is a proposal that may be revised at any time.";
@@ -23,14 +23,14 @@ function getStatusString(conf) {
   // specStatus: See 1edtech/config.js for known values
   switch (conf.specStatus) {
     case "Proposal":
-      return "This document is for review and comment by IMS Contributing Members.";
-    case "IMS Base Document":
-      return "This document is for review and comment by IMS Contributing Members.";
-    case "IMS Candidate Final":
-      return "This document is for review and adoption by the IMS membership.";
-    case "IMS Candidate Final Public":
-      return "This document is for review and adoption by the IMS membership.";
-    case "IMS Final Release":
+      return "This document is for review and comment by 1EdTech Contributing Members.";
+    case "Base Document":
+      return "This document is for review and comment by 1EdTech Contributing Members.";
+    case "Candidate Final":
+      return "This document is for review and adoption by the 1EdTech membership.";
+    case "Candidate Final Public":
+      return "This document is for review and adoption by the 1EdTech membership.";
+    case "Final Release":
       return "This document is made available for adoption by the public community at large.";
     default:
       // 1edtech/config.js will issue error for unknown values
@@ -48,7 +48,13 @@ function showLink(link) {
   return html`
     <tr class="${link.class ? link.class : null}">
       <td>${link.key}</td>
-      ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
+      <td>
+        <table style="margin:0;border:none">
+          <tr>
+            ${link.data ? link.data.map(showLinkData) : showLinkData(link)}
+          </tr>
+        </table>
+      </td>
     </tr>
   `;
 }
@@ -72,7 +78,7 @@ function renderSpecVersion(conf) {
 function renderSpecStatus(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<span
-      class="statusPD${conf.specStatus === "IMS Final Release" ? " final" : ""}"
+      class="statusPD${conf.specStatus === "Final Release" ? " final" : ""}"
       data-content="${conf.specStatus}"
       >${conf.specStatus}</span
     >`;
@@ -83,8 +89,7 @@ function renderVersionTable(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<table
   id="version-table"
-  title="Version/Release Details"
-  summary="Details about the version and release.">
+  title="Version/Release Details">
     <tbody>
       <tr>
         <td>Document Version:</td>
@@ -119,8 +124,7 @@ function renderVersionTable(conf) {
   } else {
     return html`<table
       id="version-table"
-      title="Version/Release Details"
-      summary="Details about the version and release.">
+      title="Version/Release Details">
       <tbody>
         <tr>
           <td>Date Issued:</td>
@@ -138,8 +142,7 @@ function renderVersionTable(conf) {
 function renderCopyright() {
   return html`<div id="cpr">
     <p>
-      © ${new Date().getFullYear()} IMS Global Learning Consortium, Inc. All
-      Rights Reserved.
+      © ${new Date().getFullYear()} 1EdTech&trade; Consortium, Inc. All Rights Reserved.
     </p>
     <p>
       Trademark information:
@@ -156,11 +159,11 @@ function renderDisclosure(conf) {
       <h2>Proposals</h2>
       <p>
         Proposals are made available for the purposes of Project Group / Task
-        Force only and should not be distributed outside of the IMS Contributing
-        Membership without the express written consent of IMS GLC. Provision of
+        Force only and should not be distributed outside of the 1EdTech Contributing
+        Membership without the express written consent of 1EdTech. Provision of
         any work documents outside of the project group/ task force will revoke
         all privileges as an Invited Guest. Any documents provided
-        non-participants will be done by IMS GLC only on the IMS GLC public
+        non-participants will be done by 1EdTech only on the 1EdTech public
         website when the documents become publicly available.
       </p>
     </div>`;
@@ -168,7 +171,7 @@ function renderDisclosure(conf) {
     return html`<div id="disclosure">
       <p>
         Use of this specification to develop products or services is governed by
-        the license with IMS found on the IMS website:
+        the license with 1EdTech found on the 1EdTech website:
         <a href="http://www.imsglobal.org/speclicense.html">
           http://www.imsglobal.org/speclicense.html</a
         >.
@@ -179,7 +182,7 @@ function renderDisclosure(conf) {
       </p>
       <p>
         The limited permissions granted above are perpetual and will not be
-        revoked by IMS or its successors or assigns.
+        revoked by 1EdTech or its successors or assigns.
       </p>
       <p>
         THIS SPECIFICATION IS BEING OFFERED WITHOUT ANY WARRANTY WHATSOEVER, AND
@@ -211,13 +214,13 @@ function renderIpr(conf) {
         document, and to provide supporting documentation.
       </p>
       <p>
-        IMS takes no position regarding the validity or scope of any
+        1EdTech takes no position regarding the validity or scope of any
         intellectual property or other rights that might be claimed to pertain
         implementation or use of the technology described in this document or
         the extent to which any license under such rights might or might not be
         available; neither does it represent that it has made any effort to
-        identify any such rights. Information on IMS's procedures with respect
-        to rights in IMS specifications can be found at the IMS Intellectual
+        identify any such rights. Information on 1EdTech's procedures with respect
+        to rights in 1EdTech specifications can be found at the 1EdTech Intellectual
         Property Rights webpage:
         <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">
           http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf </a
@@ -262,10 +265,11 @@ export default conf => {
   return html`<header>
     <div class="header-top">
       <h1 class="title" id="title">${conf.specTitle}</h1>
-      <a href="https://www.imsglobal.org" id="ims-logo">
+      <a href="https://www.1edtech.org" id="1edtech-logo" style="margin-left:27px">
         <img
-          src="https://www.imsglobal.org/sites/default/files/IMSglobalreg2_2.png"
-          alt="IMS logo"
+          src="https://purl.imsglobal.org/respec/1edtech_logo_color_with_tagline.svg"
+          width="300" height="105"
+          alt="1EdTech logo"
         />
       </a>
     </div>

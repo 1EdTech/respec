@@ -7,13 +7,13 @@
     Replace me with a real title
   </title>
   <!-- Load respec-vc add-on so this document can be used to generate drupal.css -->
-  <script class="remove" src="https://purl.imsglobal.org/spec/respec-dev/respec-vc.js"></script>
+  <script class="remove" src="https://purl.imsglobal.org/respec/respec-vc.js"></script>
   <script src='../profiles/1edtech.js' type="module" class="remove"></script>
   <script class='remove'>
     var respecConfig = {
       specTitle: "Replace me with a real title",
       shortName: "example",
-      specStatus: "IMS Base Document",
+      specStatus: "Base Document",
       specVersion: "1.0",
       docVersion: "0.1",
       specNature: "normative",
@@ -34,6 +34,14 @@
       iprs: [
         { company: "Acme1 Co Inc", electionDate: "October 24, 2019", necessaryClaims: "No", type: "RF RAND (Required & Optional Elements)" }
       ],
+      localBiblio: {
+        "CLR-20": {
+          title: "Comprehensive Learner Record 2.0",
+          href: "https://www.imsglobal.org/spec/clr/v2p0/",
+          status: "Base Doument",
+          publisher: "1EdTech&trade; Consortium, Inc."
+        }
+      },
       
       // Force respec-vc stylesheet to be loaded
       postProcess: [
@@ -47,7 +55,7 @@
   <section id='abstract'>
     <h2>Abstract</h2>
     <p>
-      This section is required for IMS spec documents.
+      This section is required for 1EdTech spec documents.
       <pre class="example" title="Abstract in HTML">
         &lt;section id='abstract'>
           &lt;h2>Abstract&lt;/h2>
@@ -84,7 +92,7 @@
   <section id="conformance">
     <h2>Conformance</h2>
     <p>
-      This section is required for IMS spec documents. The section will be
+      This section is required for 1EdTech spec documents. The section will be
       filled with boilerplate text, including a reference to the
       Conformance and Certification Guide in a section with <code>id="document-set"</code>.
       If you do not want to include the reference, set
@@ -97,6 +105,10 @@
       This is where you would list the documents for the
       specification.
     </p>
+    <ul>
+      <li>[[[SEC-11]]]</li>
+      <li>[[[CLR-20]]]</li>
+    </ul>
   </section>
   <section id="logo">
     <h2>

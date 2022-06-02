@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Sets the defaults for IMS specs
+ * Sets the defaults for 1EdTech specs
  */
 export const name = "1edtech/defaults";
 import { coreDefaults } from "../core/defaults.js";
