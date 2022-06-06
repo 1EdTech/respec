@@ -86,7 +86,7 @@
     "test:integration": "karma start ./tests/spec/karma.conf.js --single-run"
   },
   "dependencies": {
-    "clean-css": "^5.2.4",
+    "clean-css": "^5.3.0",
     "colors": "^1.4.0",
     "finalhandler": "^1.1.2",
     "marked": "^3.0.8",
