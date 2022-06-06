@@ -375,6 +375,8 @@ async function processClass(section, classModel) {
   const title = section.getAttribute("title");
   let wrapper;
   switch (classModel.stereoType) {
+    case "Enum":
+    case "EnumeratedList":
     case "Enumeration":
     case "EnumExt":
     case "Vocabulary":
