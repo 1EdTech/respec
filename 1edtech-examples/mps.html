@@ -90,9 +90,9 @@
 
   <!-- Start a service model section-->
 
-  <section id="api" data-model="org.1edtech.clr.v2p0.model" 
+  <section id="api" data-model="org.1edtech.clr.v2p0.model"
            data-service-model="org.1edtech.clr.v2p0.rest.servicemodel"
-           data-interface-filter="org.1edtech.clr.v2p0.rest.clrcredentials.interface" 
+           data-interface-filter="org.1edtech.clr.v2p0.rest.clrcredentials.interface"
            title="CLR Standard API">
     <p>
       Some more information about the service.
@@ -399,7 +399,7 @@
         <pre class="http example" title="Sample postCredential Response">
           HTTP/1.1 200 OK
           Content-Type: application/json
-  
+
           {
             "@context": [
               "https://www.w3.org/2018/credentials/v1",
@@ -516,7 +516,7 @@
       Some more information about the data model.
     </p>
     <section data-class="org.1edtech.clr.v2p0.clrcredential.class">
-      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class" 
+      <pre class="json example vc" data-schema="org.1edtech.clr.v2p0.clrcredential.class"
         data-allowAdditionalProperties="true" title="Sample ClrCredential">
         {
           "@context": [
@@ -557,14 +557,14 @@
                     "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002"
                   }
                 },
-                "credentialSchema": [{ 
+                "credentialSchema": [{
                   "id": "https://purl.imsglobal.org/ClrCredential.json",
                   "type": "JsonSchemaValidator2020"
                 }]
               }
             ],
             "achievement": [
-              { 
+              {
                 "id": "urn:uuid:a7467ef6-56cb-11ec-bf63-0242ac130002",
                 "type": ["Achievement"],
                 "creator": {
@@ -577,7 +577,7 @@
                   "narrative": "A simple narrative description of the criteria"
                 }
               },
-              { 
+              {
                 "id": "urn:uuid:dd887f0a-56cb-11ec-bf63-0242ac130002",
                 "type": ["Achievement"],
                 "creator": {
@@ -612,10 +612,12 @@
   <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="json" title="JSON Schema" class="appendix">
     <p>Here is the JSON Schema for Comprehensive Learner Record.</p>
   </section>
-  
+
   <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="openapi" data-binding="json" title="OpenAPI Schema (JSON)" class="appendix"></section>
   <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="openapi" data-binding="yaml" title="OpenAPI Schema (YAML)" class="appendix"></section>
 
+  <!-- Class diagrams -->
+  <section data-model="org.1edtech.ob.v2p1.model" data-class-diagram title="Class Diagram"></section>
 </body>
 
 </html>
