@@ -1045,7 +1045,8 @@ export async function run(config) {
     elem =>
       !elem.getAttribute("data-service-model") &&
       !elem.getAttribute("data-stereotype") &&
-      !elem.getAttribute("data-schema-format")
+      !elem.getAttribute("data-schema-format") &&
+      !elem.getAttribute("data-class-diagram")
   );
   const stereoTypeSections = modelSections.filter(elem =>
     elem.getAttribute("data-stereotype")
@@ -1055,6 +1056,9 @@ export async function run(config) {
   );
   const schemaSections = modelSections.filter(elem =>
     elem.getAttribute("data-schema-format")
+  );
+  const classDiagramSections = modelSections.filter(elem =>
+    elem.getAttribute("data-class-diagram")
   );
 
   // Process the DataModel sections.
@@ -1195,6 +1199,38 @@ export async function run(config) {
             await processServiceModel(config, section, preferredId);
           } catch (error) {
             showError(`Cannot process ServiceModel ${modelId}: ${error}`, name);
+          }
+        }
+      })
+    );
+  }
+
+  // Process the ClassDiagram sections.
+  if (classDiagramSections.length > 0) {
+    promises.push(
+      ...Array.from(classDiagramSections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing Model id</h2>`
+          );
+          showError(
+            "Cannot process ClassDiagram section without the Model id",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          const preferredId = section.getAttribute("id");
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            await processClassDiagram(config, section, preferredId);
+          } catch (error) {
+            showError(
+              `Cannot process ClassDiagram ${modelId}: ${error}`,
+              name
+            );
           }
         }
       })
