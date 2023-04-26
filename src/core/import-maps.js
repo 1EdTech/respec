@@ -7,6 +7,7 @@ import { MIMEType as _MIMEType } from "../../node_modules/sniffy-mimetype/index.
 import _marked from "../../node_modules/marked/lib/marked.esm.js";
 import _pluralize from "../../js/deps/builds/pluralize.js";
 import hyperHTML from "../../node_modules/hyperhtml/esm.js";
+import _mermaid from "../../node_modules/mermaid/dist/mermaid.esm.mjs";
 
 /** @type {import("idb")} */
 // @ts-ignore
@@ -25,3 +26,6 @@ export const pluralize = _pluralize;
 /** @type {import("sniffy-mimetype")} */
 // @ts-ignore
 export const MIMEType = _MIMEType;
+
+// @ts-ignore
+export const mermaid = _mermaid
