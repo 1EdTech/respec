@@ -1,13 +1,16 @@
 // @ts-check
-import { html } from "../../core/import-maps.js";
+import { html, mermaid } from "../../core/import-maps.js";
 
 /**
  * Render the Class diagram of an MPS Model / Package object.
  * @param {*} diagram The Class diagram in markdown format.
  * @param {string?} title The preferred title for this section.
- * @returns {HTMLElement[]} An array of HTML elements.
+ * @returns {Promise<HTMLElement[]>} An array of HTML elements.
  */
-export default (diagram, title) => {
-    return html`<h3>${title}</h3>
-      <pre class="mermaid">${diagram}</pre>`;
+export default async (index, diagram, title) => {
+  mermaid.initialize({ startOnLoad: false });
+  const { svg } = await mermaid.render(`class-diagram-${index}`, diagram);
+  const cleanedSvg = svg.trim().replace(/height="[0-9]*"/, '');
+  return html`<h3>${title}</h3>
+      ${cleanedSvg}`;
 };

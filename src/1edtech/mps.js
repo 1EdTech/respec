@@ -122,8 +122,8 @@ async function getClassDiagram(config, id, omitProperties = false, hideTitle = f
     // create a query string from all the parameters
     let query = `?omitProperties=${omitProperties}&hideTitle=${hideTitle}`;
     if (title) query += `&title=${title}`;
-    if (packages) query += `&packages=${packages}`;
-    if (classes) query += `&classes=${classes}`;
+    if (packages) query += `&packageNames=${packages}`;
+    if (classes) query += `&classNames=${classes}`;
 
     // execute the API call
     const res = await fetch(
@@ -1011,31 +1011,24 @@ async function validateExample(config, ajv, pre) {
  * in the main content and one in the appendices). The data-package, data-classes attributes, if present, act as a
  * filter for the section. Only classes in the named package will be expected or generated.
  *
- * The data-omit-properties attribute, if present, will cause the diagram to omit properties and display only class names.
- * The data-hide-title attribute, if present, will cause the diagram to omit the title.
+ * The data-class-diagram-omit-properties attribute, if present, will cause the diagram to omit properties and display only class names.
+ * The data-class-diagram-hide-title attribute, if present, will cause the diagram to omit the title.
  *
  * @param {object} config The respecConfig.
  * @param {HTMLElement} section The schema section element.
  * @param {string} modelId The MPS Model id.
+ * @param {number} index The index of the diagram.
  */
-async function processClassDiagram(config, section, modelId) {
+async function processClassDiagram(config, section, modelId, index) {
   section.setAttribute("id", `${modelId}-class-diagram`);
   const title = section.getAttribute("title");
   const packageNames = section.getAttribute("data-package");
-  let packageNameList = null;
-  if (packageNames) {
-    packageNameList = packageNames.split(",");
-  }
   const classNames = section.getAttribute("data-classes");
-  let classNameList = null;
-  if (classNames) {
-    classNameList = classNames.split(",");
-  }
-  const omitProperties = section.hasAttribute("data-omit-properties");
-  const hideTitle = section.hasAttribute("data-hide-title");
-  const diagram = await getClassDiagram(config, modelId, omitProperties, hideTitle, title, packageNameList, classNameList);
+  const omitProperties = section.hasAttribute("data-class-diagram-omit-properties");
+  const hideTitle = section.hasAttribute("data-class-diagram-hide-title");
+  const diagram = await getClassDiagram(config, modelId, omitProperties, hideTitle, title, packageNames, classNames);
 
-  const wrapper = classDiagramTemplate(diagram, title);
+  const wrapper = await classDiagramTemplate(index, diagram, title);
   if (diagram && wrapper) {
     let target = null;
     Array.from(wrapper.childNodes).forEach(element => {
@@ -1275,7 +1268,7 @@ export async function run(config) {
           section.setAttribute("id", `${modelId}.${index}`);
           index++;
           try {
-            await processClassDiagram(config, section, modelId);
+            await processClassDiagram(config, section, modelId, index);
           } catch (error) {
             showError(
               `Cannot process ClassDiagram ${modelId}: ${error}`,
