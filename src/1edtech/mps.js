@@ -115,6 +115,40 @@ async function getJsonSchema(config, id, allowAdditionalProperties = true) {
   }
 }
 
+// execute the API to retrieve the MPS class diagram (/classdiagram/{id})
+async function getClassDiagram(config, id, omitProperties = false, hideTitle = false, title = null, packages = null, classes = null) {
+  try {
+    // create a query string from all the parameters
+    let query = `?omitProperties=${omitProperties}&hideTitle=${hideTitle}`;
+    if (title) query += `&title=${title}`;
+    if (packages) query += `&packages=${packages}`;
+    if (classes) query += `&classes=${classes}`;
+
+    // execute the API call
+    const res = await fetch(
+      `${getBaseUrl(
+        config
+      )}/classdiagram/${id}${query}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/markdown",
+          "X-Api-Key": getApiKey(config),
+        },
+      }
+    );
+    if (!res.ok) {
+      showError(`Could not get the class diagram for ${id}: ${res.status}`, name);
+      return null;
+    }
+    const data = await res.text();
+    return data;
+  } catch (error) {
+    showError(`Could not get the class diagram for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
 /**
  * Execute the API call to retrieve MPS Model Classes and Services.
  *
