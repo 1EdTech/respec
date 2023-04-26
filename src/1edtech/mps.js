@@ -5,6 +5,7 @@
  * Handles the optional Model Processing Service.
  */
 import { addFormats } from "./ajv-formats.js";
+import classDiagramTemplate from "./templates/classDiagramTemplate.js";
 import classTemplate from "./templates/classTemplate.js";
 import dataModelTemplate from "./templates/dataModelTemplate.js";
 import enumerationTemplate from "./templates/enumerationTemplate.js";
@@ -1006,6 +1007,56 @@ async function validateExample(config, ajv, pre) {
 }
 
 /**
+ * Process a Class diagram section. Diagrams can be split across multiple sections (e.g. one section
+ * in the main content and one in the appendices). The data-package, data-classes attributes, if present, act as a
+ * filter for the section. Only classes in the named package will be expected or generated.
+ *
+ * The data-omit-properties attribute, if present, will cause the diagram to omit properties and display only class names.
+ * The data-hide-title attribute, if present, will cause the diagram to omit the title.
+ *
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} section The schema section element.
+ * @param {string} modelId The MPS Model id.
+ */
+async function processClassDiagram(config, section, modelId) {
+  section.setAttribute("id", `${modelId}-class-diagram`);
+  const title = section.getAttribute("title");
+  const packageNames = section.getAttribute("data-package");
+  let packageNameList = null;
+  if (packageNames) {
+    packageNameList = packageNames.split(",");
+  }
+  const classNames = section.getAttribute("data-classes");
+  let classNameList = null;
+  if (classNames) {
+    classNameList = classNames.split(",");
+  }
+  const omitProperties = section.hasAttribute("data-omit-properties");
+  const hideTitle = section.hasAttribute("data-hide-title");
+  const diagram = await getClassDiagram(config, modelId, omitProperties, hideTitle, title, packageNameList, classNameList);
+
+  const wrapper = classDiagramTemplate(diagram, title);
+  if (diagram && wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+  }
+}
+
+/**
  * Render Model Processing Service objects.
  *
  * @param {object} config respecConfig.
@@ -1046,7 +1097,7 @@ export async function run(config) {
       !elem.getAttribute("data-service-model") &&
       !elem.getAttribute("data-stereotype") &&
       !elem.getAttribute("data-schema-format") &&
-      !elem.getAttribute("data-class-diagram")
+      !elem.hasAttribute("data-class-diagram")
   );
   const stereoTypeSections = modelSections.filter(elem =>
     elem.getAttribute("data-stereotype")
@@ -1058,7 +1109,7 @@ export async function run(config) {
     elem.getAttribute("data-schema-format")
   );
   const classDiagramSections = modelSections.filter(elem =>
-    elem.getAttribute("data-class-diagram")
+    elem.hasAttribute("data-class-diagram")
   );
 
   // Process the DataModel sections.
@@ -1221,11 +1272,10 @@ export async function run(config) {
             { elements: [section] }
           );
         } else {
-          const preferredId = section.getAttribute("id");
           section.setAttribute("id", `${modelId}.${index}`);
           index++;
           try {
-            await processClassDiagram(config, section, preferredId);
+            await processClassDiagram(config, section, modelId);
           } catch (error) {
             showError(
               `Cannot process ClassDiagram ${modelId}: ${error}`,
