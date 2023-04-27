@@ -10,7 +10,7 @@ import { html, mermaid } from "../../core/import-maps.js";
 export default async (index, diagram, title) => {
   mermaid.initialize({ startOnLoad: false });
   const { svg } = await mermaid.render(`class-diagram-${index}`, diagram);
-  const cleanedSvg = svg.trim().replace(/height="[0-9]*"/, '');
+  const cleanedSvg = svg.trim().replace(/height="[0-9]*"/, "");
   return html`<h3>${title}</h3>
-      ${cleanedSvg}`;
+    ${cleanedSvg}`;
 };

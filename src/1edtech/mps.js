@@ -117,7 +117,15 @@ async function getJsonSchema(config, id, allowAdditionalProperties = true) {
 }
 
 // execute the API to retrieve the MPS class diagram (/classdiagram/{id})
-async function getClassDiagram(config, id, omitProperties = false, hideTitle = false, title = null, packages = null, classes = null) {
+async function getClassDiagram(
+  config,
+  id,
+  omitProperties = false,
+  hideTitle = false,
+  title = null,
+  packages = null,
+  classes = null
+) {
   try {
     // create a query string from all the parameters
     let query = `?omitProperties=${omitProperties}&hideTitle=${hideTitle}`;
@@ -127,9 +135,7 @@ async function getClassDiagram(config, id, omitProperties = false, hideTitle = f
 
     // execute the API call
     const res = await fetch(
-      `${getBaseUrl(
-        config
-      )}/classdiagram/${id}${query}`,
+      `${getBaseUrl(config)}/classdiagram/${id}${query}`,
       {
         method: "GET",
         headers: {
@@ -139,7 +145,10 @@ async function getClassDiagram(config, id, omitProperties = false, hideTitle = f
       }
     );
     if (!res.ok) {
-      showError(`Could not get the class diagram for ${id}: ${res.status}`, name);
+      showError(
+        `Could not get the class diagram for ${id}: ${res.status}`,
+        name
+      );
       return null;
     }
     const data = await res.text();
@@ -1024,9 +1033,19 @@ async function processClassDiagram(config, section, modelId, index) {
   const title = section.getAttribute("title");
   const packageNames = section.getAttribute("data-package");
   const classNames = section.getAttribute("data-classes");
-  const omitProperties = section.hasAttribute("data-class-diagram-omit-properties");
+  const omitProperties = section.hasAttribute(
+    "data-class-diagram-omit-properties"
+  );
   const hideTitle = section.hasAttribute("data-class-diagram-hide-title");
-  const diagram = await getClassDiagram(config, modelId, omitProperties, hideTitle, title, packageNames, classNames);
+  const diagram = await getClassDiagram(
+    config,
+    modelId,
+    omitProperties,
+    hideTitle,
+    title,
+    packageNames,
+    classNames
+  );
 
   const wrapper = await classDiagramTemplate(index, diagram, title);
   if (diagram && wrapper) {
@@ -1270,10 +1289,7 @@ export async function run(config) {
           try {
             await processClassDiagram(config, section, modelId, index);
           } catch (error) {
-            showError(
-              `Cannot process ClassDiagram ${modelId}: ${error}`,
-              name
-            );
+            showError(`Cannot process ClassDiagram ${modelId}: ${error}`, name);
           }
         }
       })
