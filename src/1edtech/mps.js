@@ -5,6 +5,7 @@
  * Handles the optional Model Processing Service.
  */
 import { addFormats } from "./ajv-formats.js";
+import classDiagramTemplate from "./templates/classDiagramTemplate.js";
 import classTemplate from "./templates/classTemplate.js";
 import dataModelTemplate from "./templates/dataModelTemplate.js";
 import enumerationTemplate from "./templates/enumerationTemplate.js";
@@ -111,6 +112,49 @@ async function getJsonSchema(config, id, allowAdditionalProperties = true) {
     return data;
   } catch (error) {
     showError(`Could not get the schema for ${id}: ${error}`, name);
+    return null;
+  }
+}
+
+// execute the API to retrieve the MPS class diagram (/classdiagram/{id})
+async function getClassDiagram(
+  config,
+  id,
+  omitProperties = false,
+  hideTitle = false,
+  title = null,
+  packages = null,
+  classes = null
+) {
+  try {
+    // create a query string from all the parameters
+    let query = `?omitProperties=${omitProperties}&hideTitle=${hideTitle}`;
+    if (title) query += `&title=${title}`;
+    if (packages) query += `&packageNames=${packages}`;
+    if (classes) query += `&classNames=${classes}`;
+
+    // execute the API call
+    const res = await fetch(
+      `${getBaseUrl(config)}/classdiagram/${id}${query}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/markdown",
+          "X-Api-Key": getApiKey(config),
+        },
+      }
+    );
+    if (!res.ok) {
+      showError(
+        `Could not get the class diagram for ${id}: ${res.status}`,
+        name
+      );
+      return null;
+    }
+    const data = await res.text();
+    return data;
+  } catch (error) {
+    showError(`Could not get the class diagram for ${id}: ${error}`, name);
     return null;
   }
 }
@@ -972,6 +1016,59 @@ async function validateExample(config, ajv, pre) {
 }
 
 /**
+ * Process a Class diagram section. Diagrams can be split across multiple sections (e.g. one section
+ * in the main content and one in the appendices). The data-package, data-classes attributes, if present, act as a
+ * filter for the section. Only classes in the named package will be expected or generated.
+ *
+ * The data-class-diagram-omit-properties attribute, if present, will cause the diagram to omit properties and display only class names.
+ * The data-class-diagram-hide-title attribute, if present, will cause the diagram to omit the title.
+ *
+ * @param {object} config The respecConfig.
+ * @param {HTMLElement} section The schema section element.
+ * @param {string} modelId The MPS Model id.
+ * @param {number} index The index of the diagram.
+ */
+async function processClassDiagram(config, section, modelId, index) {
+  section.setAttribute("id", `${modelId}-class-diagram`);
+  const title = section.getAttribute("title");
+  const packageNames = section.getAttribute("data-package");
+  const classNames = section.getAttribute("data-classes");
+  const omitProperties = section.hasAttribute(
+    "data-class-diagram-omit-properties"
+  );
+  const hideTitle = section.hasAttribute("data-class-diagram-hide-title");
+  const diagram = await getClassDiagram(
+    config,
+    modelId,
+    omitProperties,
+    hideTitle,
+    title,
+    packageNames,
+    classNames
+  );
+
+  const wrapper = await classDiagramTemplate(index, diagram, title);
+  if (diagram && wrapper) {
+    let target = null;
+    Array.from(wrapper.childNodes).forEach(element => {
+      if (element.nodeName !== "#comment") {
+        let thisElement = element;
+        if (element.nodeName === "#text") {
+          thisElement = document.createElement("text");
+          thisElement.innerHTML = element.nodeValue;
+        }
+        if (target) {
+          target.insertAdjacentElement("afterend", thisElement);
+        } else {
+          section.insertAdjacentElement("afterbegin", thisElement);
+        }
+        target = thisElement;
+      }
+    });
+  }
+}
+
+/**
  * Render Model Processing Service objects.
  *
  * @param {object} config respecConfig.
@@ -1011,7 +1108,8 @@ export async function run(config) {
     elem =>
       !elem.getAttribute("data-service-model") &&
       !elem.getAttribute("data-stereotype") &&
-      !elem.getAttribute("data-schema-format")
+      !elem.getAttribute("data-schema-format") &&
+      !elem.hasAttribute("data-class-diagram")
   );
   const stereoTypeSections = modelSections.filter(elem =>
     elem.getAttribute("data-stereotype")
@@ -1021,6 +1119,9 @@ export async function run(config) {
   );
   const schemaSections = modelSections.filter(elem =>
     elem.getAttribute("data-schema-format")
+  );
+  const classDiagramSections = modelSections.filter(elem =>
+    elem.hasAttribute("data-class-diagram")
   );
 
   // Process the DataModel sections.
@@ -1161,6 +1262,34 @@ export async function run(config) {
             await processServiceModel(config, section, preferredId);
           } catch (error) {
             showError(`Cannot process ServiceModel ${modelId}: ${error}`, name);
+          }
+        }
+      })
+    );
+  }
+
+  // Process the ClassDiagram sections.
+  if (classDiagramSections.length > 0) {
+    promises.push(
+      ...Array.from(classDiagramSections).map(async section => {
+        const modelId = section.getAttribute("data-model") ?? "";
+        if (modelId === "") {
+          section.insertAdjacentElement(
+            "afterbegin",
+            html`<h2>Missing Model id</h2>`
+          );
+          showError(
+            "Cannot process ClassDiagram section without the Model id",
+            name,
+            { elements: [section] }
+          );
+        } else {
+          section.setAttribute("id", `${modelId}.${index}`);
+          index++;
+          try {
+            await processClassDiagram(config, section, modelId, index);
+          } catch (error) {
+            showError(`Cannot process ClassDiagram ${modelId}: ${error}`, name);
           }
         }
       })
