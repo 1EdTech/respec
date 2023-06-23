@@ -68,7 +68,7 @@ function renderRequestParameters(operation) {
         <thead>
           <tr>
             <th>Parameter</th>
-            <th>Paramter Type</th>
+            <th>Parameter Type</th>
             <th>Description</th>
             <th>Required</th>
           </tr>
