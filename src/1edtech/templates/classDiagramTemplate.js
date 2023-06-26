@@ -1,5 +1,5 @@
 // @ts-check
-import { html, mermaid } from "../../core/import-maps.js";
+import { html, mermaidModule } from "../../core/import-maps.js";
 
 /**
  * Render the Class diagram of an MPS Model / Package object.
@@ -8,7 +8,8 @@ import { html, mermaid } from "../../core/import-maps.js";
  * @returns {Promise<HTMLElement[]>} An array of HTML elements.
  */
 export default async (index, diagram, title) => {
-  await mermaid;
+  // dinamycally import mermaid to avoid increase of size of the library
+  const { default: mermaid }  = await import(mermaidModule);
   mermaid.initialize({ startOnLoad: false });
   const { svg } = await mermaid.render(`class-diagram-${index}`, diagram);
   const cleanedSvg = svg.trim().replace(/height="[0-9]*"/, "");

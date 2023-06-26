@@ -28,4 +28,4 @@ export const MIMEType = _MIMEType;
 
 // dinamycally import mermaid to avoid increase of size of the library
 // @ts-ignore
-export const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+export const mermaidModule = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
