@@ -1,5 +1,5 @@
 // @ts-check
-import { renderIssue, renderNote } from "./templateUtils.js";
+import { renderIssue, renderNote, renderPrivacyImplicationDoc } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
 /**
@@ -22,6 +22,7 @@ export default (classData, title) => {
             <th>Type</th>
             <th>Description</th>
             <th>Multiplicity</th>
+            <th>Privacy</th>
           </tr>
         </thead>
         <tbody>
@@ -62,8 +63,10 @@ function renderProperty(property) {
       ${property.documentation.description}
       ${property.documentation.issues.map(renderIssue)}
       ${property.documentation.notes.map(renderNote)}
+      ${renderPrivacyImplicationDoc(property.documentation.privacyDoc)}
     </td>
     <td>${renderCardinality(property)}</td>
+    <td>${renderPrivacyImplications(property)}</td>
   </tr>`;
 }
 
@@ -84,6 +87,56 @@ function renderCardinality(property) {
       return "[1..*]";
     case "TWO":
       return "[2]";
+    default:
+      break;
+  }
+}
+
+/**
+ * Return a string describing the privacy implications of a property.
+ * @param {*} property The MPS Property object.
+ * @returns {string} A string describing the privacy implications of a property.
+ */
+function renderPrivacyImplications(property) {
+  switch (property.privacyImplications.value) {
+    case "ACCESSIBILITY":
+      return "Accessibility";
+    case "ANALYTICS":
+      return "Analytics";
+    case "CONTAINER":
+      return "Container";
+    case "CREDENTIALS":
+      return "Credentials";
+    case "CREDENTIALSIDREF":
+      return "CredentialsIdRef";
+    case "DEMOGRAPHICS":
+      return "Demographics";
+    case "EXTENSION":
+      return "Extension";
+    case "FINANCIAL":
+      return "Financial";
+    case "IDENTIFIER":
+      return "Identifier";
+    case "IDENTIFIERREF":
+      return "IdentifierRef";
+    case "INSURANCE":
+      return "Insurance/Assurance";
+    case "LEGAL":
+      return "Legal";
+    case "MEDICAL":
+      return "Medical/Healthcare";
+    case "NA":
+      return "N/A";
+    case "OTHER":
+      return "Other";
+    case "QUALIFICATION":
+      return "Qualification/Certification";
+    case "PERSONAL":
+      return "Personal";
+    case "SOURCEDID":
+      return "SourcedId";
+    case "SOURCEDIDREF":
+      return "SourcedIdRef";
     default:
       break;
   }
