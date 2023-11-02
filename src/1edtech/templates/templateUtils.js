@@ -20,6 +20,16 @@ export function renderNote(note) {
 }
 
 /**
+ * Render a MPS privacy doc as a Respec note.
+ * @param {String} doc A MPS privacy doc ("pd:" in a .lines file).
+ * @returns The doc wrapped in a div with class="note".
+ */
+export function renderPrivacyImplicationDoc(doc) {
+  if (doc) {
+    return html`<div class="advisement">Privacy implication: ${doc}</div>`;
+  }
+}
+/**
  * Render a term as HTML.
  * @param {*} term A MPS model for a property representing an enumeration
  * or vocabulary term.

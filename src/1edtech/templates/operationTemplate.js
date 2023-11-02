@@ -71,6 +71,7 @@ function renderRequestParameters(operation) {
             <th>Parameter Type</th>
             <th>Description</th>
             <th>Required</th>
+            <th>Confidentiality Level</th>
           </tr>
         </thead>
         <tbody>
@@ -99,7 +100,8 @@ function renderRequestBodies(operation) {
             <th>Content Type</th>
             <th>Content Description</th>
             <th>Content Required</th>
-          </tr>
+            <th>Confidentiality Level</th>
+            </tr>
         </thead>
         <tbody>
           ${operation.request.bodies.map(renderRequestBody)}
@@ -124,6 +126,7 @@ function renderRequestBody(body) {
       ${body.documentation?.notes.map(renderNote)}
     </td>
     <td>${renderRequired(body)}</td>
+    <td>${renderConfidentiality(body)}</td>
   </tr>`;
 }
 
@@ -140,6 +143,7 @@ function renderParameter(parameter) {
       ${parameter.documentation.notes.map(renderNote)}
     </td>
     <td>${renderRequired(parameter)}</td>
+    <td>${renderConfidentiality(parameter)}</td>
   </tr>`;
 }
 
@@ -157,6 +161,7 @@ function renderResponses(operation) {
           <th>Content Type</th>
           <th>Content Description</th>
           <th>Content Required</th>
+          <th>Confidentiality Level</th>
         </tr>
       </thead>
       <tbody>
@@ -177,6 +182,7 @@ function renderResponse(response) {
       ${response.body?.documentation?.notes.map(renderNote)}
     </td>
     <td>${renderRequired(response.body)}</td>
+    <td>${renderConfidentiality(response.body)}</td>
   </tr>`;
 }
 
@@ -200,6 +206,12 @@ function mergeResponseBodies(response) {
 function renderRequired(value) {
   if (value?.cardinality)
     return value.cardinality.value.includes("ZERO") ? "Optional" : "Required";
+}
+
+function renderConfidentiality(value) {
+  if (value?.confidentiality) {
+    return value.confidentiality.label;
+  }
 }
 
 function renderParmeterType(parameter) {
