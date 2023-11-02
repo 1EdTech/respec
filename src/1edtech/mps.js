@@ -207,11 +207,17 @@ async function getModel(config, source, id) {
               description
               notes
               issues
+              privacyDoc
+            }
+            privacyImplications {
+              label
+              value
             }
             parentClass {
               id
               name
             }
+
           }
           isExtensible
         }
@@ -263,6 +269,9 @@ async function getModel(config, source, id) {
                     cardinality {
                       value
                     }
+                    confidentiality {
+                      label
+                    }
                     contentType
                   }
                   parameters {
@@ -276,6 +285,9 @@ async function getModel(config, source, id) {
                     type
                     cardinality {
                       value
+                    }
+                    confidentiality {
+                      label
                     }
                     value {
                       id
@@ -302,6 +314,9 @@ async function getModel(config, source, id) {
                       id
                       name
                       stereoType
+                    }
+                    confidentiality {
+                      label
                     }
                     cardinality {
                       value
