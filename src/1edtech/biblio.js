@@ -25,21 +25,19 @@ export async function run(conf) {
 
   if (!conf.disableFetchIMSbiblio) {
     // console.log("fetching ims biblio...");
-    fetch(imsBiblioURL, { mode: "cors" })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
+    try {
+      const response = await fetch(imsBiblioURL, { mode: "cors" });
+      if (!response.ok) {
         throw new Error(response.statusText);
-      })
-      .then(json => {
-        // TODO invalid json should be caught here
-        // JSON.stringify(conf.localBiblio) --> throws error?
-        // TODO we might want to worry about dupes and precedence
-        conf.localBiblio = Object.assign(conf.localBiblio, json);
-      })
-      .catch(error => {
-        pub("warn", error.toString());
-      });
+      }
+      const json = await response.json();
+      // TODO invalid json should be caught here
+      // JSON.stringify(conf.localBiblio) --> throws error?
+      // TODO we might want to worry about dupes and precedence
+      conf.localBiblio = Object.assign(conf.localBiblio, json);
+    }
+    catch (error) {
+      pub("warn", error.toString());
+    }
   }
 }
