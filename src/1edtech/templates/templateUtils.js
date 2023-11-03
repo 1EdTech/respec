@@ -21,11 +21,12 @@ export function renderNote(note) {
 
 /**
  * Render a MPS privacy doc as a Respec note.
+ * @param {*} config The ReSpec config object.
  * @param {String} doc A MPS privacy doc ("pd:" in a .lines file).
  * @returns The doc wrapped in a div with class="note".
  */
-export function renderPrivacyImplicationDoc(doc) {
-  if (doc) {
+export function renderPrivacyImplicationDoc(config, doc) {
+  if (config.showPrivacyAppendix && doc) {
     return html`<div class="advisement">Privacy implication: ${doc}</div>`;
   }
 }

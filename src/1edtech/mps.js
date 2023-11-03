@@ -271,6 +271,7 @@ async function getModel(config, source, id) {
                     }
                     confidentiality {
                       label
+                      value
                     }
                     contentType
                   }
@@ -288,6 +289,7 @@ async function getModel(config, source, id) {
                     }
                     confidentiality {
                       label
+                      value
                     }
                     value {
                       id
@@ -317,6 +319,7 @@ async function getModel(config, source, id) {
                     }
                     confidentiality {
                       label
+                      value
                     }
                     cardinality {
                       value
@@ -426,10 +429,11 @@ async function getOpenApiSchema(config, id, binding) {
 /**
  * Process a single MPS Class model.
  *
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The class section element.
  * @param {object} classModel The MPS Class object.
  */
-async function processClass(section, classModel) {
+async function processClass(config, section, classModel) {
   section.setAttribute("id", classModel.id);
   const title = section.getAttribute("title");
   let wrapper;
@@ -442,7 +446,7 @@ async function processClass(section, classModel) {
       wrapper = enumerationTemplate(classModel, title);
       break;
     default:
-      wrapper = classTemplate(classModel, title);
+      wrapper = classTemplate(config, classModel, title);
       break;
   }
 
@@ -531,11 +535,11 @@ async function processDataModel(config, section, modelId) {
         `section[data-class="${classModel.id}"]`
       );
       if (classSection) {
-        processClass(classSection, classModel);
+        processClass(config, classSection, classModel);
       } else {
         // Auto-generate the class definition
         classSection = html`<section data-class="${classModel.id}"></section>`;
-        processClass(classSection, classModel);
+        processClass(config, classSection, classModel);
         section.insertAdjacentElement("beforeend", classSection);
       }
     });
@@ -548,10 +552,11 @@ async function processDataModel(config, section, modelId) {
 /**
  * Process a single service interface model.
  *
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The service interface section element.
  * @param {object} serviceInterface The MPS Interface object.
  */
-async function processInterface(section, serviceInterface) {
+async function processInterface(config, section, serviceInterface) {
   const preferredId = section.getAttribute("id");
   section.setAttribute("id", serviceInterface.id);
   const title = section.getAttribute("title");
@@ -581,6 +586,7 @@ async function processInterface(section, serviceInterface) {
       );
       if (operationSection) {
         processOperation(
+          config,
           operationSection,
           serviceInterface.rootPath,
           operation
@@ -591,6 +597,7 @@ async function processInterface(section, serviceInterface) {
           data-operation="${operation.id}"
         ></section>`;
         processOperation(
+          config,
           operationSection,
           serviceInterface.rootPath,
           operation
@@ -768,14 +775,15 @@ async function processOpenApiSchema(config, section, modelId) {
 /**
  * Process a single MPS Operation model.
  *
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The operation section element.
  * @param {string} rootPath The services root path.
  * @param {object} operation The MPS Operation object.
  */
-async function processOperation(section, rootPath, operation) {
+async function processOperation(config, section, rootPath, operation) {
   section.setAttribute("id", operation.id);
   const title = section.getAttribute("title");
-  const wrapper = operationTemplate(rootPath, operation, title);
+  const wrapper = operationTemplate(config, rootPath, operation, title);
   if (wrapper) {
     let target = null;
     Array.from(wrapper.childNodes).forEach(element => {
@@ -901,13 +909,13 @@ async function processServiceModel(config, section, preferredId) {
         `section[data-interface="${serviceInterface.id}"]`
       );
       if (interfaceSection) {
-        processInterface(interfaceSection, serviceInterface);
+        processInterface(config, interfaceSection, serviceInterface);
       } else {
         // Auto-generate the service definition
         interfaceSection = html`
           <section data-interface="${serviceInterface.id}"></section>
         `;
-        processInterface(interfaceSection, serviceInterface);
+        processInterface(config, interfaceSection, serviceInterface);
         section.insertAdjacentElement("beforeend", interfaceSection);
       }
     });
