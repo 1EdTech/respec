@@ -1,38 +1,44 @@
 // @ts-check
 // Module 1edtech/privacy
 // Handle the privacy section properly.
-import { getIntlData } from "../core/utils.js";
-import privacyTmpl from "./templates/privacyImplicationsTemplate.js";
 import confLevelTmpl from "./templates/confidentialityLevelTemplate.js";
+import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
 import localizationStrings from "./translations/1edtech.js";
+import privacyTmpl from "./templates/privacyImplicationsTemplate.js";
 
 export const name = "1edtech/privacy";
 
 const l10n = getIntlData(localizationStrings);
-const privacyImplicationsKeys = ["ACCESSIBILITY",
-                                 "ANALYTICS",
-                                 "CONTAINER",
-                                 "CREDENTIALS",
-                                 "CREDENTIALSIDREF",
-                                 "DEMOGRAPHICS",
-                                 "EXTENSION",
-                                 "FINANCIAL",
-                                 "IDENTIFIER",
-                                 "IDENTIFIERREF",
-                                 "INSURANCE",
-                                 "LEGAL",
-                                 "MEDICAL",
-                                 "NA",
-                                 "OTHER",
-                                 "QUALIFICATION",
-                                 "PERSONAL",
-                                 "SOURCEDID",
-                                 "SOURCEDIDREF"];
-const confidentialityLevelKeys = ["UNRESTRICTED",
-                                  "NORMAL",
-                                  "RESTRICTED",
-                                  "VERYRESTRICTED"];
+const privacyImplicationsKeys = [
+  "ACCESSIBILITY",
+  "ANALYTICS",
+  "CONTAINER",
+  "CREDENTIALS",
+  "CREDENTIALSIDREF",
+  "DEMOGRAPHICS",
+  "EXTENSION",
+  "FINANCIAL",
+  "IDENTIFIER",
+  "IDENTIFIERREF",
+  "INSURANCE",
+  "LEGAL",
+  "MEDICAL",
+  "NA",
+  "OTHER",
+  "QUALIFICATION",
+  "PERSONAL",
+  "SOURCEDID",
+  "SOURCEDIDREF",
+];
+
+const confidentialityLevelKeys = [
+  "UNRESTRICTED",
+  "NORMAL",
+  "RESTRICTED",
+  "VERYRESTRICTED",
+];
+
 /**
  * @param {string} title
  * @returns {HTMLElement}
@@ -41,7 +47,7 @@ function createSection(title, header) {
   return html`<section>
     <h3>${title}</h3>
     <p>${header}</p>
-  </section>`
+  </section>`;
 }
 
 /**
@@ -63,14 +69,19 @@ export async function run(conf) {
 
   privacySection.classList.add("appendix");
 
-  const piSection = createSection(l10n.privacy_implications, l10n.privacy_implications_paragraph);
+  const piSection = createSection(
+    l10n.privacy_implications,
+    l10n.privacy_implications_paragraph
+  );
   piSection.appendChild(privacyTmpl(privacyImplicationsKeys, l10n));
   privacySection.appendChild(piSection);
 
-  const confSection = createSection(l10n.confidentiality_level, l10n.confidentiality_level_paragram);
+  const confSection = createSection(
+    l10n.confidentiality_level,
+    l10n.confidentiality_level_paragram
+  );
   confSection.appendChild(confLevelTmpl(confidentialityLevelKeys, l10n));
   privacySection.appendChild(confSection);
 
   document.body.appendChild(privacySection);
-
 }

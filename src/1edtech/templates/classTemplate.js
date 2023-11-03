@@ -1,5 +1,9 @@
 // @ts-check
-import { renderIssue, renderNote, renderPrivacyImplicationDoc } from "./templateUtils.js";
+import {
+  renderIssue,
+  renderNote,
+  renderPrivacyImplicationDoc,
+} from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
 /**
@@ -69,7 +73,9 @@ function renderProperty(config, property) {
       ${renderPrivacyImplicationDoc(config, property.documentation.privacyDoc)}
     </td>
     <td>${renderCardinality(property)}</td>
-    ${config.showPrivacyAnnotations ? renderPrivacyImplicationCell(property) : null}
+    ${config.showPrivacyAnnotations
+      ? renderPrivacyImplicationCell(property)
+      : null}
   </tr>`;
 }
 
@@ -101,7 +107,11 @@ function renderCardinality(property) {
  * @returns {HTMLTableCellElement} A table cell with a string describing the privacy implications of a property.
  */
 function renderPrivacyImplicationCell(property) {
-  return html`<td><a href="#privacy-${property.privacyImplications.value.toLowerCase()}">${renderPrivacyImplication(property)}</a></td>`;
+  return html`<td>
+    <a href="#privacy-${property.privacyImplications.value.toLowerCase()}">
+      ${renderPrivacyImplication(property)}
+    </a>
+  </td>`;
 }
 
 /**
