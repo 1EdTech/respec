@@ -9,7 +9,7 @@ import { html, mermaidModule } from "../../core/import-maps.js";
  */
 export default async (index, diagram, title) => {
   // dinamycally import mermaid to avoid increase of size of the library
-  const { default: mermaid }  = await import(mermaidModule);
+  const { default: mermaid } = await import(mermaidModule);
   mermaid.initialize({ startOnLoad: false });
   const { svg } = await mermaid.render(`class-diagram-${index}`, diagram);
   const cleanedSvg = svg.trim().replace(/height="[0-9]*"/, "");

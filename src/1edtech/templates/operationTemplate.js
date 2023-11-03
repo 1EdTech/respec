@@ -17,7 +17,8 @@ export default (config, rootPath, operation, title) => {
       <p>${operation.documentation.description}</p>
       ${operation.documentation.issues.map(renderIssue)}
       ${operation.documentation.notes.map(renderNote)}
-      ${renderRequest(config, rootPath, operation)} ${renderResponses(config, operation)}`;
+      ${renderRequest(config, rootPath, operation)}
+      ${renderResponses(config, operation)}`;
   }
 };
 
@@ -30,7 +31,8 @@ export default (config, rootPath, operation, title) => {
  */
 function renderRequest(config, rootPath, operation) {
   return html`<h5>Request</h5>
-    ${renderUrl(rootPath, operation)} ${renderRequestParameters(config, operation)}
+    ${renderUrl(rootPath, operation)}
+    ${renderRequestParameters(config, operation)}
     ${renderRequestBodies(config, operation)}`;
 }
 
@@ -74,11 +76,15 @@ function renderRequestParameters(config, operation) {
             <th>Parameter Type</th>
             <th>Description</th>
             <th>Required</th>
-            ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
+            ${config.showPrivacyAnnotations
+              ? html`<th>Confidentiality Level</th>`
+              : null}
           </tr>
         </thead>
         <tbody>
-          ${operation.request.parameters.map(param => renderParameter(config, param))}
+          ${operation.request.parameters.map(param =>
+            renderParameter(config, param)
+          )}
         </tbody>
       </table>
     `;
@@ -104,11 +110,15 @@ function renderRequestBodies(config, operation) {
             <th>Content Type</th>
             <th>Content Description</th>
             <th>Content Required</th>
-            ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
-            </tr>
+            ${config.showPrivacyAnnotations
+              ? html`<th>Confidentiality Level</th>`
+              : null}
+          </tr>
         </thead>
         <tbody>
-          ${operation.request.bodies.map(body => renderRequestBody(config, body))}
+          ${operation.request.bodies.map(body =>
+            renderRequestBody(config, body)
+          )}
         </tbody>
       </table>
     `;
@@ -135,8 +145,6 @@ function renderRequestBody(config, body) {
   </tr>`;
 }
 
-
-
 function renderParameter(config, parameter) {
   return html` <tr>
     <td>
@@ -150,7 +158,9 @@ function renderParameter(config, parameter) {
       ${parameter.documentation.notes.map(renderNote)}
     </td>
     <td>${renderRequired(parameter)}</td>
-    ${config.showPrivacyAnnotations ? renderConfidentialityCell(parameter) : null}
+    ${config.showPrivacyAnnotations
+      ? renderConfidentialityCell(parameter)
+      : null}
   </tr>`;
 }
 
@@ -168,8 +178,10 @@ function renderResponses(config, operation) {
           <th>Content Type</th>
           <th>Content Description</th>
           <th>Content Required</th>
-          ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
-          </tr>
+          ${config.showPrivacyAnnotations
+            ? html`<th>Confidentiality Level</th>`
+            : null}
+        </tr>
       </thead>
       <tbody>
         ${responses.map(resp => renderResponse(config, resp))}
@@ -189,7 +201,9 @@ function renderResponse(config, response) {
       ${response.body?.documentation?.notes.map(renderNote)}
     </td>
     <td>${renderRequired(response.body)}</td>
-    ${config.showPrivacyAnnotations ? renderConfidentialityCell(response.body) : null}
+    ${config.showPrivacyAnnotations
+      ? renderConfidentialityCell(response.body)
+      : null}
   </tr>`;
 }
 
@@ -222,7 +236,11 @@ function renderRequired(value) {
  */
 function renderConfidentialityCell(value) {
   if (value?.confidentiality) {
-    return html`<td><a href="#privacy-${value.confidentiality.value.toLowerCase()}">${renderConfidentiality(value)}</a></td>`;
+    return html`<td>
+      <a href="#privacy-${value.confidentiality.value.toLowerCase()}">
+        ${renderConfidentiality(value)}
+      </a>
+    </td>`;
   }
 }
 function renderConfidentiality(value) {
