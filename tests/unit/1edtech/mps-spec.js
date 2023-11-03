@@ -5,7 +5,7 @@ import { flushIframes, makePluginDoc } from "../SpecHelper.js";
 describe("1EdTech - mps.js", () => {
   afterAll(flushIframes);
 
-  const plugins = ["/src/1edtech/mps.js"];
+  const plugins = ["/src/1edtech/post-markdown.js"];
   const config = { format: "markdown" };
 
   it("Removes <md-only> blocks when format='markdown'", async () => {
@@ -16,7 +16,7 @@ describe("1EdTech - mps.js", () => {
         This should be removed
       </p>
     </md-only>
-    
+
     <section>
       <h2 id="custom-id">Section Title</h2>
       <md-only>
@@ -47,7 +47,7 @@ describe("1EdTech - mps.js", () => {
       <ul>
         <li>Test</li>
       </ul>
-      
+
       <md-only>
         <p>
           This should be removed
