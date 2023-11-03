@@ -17,6 +17,8 @@ const modules = [
   import("../src/core/data-include.js"),
   // Model Processing Service plugin
   import("../src/1edtech/mps.js"),
+  // Add the 1EdTech privacy appendix
+  import("../src/1edtech/privacy.js"),
   import("../src/core/markdown.js"),
   import("../src/1edtech/post-markdown.js"),
   import("../src/core/reindent.js"),

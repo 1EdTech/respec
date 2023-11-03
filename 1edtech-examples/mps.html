@@ -62,6 +62,8 @@
       // Add the MPS configuration to respecConfig
       mps: _mps,
 
+      showPrivacyAnnotations: true,
+
       // Add VC proof examples
       // postProcess: [
       //   window.respecVc.createVcExamples
@@ -91,6 +93,7 @@
   <!-- Start a service model section-->
 
   <section id="api" data-model="org.1edtech.clr.v2p0.model"
+           data-source="SANDBOX"
            data-service-model="org.1edtech.clr.v2p0.rest.servicemodel"
            data-interface-filter="org.1edtech.clr.v2p0.rest.clrcredentials.interface"
            title="CLR Standard API">
@@ -511,7 +514,16 @@
   </section>
 
   <!-- Start a data model section-->
-  <section data-model="org.1edtech.clr.v2p0.model">
+  <section data-model="org.1edtech.orrostering.v1p2.model">
+  </section>
+
+  <!-- Start a data model section-->
+  <section data-model="org.1edtech.orrostering.v1p2.model"
+    data-service-model="org.1edtech.orrostering.v1p2.rest.servicemodel"
+    data-interface-filter="org.1edtech.orrostering.v1p2.rest.demographicsmanagement.interface">
+  </section>
+
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX">
     <p>
       Some more information about the data model.
     </p>
@@ -604,21 +616,22 @@
     </section>
   </section>
 
-  <section data-model="org.1edtech.clr.v2p0.model" data-stereotype="DerivedType" title="Derived Types" class="appendix">
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX" data-stereotype="DerivedType" title="Derived Types" class="appendix">
     <p>Something about Derived Types.</p>
   </section>
-  <section data-model="org.1edtech.clr.v2p0.model" data-stereotype="PrimitiveType" title="Primitive Types" class="appendix"></section>
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX" data-stereotype="PrimitiveType" title="Primitive Types" class="appendix"></section>
 
-  <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="json" title="JSON Schema" class="appendix">
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX" data-schema-format="json" title="JSON Schema" class="appendix">
     <p>Here is the JSON Schema for Comprehensive Learner Record.</p>
   </section>
 
-  <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="openapi" data-binding="json" title="OpenAPI Schema (JSON)" class="appendix"></section>
-  <section data-model="org.1edtech.clr.v2p0.model" data-schema-format="openapi" data-binding="yaml" title="OpenAPI Schema (YAML)" class="appendix"></section>
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX" data-schema-format="openapi" data-binding="json" title="OpenAPI Schema (JSON)" class="appendix"></section>
+  <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX" data-schema-format="openapi" data-binding="yaml" title="OpenAPI Schema (YAML)" class="appendix"></section>
 
   <!-- Class diagrams -->
   <section data-model="org.1edtech.ob.v2p1.model" data-class-diagram data-class-diagram-omit-properties data-class-diagram-hide-title data-classes="AssertionPayload,Assertion" title="Class Diagram of two classes, no properties, no title"></section>
   <section data-model="org.1edtech.eduapi.v1p0.model" data-class-diagram  data-package="EducationTemplates" title="EducationTemplates' Class Diagram"></section>
+
 </body>
 
 </html>
