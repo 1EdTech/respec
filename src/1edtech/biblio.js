@@ -35,8 +35,7 @@ export async function run(conf) {
       // JSON.stringify(conf.localBiblio) --> throws error?
       // TODO we might want to worry about dupes and precedence
       conf.localBiblio = Object.assign(conf.localBiblio, json);
-    }
-    catch (error) {
+    } catch (error) {
       pub("warn", error.toString());
     }
   }
