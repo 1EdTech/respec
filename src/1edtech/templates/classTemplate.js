@@ -23,7 +23,7 @@ export default (config, classData, title) => {
             <th>Type</th>
             <th>Description</th>
             <th>Multiplicity</th>
-            ${config.showPrivacyAppendix ? html`<th>Privacy</th>` : null}
+            ${config.showPrivacyAnnotations ? html`<th>Privacy</th>` : null}
           </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@ export default (config, classData, title) => {
 function renderExtensibility(config, classData) {
   if (classData.isExtensible) {
     return html` <tr>
-      <td colspan="${config.showPrivacyAppendix ? 5 : 4}">
+      <td colspan="${config.showPrivacyAnnotations ? 5 : 4}">
         This class can be extended with additional properties.
       </td>
     </tr>`;
@@ -69,7 +69,7 @@ function renderProperty(config, property) {
       ${renderPrivacyImplicationDoc(config, property.documentation.privacyDoc)}
     </td>
     <td>${renderCardinality(property)}</td>
-    ${config.showPrivacyAppendix ? renderPrivacyImplicationCell(property) : null}
+    ${config.showPrivacyAnnotations ? renderPrivacyImplicationCell(property) : null}
   </tr>`;
 }
 

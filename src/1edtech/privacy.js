@@ -49,7 +49,7 @@ function createSection(title, header) {
  */
 export async function run(conf) {
   /** @type {HTMLElement} */
-  if (!conf.showPrivacyAppendix) {
+  if (!conf.showPrivacyAnnotations) {
     return;
   }
 

@@ -74,7 +74,7 @@ function renderRequestParameters(config, operation) {
             <th>Parameter Type</th>
             <th>Description</th>
             <th>Required</th>
-            ${config.showPrivacyAppendix ? html`<th>Confidentiality Level</th>` : null}
+            ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
           </tr>
         </thead>
         <tbody>
@@ -104,7 +104,7 @@ function renderRequestBodies(config, operation) {
             <th>Content Type</th>
             <th>Content Description</th>
             <th>Content Required</th>
-            ${config.showPrivacyAppendix ? html`<th>Confidentiality Level</th>` : null}
+            ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
             </tr>
         </thead>
         <tbody>
@@ -131,7 +131,7 @@ function renderRequestBody(config, body) {
       ${body.documentation?.notes.map(renderNote)}
     </td>
     <td>${renderRequired(body)}</td>
-    ${config.showPrivacyAppendix ? renderConfidentialityCell(body) : null}
+    ${config.showPrivacyAnnotations ? renderConfidentialityCell(body) : null}
   </tr>`;
 }
 
@@ -150,7 +150,7 @@ function renderParameter(config, parameter) {
       ${parameter.documentation.notes.map(renderNote)}
     </td>
     <td>${renderRequired(parameter)}</td>
-    ${config.showPrivacyAppendix ? renderConfidentialityCell(parameter) : null}
+    ${config.showPrivacyAnnotations ? renderConfidentialityCell(parameter) : null}
   </tr>`;
 }
 
@@ -168,7 +168,7 @@ function renderResponses(config, operation) {
           <th>Content Type</th>
           <th>Content Description</th>
           <th>Content Required</th>
-          ${config.showPrivacyAppendix ? html`<th>Confidentiality Level</th>` : null}
+          ${config.showPrivacyAnnotations ? html`<th>Confidentiality Level</th>` : null}
           </tr>
       </thead>
       <tbody>
@@ -189,7 +189,7 @@ function renderResponse(config, response) {
       ${response.body?.documentation?.notes.map(renderNote)}
     </td>
     <td>${renderRequired(response.body)}</td>
-    ${config.showPrivacyAppendix ? renderConfidentialityCell(response.body) : null}
+    ${config.showPrivacyAnnotations ? renderConfidentialityCell(response.body) : null}
   </tr>`;
 }
 

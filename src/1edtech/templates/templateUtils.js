@@ -26,7 +26,7 @@ export function renderNote(note) {
  * @returns The doc wrapped in a div with class="note".
  */
 export function renderPrivacyImplicationDoc(config, doc) {
-  if (config.showPrivacyAppendix && doc) {
+  if (config.showPrivacyAnnotations && doc) {
     return html`<div class="advisement">Privacy implication: ${doc}</div>`;
   }
 }
