@@ -19,6 +19,7 @@ import serviceModelTemplate from "./templates/serviceModelTemplate.js";
 import { showError } from "../core/utils.js";
 import stereoTypeTemplate from "./templates/stereoTypeTemplate.js";
 import { sub } from "../core/pubsubhub.js";
+import embeddedSelectionTemplate from "./templates/embeddedSelectionTemplate.js";
 
 export const name = "1edtech/mps";
 
@@ -220,6 +221,15 @@ async function getModel(config, source, id) {
 
           }
           isExtensible
+          generalizations {
+            id
+            name
+            documentation {
+              description
+              notes
+              issues
+            }
+          }
         }
         services {
           ... on RestService {
@@ -444,6 +454,9 @@ async function processClass(config, section, classModel) {
     case "EnumExt":
     case "Vocabulary":
       wrapper = enumerationTemplate(classModel, title);
+      break;
+    case "EmbeddedSelection":
+      wrapper = embeddedSelectionTemplate(classModel, title);
       break;
     default:
       wrapper = classTemplate(config, classModel, title);
