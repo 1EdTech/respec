@@ -3,6 +3,7 @@ import {
   renderIssue,
   renderNote,
   renderPrivacyImplicationDoc,
+  renderType
 } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
 
@@ -65,7 +66,7 @@ function renderExtensibility(config, classData) {
 function renderProperty(config, property) {
   return html` <tr>
     <td style="min-width: 150px; word-break: break-all;">${property.name}</td>
-    <td>${renderType(property)}</td>
+    <td>${renderType(property.type)}</td>
     <td>
       ${property.documentation.description}
       ${property.documentation.issues.map(renderIssue)}
@@ -121,21 +122,4 @@ function renderPrivacyImplicationCell(property) {
  */
 function renderPrivacyImplication(property) {
   return html`${property.privacyImplications.label}`;
-}
-
-/**
- * Return a clickable link to the property type definition.
- * @param {*} property The MPS Property object.
- * @returns {HTMLAnchorElement} Returns an anchor element that links to the property type definition.
- */
-function renderType(property) {
-  let name = property.type.name;
-  if (
-    property.type.stereoType === "Enumeration" ||
-    property.type.stereoType === "EnumExt"
-  ) {
-    name += " Enumeration";
-  }
-  name = html`<a href="#${property.type.id}"><samp>${name}</samp></a>`;
-  return name;
 }

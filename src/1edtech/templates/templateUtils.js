@@ -47,3 +47,20 @@ export function renderTerm(term) {
     </td>
   </tr>`;
 }
+
+/**
+ * Return a clickable link to the type definition.
+ * @param {*} type The MPS ModelClass object.
+ * @returns {HTMLAnchorElement} Returns an anchor element that links to the property type definition.
+ */
+export function renderType(type) {
+  let name = type.name;
+  if (
+    type.stereoType === "Enumeration" ||
+    type.stereoType === "EnumExt"
+  ) {
+    name += " Enumeration";
+  }
+  name = html`<a href="#${type.id}"><samp>${name}</samp></a>`;
+  return name;
+}
