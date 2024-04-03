@@ -383,7 +383,7 @@ body{-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;color:var(--fgclr1)}
       <p>${e.documentation.description}</p>
       ${e.documentation.issues.map(ir)}
       ${e.documentation.notes.map(ar)}
-      <p>This class is a choice of exactly one in the following set:</p>
+      <p>The ultimate representation of this class is a choice of exactly one of the classes in the following set:</p>
       <table class="simple">
         <thead>
           <tr>
