@@ -15,7 +15,7 @@ export default (classData, title) => {
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
       ${classData.documentation.notes.map(renderNote)}
-      <p>This class is a choice of exactly one in the following set:</p>
+      <p>The ultimate representation of this class is a choice of exactly one of the classes in the following set:</p>
       <table class="simple">
         <thead>
           <tr>
