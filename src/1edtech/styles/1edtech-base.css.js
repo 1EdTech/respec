@@ -16,7 +16,7 @@ export default css`@charset "UTF-8";
   --fgclr3: rgba(70, 130, 180, 1);
   --fgclr4: rgba(40, 100, 150, 1);
   --gray: rgba(200, 200, 200, 0.9);
-  --lightgray: rgba(240, 240, 240, 0.9);
+  --lightgray: rgba(240, 240, 240, 1);
   --lightestgray: rgba(250, 250, 250, 0.8);
   --darkgray: rgba(180, 180, 180, 1);
 }
@@ -230,7 +230,7 @@ td, th {
 th {
   font-weight: bold;
   background-color: var(--fgclr3);
-  color: white;
+  color: var(--lightgray);
   padding: 0.6em;
 }
 
