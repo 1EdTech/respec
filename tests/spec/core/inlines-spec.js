@@ -124,6 +124,32 @@ describe("Core - Inlines", () => {
     expect(abbr.title).toBe("included abbr");
   });
 
+  it("excludes generating abbr elements in svg content", async () => {
+    const body = `
+      <section>
+        <h2>
+          <abbr title="expanded abbreviation">
+            EA
+          </abbr>
+        </h2>
+        <div id="test">
+          <svg version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <text>SVG EA</text>
+          </svg>
+          <p>HTML EA</p>
+        </div>
+      </section>
+    `;
+    const ops = makeStandardOps({}, body);
+    const doc = await makeRSDoc(ops);
+    const abbrs = doc.querySelectorAll("#test abbr");
+    expect(abbrs).toHaveSize(1);
+
+    const abbr = abbrs.item(0);
+    expect(abbr.title).toBe("expanded abbreviation");
+  });
+
   it("processes inline variable syntax", async () => {
     const body = `
       <section>
@@ -134,6 +160,7 @@ describe("Core - Inlines", () => {
       </section>
       <section>
         <p id="a4">TEXT |with spaces :  Type with spaces| TEXT</p>
+        <p id="a5">TEXT |typeWithQuotes: "valid" or "invalid"| TEXT</p>
         <p id="b">TEXT |variable| TEXT</p>
         <p id="c">TEXT | ignored | TEXT</p>
         <p id="d">TEXT|ignore: Ignore|TEXT</p>
@@ -144,7 +171,7 @@ describe("Core - Inlines", () => {
         <p id="h"> TEXT |var: Generic&lt;int&gt;| TEXT |var2: Generic&lt;unsigned short int&gt;| </p>
       </section>
       <section>
-        <p id="nulls"> |var 1: null type spaces?| and |var 2 : NullableType?| </p>
+        <p id="nulls"> |var 1: null type spaces?| and |var 2 : NullableType?| and |var 3: Generic&lt;NullableType?&gt;|</p>
       </section>
     `;
     const doc = await makeRSDoc(makeStandardOps(null, body));
@@ -163,6 +190,10 @@ describe("Core - Inlines", () => {
     const a4 = doc.querySelector("#a4 var");
     expect(a4.textContent).toBe("with spaces");
     expect(a4.dataset.type).toBe("Type with spaces");
+
+    const a5 = doc.querySelector("#a5 var");
+    expect(a5.textContent).toBe("typeWithQuotes");
+    expect(a5.dataset.type).toBe(`"valid" or "invalid"`);
 
     const b = doc.querySelector("#b var");
     expect(b.textContent).toBe("variable");
@@ -192,11 +223,14 @@ describe("Core - Inlines", () => {
     expect(h[1].textContent).toBe("var2");
     expect(h[1].dataset.type).toBe("Generic<unsigned short int>");
 
-    const [nullVar1, nullVar2] = doc.querySelectorAll("#nulls > var");
-    expect(nullVar1.textContent).toBe("var 1");
-    expect(nullVar1.dataset.type).toBe("null type spaces?");
-    expect(nullVar2.textContent).toBe("var 2");
-    expect(nullVar2.dataset.type).toBe("NullableType?");
+    const nulls = doc.querySelectorAll("#nulls > var");
+    expect(nulls).toHaveSize(3);
+    expect(nulls[0].textContent).toBe("var 1");
+    expect(nulls[0].dataset.type).toBe("null type spaces?");
+    expect(nulls[1].textContent).toBe("var 2");
+    expect(nulls[1].dataset.type).toBe("NullableType?");
+    expect(nulls[2].textContent).toBe("var 3");
+    expect(nulls[2].dataset.type).toBe("Generic<NullableType?>");
   });
 
   it("expands inline references and they get classified as normative/informative correctly", async () => {
@@ -222,6 +256,7 @@ describe("Core - Inlines", () => {
       <section id="conformance">[[[html]]]</section>
       <section class="informative">
           <p>[[[dom]]]</a></p>
+          <p id="not-found">[[[not-found]]]</p>
       </section>
       <p>[[[fetch]]] and [[[?payment-request]]]</p>
       </section>
@@ -237,11 +272,16 @@ describe("Core - Inlines", () => {
     expect(norm.map(el => el.textContent)).toEqual(["[fetch]", "[html]"]);
 
     const inform = [...doc.querySelectorAll("#informative-references dt")];
-    expect(inform).toHaveSize(2);
+    expect(inform).toHaveSize(3);
     expect(inform.map(el => el.textContent)).toEqual([
       "[dom]",
+      "[not-found]",
       "[payment-request]",
     ]);
+
+    const notFound = doc.querySelector("#not-found");
+    expect(notFound).toBeTruthy();
+    expect(notFound.textContent).toBe("[[[not-found]]]");
   });
 
   it("allows [[[#...]]] to be a general expander for ids in document", async () => {
@@ -274,7 +314,7 @@ describe("Core - Inlines", () => {
     const anchors = doc.querySelectorAll("#output a");
     expect(anchors).toHaveSize(6);
     const [section, figure, exampleAside, examplePre, exampleDynamic] = anchors;
-    expect(section.textContent).toBe("§\u00A01. section heading");
+    expect(section.textContent).toBe("1. section heading");
     expect(section.classList).toContain("sec-ref");
     expect(figure.textContent).toBe("Figure 1");
     expect(figure.classList).toContain("fig-ref");
@@ -303,8 +343,9 @@ describe("Core - Inlines", () => {
         [=environment
             settings
           object /
-          responsible
-          document =]
+          cross-origin
+          isolated
+          capability =]
         </p>
       </section>
     `;
@@ -319,8 +360,10 @@ describe("Core - Inlines", () => {
     const codedThingCodeElem = someCodedThing.querySelector("code");
     expect(codedThingCodeElem.textContent).toBe("Coded");
 
-    const responsibleDocLink = doc.querySelector("#multiline a");
-    expect(responsibleDocLink.hash).toBe("#responsible-document");
+    const crossIsoCapLink = doc.querySelector("#multiline a");
+    expect(crossIsoCapLink.hash).toBe(
+      "#concept-settings-object-cross-origin-isolated-capability"
+    );
   });
 
   it("proceseses `backticks` as code", async () => {
@@ -490,7 +533,9 @@ describe("Core - Inlines", () => {
 
     const [localLink, conceptLink] = doc.querySelectorAll("#test a");
     expect(localLink.hash).toBe("#dfn-foo-bar");
-    expect(conceptLink.hash).toBe("#multipart/form-data-encoding-algorithm");
+    expect(decodeURIComponent(conceptLink.hash)).toBe(
+      "#multipart/form-data-encoding-algorithm"
+    );
   });
 
   it("processes {{ forContext/term }} IDL", async () => {

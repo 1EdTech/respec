@@ -17,20 +17,7 @@ export default css`
   }
 }
 
-/* Override code highlighter background */
-.hljs {
-  background: transparent !important;
-}
-
 /* --- INLINES --- */
-:is(h1, h2, h3, h4, h5, h6, a) abbr {
-  border: none;
-}
-
-dfn {
-  font-weight: bold;
-}
-
 a.internalDFN {
   color: inherit;
   border-bottom: 1px solid #99c;
@@ -75,14 +62,6 @@ cite .bibref {
   font-style: normal;
 }
 
-code {
-  color: #c63501;
-}
-
-th code {
-  color: inherit;
-}
-
 a[href].orcid {
   padding-left: 4px;
   padding-right: 4px;
@@ -92,18 +71,7 @@ a[href].orcid > svg {
   margin-bottom: -2px;
 }
 
-/* --- TOC --- */
-
-.toc a,
-.tof a {
-  text-decoration: none;
-}
-
-a .secno,
-a .figno {
-  color: #000;
-}
-
+/* --- TOF --- */
 ul.tof,
 ol.tof {
   list-style: none outside none;
@@ -113,62 +81,6 @@ ol.tof {
   margin-top: 0.5em;
   font-style: italic;
 }
-
-/* --- TABLE --- */
-
-table.simple {
-  border-spacing: 0;
-  border-collapse: collapse;
-  border-bottom: 3px solid #005a9c;
-}
-
-.simple th {
-  background: #005a9c;
-  color: #fff;
-  padding: 3px 5px;
-  text-align: left;
-}
-
-.simple th a {
-  color: #fff;
-  padding: 3px 5px;
-  text-align: left;
-}
-
-.simple th[scope="row"] {
-  background: inherit;
-  color: inherit;
-  border-top: 1px solid #ddd;
-}
-
-.simple td {
-  padding: 3px 10px;
-  border-top: 1px solid #ddd;
-}
-
-.simple tr:nth-child(even) {
-  background: #f0f6ff;
-}
-
-/* --- DL --- */
-
-.section dd > p:first-child {
-  margin-top: 0;
-}
-
-.section dd > p:last-child {
-  margin-bottom: 0;
-}
-
-.section dd {
-  margin-bottom: 1em;
-}
-
-.section dl.attrs dd,
-.section dl.eldef dd {
-  margin-bottom: 0;
-}
-
 #issue-summary > ul {
   column-count: 2;
 }
@@ -213,53 +125,52 @@ details.respec-tests-details > li {
   padding-left: 1em;
 }
 
-a[href].self-link:hover {
+.self-link:hover {
   opacity: 1;
   text-decoration: none;
   background-color: transparent;
-}
-
-h2,
-h3,
-h4,
-h5,
-h6 {
-  position: relative;
 }
 
 aside.example .marker > a.self-link {
   color: inherit;
 }
 
-:is(h2, h3, h4, h5, h6) > a.self-link {
-  border: none;
-  color: inherit;
-  font-size: 83%;
-  height: 2em;
-  left: -1.6em;
-  opacity: 0.5;
-  position: absolute;
-  text-align: center;
-  text-decoration: none;
-  top: 0;
-  transition: opacity 0.2s;
-  width: 2em;
+.header-wrapper {
+  display: flex;
+  align-items: baseline;
 }
 
-:is(h2, h3, h4, h5, h6) > a.self-link::before{
+:is(h2, h3, h4, h5, h6):not(#toc > h2, #abstract > h2, #sotd > h2, .head > h2) {
+  position: relative;
+  left: -.5em;
+}
+
+:is(h2, h3, h4, h5, h6):not(#toc h2) + a.self-link {
+  color: inherit;
+  order: -1;
+  position: relative;
+  left: -1.1em;
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+:is(h2, h3, h4, h5, h6) + a.self-link::before {
   content: "§";
-  display: block;
+  text-decoration: none;
+  color: var(--heading-text);
+}
+
+:is(h2, h3) + a.self-link {
+  top: -0.2em;
+}
+
+:is(h4, h5, h6) + a.self-link::before {
+  color: black;
 }
 
 @media (max-width: 767px) {
   dd {
     margin-left: 0;
-  }
-
-  /* Don't position self-link in headings off-screen */
-  :is(h2, h3, h4, h5, h6) > a.self-link {
-    left: auto;
-    top: auto;
   }
 }
 

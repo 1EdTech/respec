@@ -1,13 +1,16 @@
 #!/usr/bin/env node
-const path = require("path");
-const http = require("http");
-const serveStatic = require("serve-static");
-const finalhandler = require("finalhandler");
-const sade = require("sade");
-const colors = require("colors");
-const marked = require("marked");
-const { writeFile } = require("fs").promises;
-const { toHTML } = require("./respecDocWriter.js");
+import { readFile, writeFile } from "fs/promises";
+import colors from "colors";
+import { fileURLToPath } from "url";
+import finalhandler from "finalhandler";
+import http from "http";
+import { marked } from "marked";
+import path from "path";
+import sade from "sade";
+import serveStatic from "serve-static";
+import { toHTML } from "./respecDocWriter.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class Renderer extends marked.Renderer {
   strong(text) {
@@ -17,13 +20,19 @@ class Renderer extends marked.Renderer {
     return colors.italic(text);
   }
   codespan(text) {
-    return colors.underline(text);
+    return colors.underline(unescape(text));
   }
   paragraph(text) {
-    return text;
+    return unescape(text);
   }
   link(href, _title, text) {
     return `[${text}](${colors.blue.dim.underline(href)})`;
+  }
+  list(body, _orderered) {
+    return `\n${body}`;
+  }
+  listitem(text) {
+    return `* ${text}\n`;
   }
 }
 
@@ -170,14 +179,23 @@ cli
     false
   )
   .option("-e, --haltonerror", "Abort if the spec has any errors.", false)
-  .option("-w, --haltonwarn", "Abort if ReSpec generates warnings.", false)
-  .option("--disable-sandbox", "Disable Chromium sandboxing if needed.", false)
+  .option(
+    "-w, --haltonwarn",
+    "Abort if ReSpec generates warnings (or errors).",
+    false
+  )
+  .option(
+    "--sandbox",
+    "Disable Chromium sandboxing if needed, with --no-sandbox.",
+    true
+  )
+  .option("--disable-sandbox", "Alias of --no-sandbox.", false)
   .option("--devtools", "Enable debugging and show Chrome's DevTools.", false)
   .option("--verbose", "Log processing status to stdout.", false)
   .option("--localhost", "Spin up a local server to perform processing.", false)
   .option("--port", "Port override for --localhost.", 3000);
 
-cli.action((source, destination, opts) => {
+cli.action(async (source, destination, opts) => {
   source = source || opts.src;
   destination = destination || opts.out;
   const log = new Logger(opts.verbose);
@@ -188,15 +206,24 @@ cli.action((source, destination, opts) => {
     process.exit(1);
   }
 
-  return run(source, destination, opts, log).catch(err => {
-    log.fatal(err);
+  if (opts["disable-sandbox"]) {
+    opts.sandbox = false;
+    delete opts["disable-sandbox"];
+  }
+
+  try {
+    await run(source, destination, opts, log);
+    process.exit(0);
+  } catch (error) {
+    log.fatal(error);
     process.exit(1);
-  });
+  }
 });
 
 // https://github.com/lukeed/sade/issues/28#issuecomment-516104013
-cli._version = () => {
-  const { version } = require("../package.json");
+cli._version = async () => {
+  const packageJson = path.join(__dirname, "..", "package.json");
+  const { version } = JSON.parse(await readFile(packageJson));
   console.log(version);
 };
 
@@ -230,12 +257,13 @@ async function run(source, destination, options, log) {
     onError: log.error.bind(log),
     onWarning: log.warn.bind(log),
     onProgress: log.info.bind(log),
-    disableSandbox: options["disable-sandbox"],
+    disableSandbox: !options.sandbox,
     devtools: options.devtools,
   });
 
   const exitOnError = errors.length && options.haltonerror;
-  const exitOnWarning = warnings.length && options.haltonwarn;
+  const exitOnWarning =
+    (warnings.length || errors.length) && options.haltonwarn;
   if (exitOnError || exitOnWarning) {
     throw new Error(
       `${exitOnError ? "Errors" : "Warnings"} found during processing.`
@@ -267,4 +295,25 @@ async function write(destination, html) {
       await writeFile(newFilePath, html, "utf-8");
     }
   }
+}
+
+/**
+ * From https://gist.github.com/WebReflection/df05641bd04954f6d366
+ * @param {string} str
+ */
+function unescape(str) {
+  const re = /&(?:amp|#38|lt|#60|gt|#62|apos|#39|quot|#34);/g;
+  const unescaped = {
+    "&amp;": "&",
+    "&#38;": "&",
+    "&lt;": "<",
+    "&#60;": "<",
+    "&gt;": ">",
+    "&#62;": ">",
+    "&apos;": "'",
+    "&#39;": "'",
+    "&quot;": '"',
+    "&#34;": '"',
+  };
+  return str.replace(re, m => unescaped[m]);
 }

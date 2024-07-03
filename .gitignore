@@ -13,4 +13,6 @@ js/deps/builds
 !js/profile-w3c.js
 .vscode/*
 !.vscode/tasks.json
-git-crypt.exe
+package-lock.json
+yarn.lock
+*.log

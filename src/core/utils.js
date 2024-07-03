@@ -22,11 +22,23 @@ function hashString(text) {
   return String(hash);
 }
 
-export const ISODate = new Intl.DateTimeFormat(["en-ca-iso8601"], {
+// https://stackoverflow.com/a/58633686
+export const ISODate = new Intl.DateTimeFormat(["sv-SE"], {
   timeZone: "UTC",
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
+});
+
+// We use an "Australian Date" because it omits the ","
+// after the day of the month, which is required by the W3C.
+const dateLang =
+  docLang === "en" || docLang.startsWith("en-") ? "en-AU" : docLang;
+export const W3CDate = new Intl.DateTimeFormat(dateLang, {
+  timeZone: "UTC",
+  year: "numeric",
+  month: "long",
+  day: dateLang === "en-AU" ? "2-digit" : "numeric",
 });
 
 /** CSS selector for matching elements that are non-normative */
@@ -55,6 +67,9 @@ export function createResourceHint(opts) {
     case "preload":
       if ("as" in opts) {
         linkElem.setAttribute("as", opts.as);
+      }
+      if (opts.corsMode) {
+        linkElem.crossOrigin = opts.corsMode;
       }
       break;
   }
@@ -162,36 +177,38 @@ export function norm(str) {
 }
 
 /**
- * @param {string} lang
- */
-function resolveLanguageAlias(lang) {
-  const aliases = {
-    "zh-hans": "zh",
-    "zh-cn": "zh",
-  };
-  return aliases[lang] || lang;
-}
-
-/**
  * @template {Record<string, Record<string, string|Function>>} T
  * @param {T} localizationStrings
  * @returns {T[keyof T]}
  */
 export function getIntlData(localizationStrings, lang = docLang) {
-  lang = resolveLanguageAlias(lang.toLowerCase());
+  lang = lang.toLowerCase();
   // Proxy return type is a known bug:
   // https://github.com/Microsoft/TypeScript/issues/20846
-  // @ts-ignore
+  // @ts-expect-error
   return new Proxy(localizationStrings, {
     /** @param {string} key */
     get(data, key) {
-      const result = (data[lang] && data[lang][key]) || data.en[key];
+      const result = getIntlDataForKey(data, key, lang) || data.en[key];
       if (!result) {
         throw new Error(`No l10n data for key: "${key}"`);
       }
       return result;
     },
   });
+}
+
+/**
+ * @template {Record<string, Record<string, string|Function>>} T
+ * @param {T} localizationStrings
+ * @param {string} key
+ */
+export function getIntlDataForKey(localizationStrings, key, lang = docLang) {
+  lang = lang.toLowerCase();
+  return (
+    localizationStrings[lang]?.[key] ||
+    localizationStrings[lang.match(/^(\w{2,3})-.+$/)?.[1]]?.[key]
+  );
 }
 
 // --- DATE HELPERS -------------------------------------------------------------------------------
@@ -203,50 +220,6 @@ export function getIntlData(localizationStrings, lang = docLang) {
  */
 export function concatDate(date, sep = "") {
   return ISODate.format(date).replace(dashes, sep);
-}
-
-/**
- * Formats a date to "yyyy-mm-dd".
- * @param {Date} date
- */
-export function toShortIsoDate(date) {
-  return ISODate.format(date);
-}
-
-/**
- * Given either a Date object or a date in `YYYY-MM-DD` format, return a
- * human-formatted date suitable for use in the specification.
- * @param {Date | string} [date]
- */
-export function humanDate(
-  date = new Date(),
-  lang = document.documentElement.lang || "en"
-) {
-  if (!(date instanceof Date)) date = new Date(date);
-  const langs = [lang, "en"];
-  const day = date.toLocaleString(langs, {
-    day: "2-digit",
-    timeZone: "UTC",
-  });
-  const month = date.toLocaleString(langs, {
-    month: "long",
-    timeZone: "UTC",
-  });
-  const year = date.toLocaleString(langs, {
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  // date month year
-  return `${day} ${month} ${year}`;
-}
-
-/**
- * Given either a Date object or a date in `YYYY-MM-DD` format, return an ISO
- * formatted date suitable for use in a xsd:datetime item
- * @param {Date | string} date
- */
-export function isoDate(date) {
-  return (date instanceof Date ? date : new Date(date)).toISOString();
 }
 
 /**
@@ -655,6 +628,30 @@ export function wrapInner(outer, wrapper) {
 }
 
 /**
+ * @param {Element} element
+ */
+export function getPreviousSections(element) {
+  /** @type {Element[]} */
+  const sections = [];
+  for (const previous of iteratePreviousElements(element)) {
+    if (previous.localName === "section") {
+      sections.push(previous);
+    }
+  }
+  return sections;
+}
+
+/**
+ * @param {Element} element
+ */
+function* iteratePreviousElements(element) {
+  let previous = element;
+  while (previous.previousElementSibling) {
+    previous = previous.previousElementSibling;
+    yield previous;
+  }
+}
+/**
  * Applies the selector for all its ancestors.
  * @param {Element} element
  * @param {string} selector
@@ -900,6 +897,21 @@ export function showWarning(message, pluginName, options = {}) {
 }
 
 /**
+ * Creates showError, showWarning utilities for use in custom pre-process and
+ * post-process plugins.
+ * @param {string} pluginName
+ */
+export function makePluginUtils(pluginName) {
+  /** @typedef {Parameters<typeof showError>[2]} Options */
+  return {
+    /** @type {(message: string, options?: Options) => void} */
+    showError: (msg, options) => showError(msg, pluginName, options),
+    /** @type {(message: string, options?: Options) => void} */
+    showWarning: (msg, options) => showWarning(msg, pluginName, options),
+  };
+}
+
+/**
  * Makes a string `coded`.
  *
  * @param {string} item
@@ -943,7 +955,7 @@ function addQuotes(item) {
  * @param {string[]} keys
  */
 export function docLink(strings, ...keys) {
-  return strings
+  const linkifiedStr = strings
     .map((s, i) => {
       const key = keys[i];
       if (!key) {
@@ -962,4 +974,26 @@ export function docLink(strings, ...keys) {
       return `${s}[\`${linkingText}\`](https://respec.org/docs/#${linkingText})`;
     })
     .join("");
+  return reindent(linkifiedStr);
+}
+
+/**
+ * Takes a text string, trims it, splits it into lines,
+ * finds the common indentation level, and then de-indents every line
+ * by that common indentation level.
+ *
+ * @param {string} text - The text to be re-indented.
+ * @returns {string} The re-indented text.
+ */
+export function reindent(text) {
+  if (!text) {
+    return text;
+  }
+  const lines = text.trimEnd().split("\n");
+  while (lines.length && !lines[0].trim()) {
+    lines.shift();
+  }
+  const indents = lines.filter(s => s.trim()).map(s => s.search(/[^\s]/));
+  const leastIndent = Math.min(...indents);
+  return lines.map(s => s.slice(leastIndent)).join("\n");
 }

@@ -9,8 +9,9 @@
 //  This module only really works when you are in an HTTP context, and will most likely
 //  fail if you are editing your documents on your local drive. That is due to security
 //  restrictions in the browser.
-import { markdownToHtml, restructure } from "./markdown.js";
 import { runTransforms, showError } from "./utils.js";
+import { markdownToHtml } from "./markdown.js";
+import { restructure } from "./sections.js";
 
 export const name = "core/data-include";
 
@@ -74,20 +75,31 @@ function removeIncludeAttributes(el) {
 }
 
 export async function run() {
-  /** @type {NodeListOf<HTMLElement>} */
-  const includables = document.querySelectorAll("[data-include]");
+  await runIncludes(document, 1);
+}
 
+/**
+ * @param {HTMLElement | Document} root
+ * @param {number} currentDepth
+ */
+async function runIncludes(root, currentDepth) {
+  /** @type {NodeListOf<HTMLElement>} */
+  const includables = root.querySelectorAll("[data-include]");
   const promisesToInclude = Array.from(includables).map(async el => {
     const url = el.dataset.include;
     if (!url) {
       return; // just skip it
     }
-    const id = `include-${String(Math.random()).substr(2)}`;
+    const id = `include-${String(Math.random()).slice(2)}`;
     el.dataset.includeId = id;
     try {
       const response = await fetch(url);
       const text = await response.text();
       processResponse(text, id, url);
+      if (currentDepth < 3) {
+        // For performance reasons, only allow limited nesting.
+        await runIncludes(el, currentDepth + 1);
+      }
     } catch (err) {
       const msg = `\`data-include\` failed: \`${url}\` (${err.message}).`;
       console.error(msg, el, err);

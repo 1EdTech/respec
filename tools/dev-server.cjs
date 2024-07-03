@@ -1,8 +1,8 @@
 /**
  * This tools lets one effectively run:
- *  $ npm run build:w3c
- *  $ npm run server
- *  $ npm run test:unit + test:integration
+ *  $ pnpm build:w3c
+ *  $ pnpm run server
+ *  $ pnpm test:unit + test:integration
  * with ability to:
  *  - build/test when a file changes
  *  - build/test on a single keypress (interactive mode)
@@ -16,13 +16,12 @@ const chokidar = require("chokidar");
 const karma = require("karma");
 const serve = require("serve-handler");
 const colors = require("colors");
-const boxen = require("boxen");
 const sade = require("sade");
 const serveConfig = require("../serve.json");
-const { Builder } = require("./builder.js");
+const { Builder } = require("./builder.cjs");
 
 const KARMA_PORT = 9876;
-const SERVE_PORT = 5000;
+const SERVE_PORT = 8000;
 
 class KarmaServer {
   /**
@@ -33,11 +32,11 @@ class KarmaServer {
     const browsers = browser ? [browser] : undefined;
 
     const files = [
-      ...require("../tests/karma.conf.base.js").files,
-      ...require("../tests/unit/karma.conf.js").additionalFiles,
-      ...require("../tests/spec/karma.conf.js").additionalFiles,
+      ...require("../tests/karma.conf.base.cjs").files,
+      ...require("../tests/unit/karma.conf.cjs").additionalFiles,
+      ...require("../tests/spec/karma.conf.cjs").additionalFiles,
     ];
-    const configFile = require.resolve("../tests/karma.conf.base.js");
+    const configFile = require.resolve("../tests/karma.conf.base.cjs");
 
     this._karmaConfig = karma.config.parseConfig(configFile, {
       browsers,
@@ -110,7 +109,7 @@ async function run(args) {
   });
 
   devServer.listen(SERVE_PORT);
-  printWelcomeMessage(args);
+  await printWelcomeMessage(args);
 
   await karmaServer.start();
   if (!args.interactive) {
@@ -174,7 +173,7 @@ async function run(args) {
   }
 }
 
-function printWelcomeMessage(args) {
+async function printWelcomeMessage(args) {
   const messages = [
     ["dev server", `http://localhost:${SERVE_PORT}/examples/`],
     ["karma server", `http://localhost:${KARMA_PORT}`],
@@ -202,5 +201,6 @@ function printWelcomeMessage(args) {
     borderStyle: "bold",
     backgroundColor: "black",
   };
+  const { default: boxen } = await import("boxen");
   console.log(boxen(message, boxOptions));
 }

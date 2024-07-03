@@ -7,7 +7,7 @@
  * Searches for the terms which do not have a local definition at xref API and
  * for each query, adds `data-cite` attributes to respective elements.
  * `core/data-cite` later converts these data-cite attributes to actual links.
- * https://github.com/w3c/respec/issues/1662
+ * https://github.com/speced/respec/issues/1662
  */
 /**
  * @typedef {import('core/xref').RequestEntry} RequestEntry
@@ -25,7 +25,6 @@ import {
   nonNormativeSelector,
   norm as normalize,
   showError,
-  showWarning,
 } from "./utils.js";
 import { possibleExternalLinks } from "./link-to-dfn.js";
 import { sub } from "./pubsubhub.js";
@@ -37,6 +36,9 @@ const profiles = {
 };
 
 export const API_URL = "https://respec.org/xref/";
+
+/** @type {{ term: string; spec: string; element: HTMLElement }[]} */
+export const informativeRefsInNormative = [];
 
 if (
   !document.querySelector("link[rel='preconnect'][href='https://respec.org']")
@@ -108,7 +110,7 @@ function findExplicitExternalLinks() {
  */
 function normalizeConfig(xref) {
   const defaults = {
-    url: API_URL,
+    url: new URL("search/", API_URL).href,
     specs: null,
   };
 
@@ -311,24 +313,23 @@ async function getData(queryKeys, apiUrl) {
 }
 
 /**
- * @param {RequestEntry[]} keys
+ * @param {RequestEntry[]} queries
  * @param {string} url
  * @returns {Promise<Map<string, SearchResultEntry[]>>}
  */
-async function fetchFromNetwork(keys, url) {
-  if (!keys.length) return new Map();
+async function fetchFromNetwork(queries, url) {
+  if (!queries.length) return new Map();
 
-  const query = { keys };
   const options = {
     method: "POST",
-    body: JSON.stringify(query),
+    body: JSON.stringify({ queries }),
     headers: {
       "Content-Type": "application/json",
     },
   };
   const response = await fetch(url, options);
   const json = await response.json();
-  return new Map(json.result);
+  return new Map(json.results.map(({ id, result }) => [id, result]));
 }
 
 /**
@@ -439,9 +440,8 @@ function addToReferences(elem, cite, normative, term, conf) {
     return;
   }
 
-  const msg = `Normative reference to "${term}" found but term is defined "informatively" in "${cite}".`;
-  const title = "Normative reference to non-normative term.";
-  showWarning(msg, name, { title, elements: [elem] });
+  // This is used by the informative-dfn linter
+  informativeRefsInNormative.push({ term, spec: cite, element: elem });
 }
 
 /** @param {Errors} errors */
@@ -456,9 +456,7 @@ function showErrors({ ambiguous, notFound }) {
   };
 
   const howToFix = (howToCiteURL, originalTerm) => {
-    return docLink`
-    [See search matches for "${originalTerm}"](${howToCiteURL}) or
-    ${"[Learn about this error|#error-term-not-found]"}.`;
+    return docLink`[See search matches for "${originalTerm}"](${howToCiteURL}) or ${"[Learn about this error|#error-term-not-found]"}.`;
   };
 
   for (const { query, elems } of notFound.values()) {
@@ -480,7 +478,9 @@ function showErrors({ ambiguous, notFound }) {
     const formUrl = getPrefilledFormURL(originalTerm, query, specs);
     const forParent = query.for ? `, for **"${query.for}"**, ` : "";
     const moreInfo = howToFix(formUrl, originalTerm);
-    const hint = docLink`To fix, use the ${"[data-cite]"} attribute to pick the one you mean from the appropriate specification. ${moreInfo}.`;
+    const hint =
+      docLink`To fix, use the ${"[data-cite]"} attribute to pick the one you mean from the appropriate specification.` +
+      String.raw` ${moreInfo}`;
     const msg = `The term "**${originalTerm}**"${forParent} is ambiguous because it's defined in ${specsString}.`;
     const title = "Definition is ambiguous.";
     showError(msg, name, { title, elements: elems, hint });

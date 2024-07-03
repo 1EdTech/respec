@@ -239,32 +239,6 @@ describe("Core - Utils", () => {
     });
   });
 
-  describe("humanDate", () => {
-    it("produces a human date", () => {
-      expect(utils.humanDate("1977-03-15")).toBe("15 March 1977");
-      const d = new Date("1977-03-15");
-      expect(utils.humanDate(d)).toBe("15 March 1977");
-    });
-
-    it("produces a human date in different languages", () => {
-      expect(utils.humanDate("1977-03-15", "en")).toBe("15 March 1977");
-      const d = new Date("1977-03-15");
-      expect(utils.humanDate(d)).toBe("15 March 1977");
-      expect(utils.humanDate(d, "en")).toBe("15 March 1977");
-      expect(utils.humanDate(d, "nl")).toBe("15 maart 1977");
-      expect(utils.humanDate(d, "fr")).toBe("15 mars 1977");
-      expect(utils.humanDate(d, "unknown")).toBe("15 March 1977");
-    });
-  });
-
-  describe("isoDate", () => {
-    it("produces an ISO date", () => {
-      expect(utils.isoDate("2013-06-25")).toMatch(/2013-06-2[45]T/);
-      const d = new Date("2013-09-25");
-      expect(utils.isoDate(d)).toMatch(/2013-09-2[45]T/);
-    });
-  });
-
   describe("isValidConfDate", () => {
     it("checks the validity of a date", () => {
       expect(utils.isValidConfDate("2000-01-01")).toBeTrue();
@@ -305,6 +279,7 @@ describe("Core - Utils", () => {
     const localizationStrings = {
       en: { foo: "EN Foo", bar: "EN Bar" },
       ko: { foo: "KO Foo" },
+      "en-us": { foo: "EN-US Foo" },
     };
 
     it("returns localized string in given language", () => {
@@ -313,6 +288,9 @@ describe("Core - Utils", () => {
 
       const intlEn = getIntlData(localizationStrings, "EN");
       expect(intlEn.foo).toBe("EN Foo");
+
+      const intlEnUs = getIntlData(localizationStrings, "en-US");
+      expect(intlEnUs.foo).toBe(localizationStrings["en-us"].foo);
     });
 
     it("falls back to English string if key does not exist in language", () => {
@@ -325,9 +303,42 @@ describe("Core - Utils", () => {
       expect(intl.bar).toBe("EN Bar");
     });
 
+    it("falls back to primary language subtag", () => {
+      const intl = getIntlData(localizationStrings, "en-US");
+      expect(intl.bar).toBe(localizationStrings.en.bar);
+      expect(() => intl.baz).toThrowError(/No l10n data for key/);
+    });
+
     it("throws error if key doesn't exist in either doc lang and English", () => {
       const intl = getIntlData(localizationStrings, "de");
       expect(() => intl.baz).toThrowError(/No l10n data for key/);
+    });
+  });
+
+  describe("getIntlDataForKey", () => {
+    const { getIntlDataForKey } = utils;
+    const localizationStrings = {
+      en: { foo: "EN Foo", bar: "EN Bar" },
+      zh: { foo: "KO Foo" },
+      "zh-hans": { foo: "EN-US Foo" },
+    };
+    const get = (key, lang) =>
+      getIntlDataForKey(localizationStrings, key, lang);
+
+    it("uses lang or subtag only; never falls back to `en`", () => {
+      expect(get("foo", "zh-hans")).toBe(localizationStrings["zh-hans"].foo);
+      expect(get("foo", "zh")).toBe(localizationStrings.zh.foo);
+
+      expect(get("bar", "zh-hans")).toBe(localizationStrings.zh.bar);
+      expect(get("bar", "zh")).toBe(localizationStrings.zh.bar);
+
+      expect(get("baz", "zh-hans")).toBeUndefined();
+      expect(get("baz", "zh")).toBeUndefined();
+
+      expect(get("foo", "en-US")).toBe(localizationStrings.en.foo);
+      expect(get("baz", "en-US")).toBeUndefined();
+
+      expect(get("foo", "ko")).toBeUndefined();
     });
   });
 

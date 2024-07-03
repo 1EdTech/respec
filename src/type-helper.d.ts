@@ -24,7 +24,7 @@ interface AxeViolation {
   nodes: { failureSummary: string; element: HTMLElement }[];
 }
 
-declare var respecConfig: any;
+declare var respecConfig: Conf;
 interface Window {
   respecVersion: string;
   respecUI: {
@@ -52,8 +52,6 @@ interface Window {
 }
 
 interface Document {
-  /** @deprecated in favour of `document.respec.ready` */
-  respecIsReady: Promise<void>;
   respec: {
     readonly version: string;
     readonly ready: Promise<void>;
@@ -112,16 +110,57 @@ interface BiblioData {
   etAl?: boolean;
   expires: number;
 }
+
+type ProcessFn = (config: Conf, doc: Document) => Promise<void> | void;
+
+/** Configuration object type */
 interface Conf {
   authors?: Person[];
+  /** Object containing bibliographic data */
   biblio: Record<string, BiblioData>;
   editors?: Person[];
   formerEditors?: Person[];
+  /** Set of informative references */
   informativeReferences: Set<string>;
   localBiblio?: Record<string, BiblioData>;
+  /** Set of normative references */
   normativeReferences: Set<string>;
   shortName: string;
+  preProcess?: ProcessFn[];
+  postProcess?: ProcessFn[];
+  afterEnd?: ProcessFn;
+  specStatus?: string;
+  wgId?: string;
+  noToc: boolean;
+  /** Disables injecting ReSpec styles */
+  noReSpecCSS?: boolean;
+
+  /** Indicates whether the document is a preview */
+  isPreview?: boolean;
+  /** The pull request number, if applicable */
+  prNumber?: number;
+  /** The URL of the pull request, if applicable */
+  prUrl?: string;
+  /** The GitHub configuration object */
+  github?: {
+    /** The URL of the GitHub repository */
+    repoURL: string;
+  };
+  /** The title of the document */
+  title?: string;
+
+  /** W3C Group - see https://respec.org/w3c/groups */
+  group?: string | string[];
 }
+
+type GroupDetails = {
+  wgId: number;
+  wg: string;
+  wgURI: string;
+  wgPatentURI: string;
+  wgPatentPolicy: string;
+  groupType: string;
+};
 
 type LicenseInfo = {
   /**
@@ -136,7 +175,7 @@ type LicenseInfo = {
    * The short linking text of license.
    */
   short: string;
-}
+};
 
 type ResourceHintOption = {
   /**
@@ -161,14 +200,18 @@ type ResourceHintOption = {
   dontRemove?: boolean;
 };
 
+/** Represents a request to the core/xref module */
 module "core/xref" {
   import { IDBPDatabase, DBSchema } from "idb";
 
+  /** Represents a single request entry */
   export interface RequestEntry {
     term: string;
     id: string;
     types: string[];
+    /** Spec URLs to restrict the search to */
     specs?: string[][];
+    /** The context in which the term appears */
     for?: string;
   }
 
@@ -225,6 +268,16 @@ type PersonExtras = {
   href?: string;
 };
 
+type EventTopic =
+  | "amend-user-config"
+  | "beforesave"
+  | "end-all"
+  | "error"
+  | "plugins-done"
+  | "start-all"
+  | "toc"
+  | "warn";
+
 type DefinitionValidator = (
   /** Text to validate. */
   text: string,
@@ -233,4 +286,52 @@ type DefinitionValidator = (
   /** The element from which the validation originated. */
   element: HTMLElement,
   /** The name of the plugin originating the validation. */
-  pluginName: string) => boolean;
+  pluginName: string
+) => boolean;
+
+declare class RespecError extends Error {
+  constructor(
+    message: string,
+    pluginName: string,
+    options: {
+      isWarning: boolean;
+      elements?: HTMLElement[];
+      title?: string;
+    }
+  );
+  toJSON(): {
+    message: string;
+    name: string;
+    plugin: string;
+    hint?: string;
+    elements?: any[];
+    title?: string;
+    details?: any;
+    stack?: string;
+  };
+}
+
+/**
+ * Localization strings for different languages.
+ *
+ */
+type LocalizationStrings = {
+  de: Record<string, string>;
+  en: Record<string, string>;
+  ja: Record<string, string>;
+  nl: Record<string, string>;
+  zh: Record<string, string>;
+};
+
+interface LinkProps {
+  href: string;
+  title: string;
+}
+
+interface CiteDetails {
+  key: string;
+  isNormative: boolean;
+  frag: string;
+  path: string;
+  href?: string;
+}

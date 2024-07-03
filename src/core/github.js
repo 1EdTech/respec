@@ -2,7 +2,7 @@
 /**
  * core/github
  *
- * @see https://github.com/w3c/respec/wiki/github
+ * @see https://github.com/speced/respec/wiki/github
  */
 
 import { docLink, getIntlData, showError, showWarning } from "../core/utils.js";
@@ -81,9 +81,7 @@ export async function run(conf) {
     return;
   }
   if (ghURL.origin !== "https://github.com") {
-    const msg = docLink`${"[github]"} configuration option must be HTTPS and pointing to GitHub. (${
-      ghURL.href
-    }).`;
+    const msg = docLink`${"[github]"} configuration option must be HTTPS and pointing to GitHub. (${ghURL.href}).`;
     rejectGithubPromise(msg);
     return;
   }

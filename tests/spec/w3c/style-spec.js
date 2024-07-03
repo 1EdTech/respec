@@ -2,104 +2,164 @@
 
 import {
   flushIframes,
-  makeBasicConfig,
-  makeDefaultBody,
+  getExportedDoc,
   makeRSDoc,
   makeStandardOps,
-  pickRandomsFromList,
 } from "../SpecHelper.js";
 
-const specStatus = [
+const statuses = [
   {
-    status: "FPWD",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}W3C-WD",
+    specStatus: undefined,
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
+    group: "webapps",
   },
   {
-    status: "WD-NOTE",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}W3C-WD",
+    specStatus: "FPWD",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-WD",
+    group: "webapps",
   },
   {
-    status: "finding",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}base.css",
+    specStatus: "NOTE",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-NOTE",
+    group: "webapps",
   },
   {
-    status: "draft-finding",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}base.css",
+    specStatus: "finding",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
+    group: "tag",
   },
   {
-    status: "editor-draft-finding",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}base.css",
+    specStatus: "draft-finding",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
+    group: "tag",
   },
   {
-    status: "unofficial",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}W3C-UD",
+    specStatus: "editor-draft-finding",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
+    group: "tag",
   },
   {
-    status: "base",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}base.css",
+    specStatus: "unofficial",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-UD",
   },
   {
-    status: "RSCND",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}W3C-RSCND",
+    specStatus: "base",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
   },
   {
-    status: "FPWD-NOTE",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}W3C-WG-NOTE.css",
+    specStatus: "RSCND",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-RSCND",
+    group: "webapps",
   },
   {
-    status: "FAKE-TEST-TYPE",
-    expectedURL:
-      "https://www.w3.org/StyleSheets/TR/{version}W3C-FAKE-TEST-TYPE",
+    specStatus: "FAKE-TEST-TYPE",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/base.css",
   },
   {
-    status: "CG-FINAL",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}cg-final",
+    specStatus: "CG-FINAL",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/cg-final",
+    group: "wicg",
   },
   {
-    status: "CG-DRAFT",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}cg-draft",
+    specStatus: "CG-DRAFT",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/cg-draft",
+    group: "wicg",
   },
   {
-    status: "BG-FINAL",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}bg-final",
+    specStatus: "BG-FINAL",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/bg-final",
+    group: "autowebplatform",
   },
   {
-    status: "BG-DRAFT",
-    expectedURL: "https://www.w3.org/StyleSheets/TR/{version}bg-draft",
+    specStatus: "BG-DRAFT",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/bg-draft",
+    group: "publishingbg",
+  },
+  {
+    specStatus: "CR",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-CR",
+    group: "webapps",
+  },
+  {
+    specStatus: "CRD",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-CRD",
+    group: "webapps",
+  },
+  {
+    specStatus: "CRY",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-CRY",
+    group: "webapps",
+  },
+  {
+    specStatus: "CRYD",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-CRYD",
+    group: "webapps",
+  },
+  {
+    specStatus: "DISC",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-DISC",
+    group: "webapps",
+  },
+  {
+    specStatus: "DNOTE",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-DNOTE",
+    group: "webapps",
+  },
+  {
+    specStatus: "DRY",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-DRY",
+    group: "webapps",
+  },
+  {
+    specStatus: "ED",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-ED",
+    group: "webapps",
+  },
+  {
+    specStatus: "Member-SUBM",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-Member-SUBM",
+    group: "webapps",
+  },
+  {
+    specStatus: "NOTE",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-NOTE",
+    group: "webapps",
+  },
+  {
+    specStatus: "PR",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-PR",
+    group: "webapps",
+  },
+  {
+    specStatus: "REC",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-REC",
+    group: "webapps",
+  },
+  {
+    specStatus: "RSCND",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-RSCND",
+    group: "webapps",
+  },
+  {
+    specStatus: "RY",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-RY",
+    group: "webapps",
+  },
+  {
+    specStatus: "STMT",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-STMT",
+    group: "webapps",
+  },
+  {
+    specStatus: "UD",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-UD",
+  },
+  {
+    specStatus: "WD",
+    expectedURL: "https://www.w3.org/StyleSheets/TR/2021/W3C-WD",
+    group: "webapps",
   },
 ];
-
-async function loadWithStatus(status, expectedURL, mode) {
-  const config = makeBasicConfig();
-  config.useExperimentalStyles = false;
-  config.specStatus = status;
-  config.prevVersion = "FPWD";
-  config.previousMaturity = "WD";
-  config.previousPublishDate = "2013-12-17";
-  let version = "2016/";
-  switch (mode) {
-    case "experimental":
-      config.useExperimentalStyles = true;
-      version = `${2016}/`;
-      break;
-    default:
-      if (mode) {
-        config.useExperimentalStyles = mode;
-        version = `${mode}/`;
-      }
-  }
-  const testedURL = expectedURL.replace("{version}", version);
-  const ops = {
-    config,
-    body: makeDefaultBody(),
-  };
-  const doc = await makeRSDoc(ops);
-  const query = `link[href^='${testedURL}']`;
-  const elem = doc.querySelector(query);
-  expect(elem).toBeTruthy();
-  expect(elem.href).toBe(testedURL);
-  return doc;
-}
 
 describe("W3C - Style", () => {
   afterAll(flushIframes);
@@ -107,9 +167,9 @@ describe("W3C - Style", () => {
   it("should include 'fixup.js'", async () => {
     const ops = makeStandardOps();
     const doc = await makeRSDoc(ops, "spec/core/simple.html");
-    const query = "script[src^='https://www.w3.org/scripts/TR/2016/fixup.js']";
+    const query = "script[src^='https://www.w3.org/scripts/TR/2021/fixup.js']";
     const elem = doc.querySelector(query);
-    expect(elem.src).toBe("https://www.w3.org/scripts/TR/2016/fixup.js");
+    expect(elem.src).toBe("https://www.w3.org/scripts/TR/2021/fixup.js");
   });
 
   it("should have a meta viewport added", async () => {
@@ -121,33 +181,75 @@ describe("W3C - Style", () => {
     expect(elem.content).toBe(expectedStr);
   });
 
-  it("should default to base when specStatus is missing", async () => {
-    await loadWithStatus(
-      "",
-      "https://www.w3.org/StyleSheets/TR/{version}base.css"
+  for (const { specStatus, expectedURL, group } of statuses) {
+    it(`styles with specStatus: ${specStatus}; group: ${group}`, async () => {
+      const conf = {
+        specStatus,
+        group,
+      };
+      const ops = makeStandardOps(conf);
+      const doc = await makeRSDoc(ops);
+      const query = `link[href^='${expectedURL}']`;
+      const elem = doc.querySelector(query);
+      expect(elem).toBeTruthy();
+      expect(elem.href).toBe(expectedURL);
+    });
+  }
+
+  it("should add W3C stylesheet at the end", async () => {
+    const ops = makeStandardOps({});
+    const doc = await getExportedDoc(await makeRSDoc(ops));
+    const url = "https://www.w3.org/StyleSheets/TR/2021/base";
+    const elem = doc.querySelector(`link[href^='${url}'][rel="stylesheet"]`);
+    expect(elem).toBeTruthy();
+    expect(elem.nextElementSibling).toBe(null);
+  });
+
+  it("respects existing color scheme", async () => {
+    const ops = makeStandardOps();
+    const doc = await makeRSDoc(ops, "spec/core/color-scheme.html");
+    const elem = doc.querySelector("meta[name='color-scheme']");
+    expect(elem).toBeTruthy();
+    expect(elem.content).toBe("dark light");
+  });
+
+  it("sets the document to light color scheme by default", async () => {
+    const ops = makeStandardOps();
+    const doc = await makeRSDoc(ops);
+    const elem = doc.querySelector("meta[name='color-scheme']");
+    expect(elem).toBeTruthy();
+    expect(elem.content).toBe("light");
+  });
+
+  it("adds dark mode stylesheet", async () => {
+    const ops = makeStandardOps();
+    const doc = await makeRSDoc(ops, "spec/core/color-scheme.html");
+    /** @type HTMLLinkElement? */
+    const link = doc.querySelector(
+      `link[href="https://www.w3.org/StyleSheets/TR/2021/dark.css"]`
     );
+    expect(link).toBeTruthy();
   });
 
-  // We pick random half from the list, as running the whole set is very slow
-  pickRandomsFromList(specStatus).map(test => {
-    it(`should style according to spec status ${test.status}`, async () => {
-      await loadWithStatus(test.status, test.expectedURL, "2016");
-    });
+  it("adds darkmode stylesheet at the end", async () => {
+    const ops = makeStandardOps();
+    const doc = await getExportedDoc(
+      await makeRSDoc(ops, "spec/core/color-scheme.html")
+    );
+    const linkBase = doc.querySelector(
+      `link[href^='https://www.w3.org/StyleSheets/TR/2021/base'][rel="stylesheet"]`
+    );
+    expect(linkBase).toBeTruthy();
+    expect(linkBase.nextElementSibling).toBeTruthy();
+
+    const linkDarkMode = doc.querySelector(
+      `link[href^='https://www.w3.org/StyleSheets/TR/2021/dark.css'][rel="stylesheet"]`
+    );
+    expect(linkDarkMode).toBeTruthy();
+    expect(linkDarkMode.nextElementSibling).toBeFalsy();
+    expect(linkBase.nextElementSibling).toBe(linkDarkMode);
   });
 
-  // We pick random half from the list, as running the whole set is very slow
-  pickRandomsFromList(specStatus).map(test => {
-    it(`should style according to spec status ${test.status} in experimental way`, async () => {
-      await loadWithStatus(test.status, test.expectedURL, "experimental");
-    });
-  });
-
-  // We pick random half from the list, as running the whole set is very slow
-  pickRandomsFromList(specStatus).map(test => {
-    it(`should not use 'experimental' URL in ${test.status} status when useExperimentalStyles is false`, async () => {
-      await loadWithStatus(test.status, test.expectedURL);
-    });
-  });
   it("shouldn't include fixup.js when noToc is set", async () => {
     const ops = makeStandardOps();
     const newProps = {
@@ -155,7 +257,7 @@ describe("W3C - Style", () => {
     };
     Object.assign(ops.config, newProps);
     const doc = await makeRSDoc(ops, "spec/core/simple.html");
-    const query = "script[src^='https://www.w3.org/scripts/TR/2016/fixup.js']";
+    const query = "script[src^='https://www.w3.org/scripts/TR/2021/fixup.js']";
     const elem = doc.querySelector(query);
     expect(elem).toBeNull();
   });

@@ -31,7 +31,7 @@ const localizationStrings = {
         /\bMUST(?:\s+NOT)?\b/,
         /\bSHOULD(?:\s+NOT)?\b/,
         /\bSHALL(?:\s+NOT)?\b/,
-        /\bMAY?\b/,
+        /\bMAY\b/,
         /\b(?:NOT\s+)?REQUIRED\b/,
         /\b(?:NOT\s+)?RECOMMENDED\b/,
         /\bOPTIONAL\b/,
@@ -42,13 +42,17 @@ const localizationStrings = {
     rfc2119Keywords() {
       return joinRegex([
         /\bMUSS\b/,
+        /\bMÜSSEN\b/,
         /\bERFORDERLICH\b/,
         /\b(?:NICHT\s+)?NÖTIG\b/,
         /\bDARF(?:\s+NICHT)?\b/,
+        /\bDÜRFEN(?:\s+NICHT)?\b/,
         /\bVERBOTEN\b/,
         /\bSOLL(?:\s+NICHT)?\b/,
+        /\bSOLLEN(?:\s+NICHT)?\b/,
         /\b(?:NICHT\s+)?EMPFOHLEN\b/,
         /\bKANN\b/,
+        /\bKÖNNEN\b/,
         /\bOPTIONAL\b/,
       ]);
     },
@@ -61,7 +65,7 @@ const l10n = getIntlData(localizationStrings);
 // add support.
 const inlineCodeRegExp = /(?:`[^`]+`)(?!`)/; // `code`
 const inlineIdlReference = /(?:{{[^}]+\?*}})/; // {{ WebIDLThing }}, {{ WebIDLThing? }}
-const inlineVariable = /\B\|\w[\w\s]*(?:\s*:[\w\s&;<>]+\??)?\|\B/; // |var : Type?|
+const inlineVariable = /\B\|\w[\w\s]*(?:\s*:[\w\s&;"?<>]+\??)?\|\B/; // |var : Type?|
 const inlineCitation = /(?:\[\[(?:!|\\|\?)?[\w.-]+(?:|[^\]]+)?\]\])/; // [[citation]]
 const inlineExpansion = /(?:\[\[\[(?:!|\\|\?)?#?[\w-.]+\]\]\])/; // [[[expand]]]
 const inlineAnchor = /(?:\[=[^=]+=\])/; // Inline [= For/link =]
@@ -94,7 +98,11 @@ function inlineElementMatches(matched) {
     }
   })();
   return html`<code
-    ><a data-xref-type="${xrefType}" data-xref-for="${xrefFor}"
+    ><a
+      data-xref-type="${xrefType}"
+      data-xref-for="${xrefFor}"
+      data-link-type="${xrefType}"
+      data-link-for="${xrefFor}"
       >${textContent}</a
     ></code
   >`;
@@ -120,9 +128,9 @@ function inlineRefMatches(matched) {
   // slices "[[[" at the beginning and "]]]" at the end
   const ref = matched.slice(3, -3).trim();
   if (!ref.startsWith("#")) {
-    return html`<a data-cite="${ref}"></a>`;
+    return html`<a data-cite="${ref}" data-matched-text="${matched}"></a>`;
   }
-  return html`<a href="${ref}"></a>`;
+  return html`<a href="${ref}" data-matched-text="${matched}"></a>`;
 }
 
 /**
@@ -215,7 +223,7 @@ function inlineAnchorMatches(matched) {
   const processedContent = processInlineContent(text);
   const forContext = isFor ? norm(isFor) : null;
   return html`<a
-    data-link-type="dfn"
+    data-link-type="dfn|abstract-op"
     data-link-for="${forContext}"
     data-xref-for="${forContext}"
     data-lt="${linkingText}"
@@ -266,7 +274,7 @@ export function run(conf) {
 
   // PROCESSING
   // Don't gather text nodes for these:
-  const exclusions = ["#respec-ui", ".head", "pre"];
+  const exclusions = ["#respec-ui", ".head", "pre", "svg"];
   const txts = getTextNodes(document.body, exclusions, {
     wsNodes: false, // we don't want nodes with just whitespace
   });
@@ -347,6 +355,7 @@ export function run(conf) {
  *
  */
 function splitByFor(str) {
+  /** @param {string} str */
   const cleanUp = str => str.replace("%%", "/").split("/").map(norm).join("/");
   const safeStr = str.replace("\\/", "%%");
   const lastSlashIdx = safeStr.lastIndexOf("/");

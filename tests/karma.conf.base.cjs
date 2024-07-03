@@ -26,7 +26,7 @@ const files = [
     included: false,
   },
   {
-    pattern: "tests/**/*.html",
+    pattern: "tests/**/*.@(html|json)",
     included: false,
   },
   {
@@ -40,6 +40,14 @@ module.exports = config => {
   /** @type {import("karma").ConfigOptions} */
   const options = {
     basePath: path.join(__dirname, ".."),
+    plugins: [
+      require("karma-jasmine"),
+      require("karma-mocha-reporter"),
+      require("karma-jasmine-html-reporter"),
+      require("karma-chrome-launcher"),
+      require("karma-firefox-launcher"),
+      require("karma-safari-launcher"),
+    ],
     frameworks: ["jasmine"],
     files,
     exclude: ["**/*.swp", "*.swp", ".DS_Store"],
@@ -84,11 +92,9 @@ module.exports = config => {
   }
 
   if (process.env.GITHUB_WORKFLOW) {
-    const localPlugins = [
-      require.resolve("../tools/github-action-reporter.js"),
-    ];
+    const localPlugins = [require("../tools/github-action-reporter.cjs")];
     options.reporters.push("respec-github-action");
-    options.plugins = ["karma-*"].concat(localPlugins);
+    options.plugins = options.plugins.concat(localPlugins);
   }
 
   config.set(options);
