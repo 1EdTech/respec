@@ -77,7 +77,7 @@
     <h2>Abstract</h2>
     <p>Simple abstract.</p>
   </section>
-  <section id="conformance">
+  <section id="conformance" class="informative">
     <h2>Conformance</h2>
   </section>
   <section>
@@ -87,7 +87,16 @@
       <dd>An authorization server.</dd>
       <dt><dfn>Resource Server</dfn></dt>
       <dd>A resource server.</dd>
+      <dt><dfn>credential equality and comparison</dfn></dt>
+      <dd>An algorithm.</dd>
     </dl>
+  </section>
+  <section id="data-integrity">
+    <h2>Data Integrity</h2>
+    <p>This specification uses the terms defined in the [[DATA-INTEGRITY]] specification.</p>
+    </section>
+  <section id="proofs-signatures">
+    <h2>Proofs</h2>
   </section>
 
   <!-- Start a service model section-->
@@ -109,6 +118,7 @@
     <section data-interface="org.1edtech.clr.v2p0.rest.clrcredentials.interface">
       <p>Some text about the interface.</p>
       <section data-operation="org.1edtech.clr.v2p0.rest.getcredentials.operation">
+        <h4>getCredentials Request</h4>
         <pre class="http example" title="Sample getCredentials Request">
           GET ims/clr/v2p0/credentials?limit=2&offset=0 HTTP/1.1
           Host: example.edu
@@ -289,6 +299,7 @@
         </pre>
       </section>
       <section data-operation="org.1edtech.clr.v2p0.rest.postcredential.operation">
+        <h4>postCredential Request</h4>
         <pre class="http example" title="Sample postCredential Request">
           POST ims/clr/v2p0/credentials
           Host: example.edu
@@ -513,7 +524,7 @@
     </section>
   </section>
 
-  <!-- Start a data model section-->
+  Start a data model section
   <section data-model="org.1edtech.orrostering.v1p2.model">
   </section>
 
@@ -522,6 +533,11 @@
     data-service-model="org.1edtech.orrostering.v1p2.rest.servicemodel"
     data-interface-filter="org.1edtech.orrostering.v1p2.rest.demographicsmanagement.interface">
   </section>
+
+  <section data-model="org.1edtech.orrostering.v1p2.model" data-stereotype="DerivedType" title="Derived Types" class="appendix">
+    <p>Something about Derived Types.</p>
+  </section>
+  <section data-model="org.1edtech.orrostering.v1p2.model" data-stereotype="PrimitiveType" title="Primitive Types" class="appendix"></section>
 
   <section data-model="org.1edtech.clr.v2p0.model" data-source="SANDBOX">
     <p>
@@ -532,8 +548,9 @@
         data-allowAdditionalProperties="true" title="Sample ClrCredential">
         {
           "@context": [
-            "https://www.w3.org/2018/credentials/v1",
-            "https://dc.imsglobal.org/draft/clr/v2p0/context"
+            "https://www.w3.org/ns/credentials/v2",
+            "https://purl.imsglobal.org/spec/clr/v2p0/context-2.0.1.json",
+            "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json"
           ],
           "id": "http://example.edu/credentials/3732",
           "type": [ "VerifiableCredential", "ClrCredential" ],
@@ -543,16 +560,15 @@
             "type": ["Profile"],
             "name": "Example University"
           },
-          "issuanceDate": "2010-01-01T00:00:00Z",
+          "validFrom": "2010-01-01T00:00:00Z",
           "credentialSubject": {
             "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
             "type": ["ClrSubject"],
             "verifiableCredential": [
               {
                 "@context": [
-                  "https://www.w3.org/2018/credentials/v1",
-                  "https://dc.imsglobal.org/draft/clr/v2p0/context",
-                  "https://imsglobal.github.io/openbadges-specification/context.json"
+                  "https://www.w3.org/ns/credentials/v2",
+                  "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json"
                 ],
                 "id": "urn:uuid:91537dba-56cb-11ec-bf63-0242ac130002",
                 "type": ["VerifiableCredential", "AchievementCredential"],
@@ -561,7 +577,7 @@
                   "type": ["Profile"],
                   "name": "Example University"
                 },
-                "issuanceDate": "2010-01-01T00:00:00Z",
+                "validFrom": "2010-01-01T00:00:00Z",
                 "credentialSubject": {
                   "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
                   "type": ["AchievementSubject"],
