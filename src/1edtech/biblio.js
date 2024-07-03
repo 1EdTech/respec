@@ -10,7 +10,7 @@
  * Note: Run before core/biblio
  */
 
-import { pub } from "../core/pubsubhub.js";
+import { showWarning } from "../core/utils.js";
 
 export const name = "1edtech/biblio";
 
@@ -36,7 +36,7 @@ export async function run(conf) {
       // TODO we might want to worry about dupes and precedence
       conf.localBiblio = Object.assign(conf.localBiblio, json);
     } catch (error) {
-      pub("warn", error.toString());
+      showWarning("Failed to fetch IMS biblio data: " + error.toString(), name);
     }
   }
 }

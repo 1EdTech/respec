@@ -93,11 +93,11 @@ function getNormativeText(conf) {
  */
 function getInformativeText(conf) {
   if (!conf.mainSpecTitle) {
-    showWarning("warn", "No mainSpecTitle property found in config')");
+    showWarning("No mainSpecTitle property found in config')", name);
   }
 
   if (!conf.mainSpecBiblioKey) {
-    showWarning("warn", "No mainSpecBiblioKey property found in config')");
+    showWarning("No mainSpecBiblioKey property found in config')", name);
   }
 
   return html` <p>
@@ -154,13 +154,13 @@ export function run(conf) {
       return;
     }
     // Otherwise, the conformance section is required
-    showError("error", "No section found with id 'conformance'");
+    showError("No section found with id 'conformance'", name);
     return;
   }
 
   // Use 1EdTech specNature to determine conformance text
   if (!conf.specNature) {
-    showError("error", "Document must have config.specNature set");
+    showError("Document must have config.specNature set", name);
   }
 
   // 1EdTech standard is to have a Conformance heading
@@ -169,7 +169,7 @@ export function run(conf) {
       "h1, h2, h3, h4, h5, h6"
     );
     if (!conformanceHeading) {
-      showWarning("warn", "No heading found in the conformance section");
+      showWarning("No heading found in the conformance section", name);
     } else {
       // Insert conformation text after heading
       conformance = conformanceHeading;

@@ -11,8 +11,7 @@ export const name = "1edtech/abstract";
 export async function run() {
   let abstract = document.getElementById("abstract");
   if (!abstract) {
-    const msg = `Document should have one element with \`id="abstract"`;
-    showWarning(msg, name);
+    showWarning("Document should have one element with 'abstract'", name);
     // insert a temp abstract
     abstract = html`<section id="abstract" class="introductory remove">
       <h2>To be removed</h2>
