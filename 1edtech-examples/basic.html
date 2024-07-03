@@ -42,7 +42,14 @@
           publisher: "1EdTech&trade; Consortium, Inc."
         }
       },
-      
+      lint: {
+         a11y: {
+            rules: {
+              "color-contrast": { enabled: true }
+            }
+         }
+      },
+
       // Force respec-vc stylesheet to be loaded
       postProcess: [
         window.respecVc.createVcExamples
@@ -87,7 +94,7 @@
       This section has a CSS class "<code>informative</code>", so it is
       listed in the TOC. ReSpec will list this reference as non-normative
       since this is an informative section [[DOM]].
-    </p>
+</p>
   </section>
   <section id="conformance">
     <h2>Conformance</h2>
@@ -121,7 +128,7 @@
       </figcaption>
     </figure>
     <p>
-      Link to <a href="#figure"></a>
+      Link to <a href="#figure"></a>.
     </p>
   </section>
   <section>
@@ -202,7 +209,7 @@
       </tbody>
     </table>
     <p>
-      <strong>Example</strong>
+      <strong>Example.</strong>
     </p>
     <figure class="example">
       <pre><code>
