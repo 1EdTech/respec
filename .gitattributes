@@ -1,0 +1,2 @@
+.gitattributes !filter !diff
+1edtech-examples/mps-config.js filter=git-crypt diff=git-crypt
