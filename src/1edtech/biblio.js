@@ -34,7 +34,7 @@ export async function run(conf) {
       // TODO invalid json should be caught here
       // JSON.stringify(conf.localBiblio) --> throws error?
       // TODO we might want to worry about dupes and precedence
-      conf.localBiblio = Object.assign(conf.localBiblio, json);
+      conf.localBiblio = Object.assign(conf.localBiblio || {}, json);
     } catch (error) {
       showWarning("Failed to fetch IMS biblio data: " + error.toString(), name);
     }
