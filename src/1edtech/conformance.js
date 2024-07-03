@@ -132,7 +132,7 @@ function processConformance(conformance, conf) {
   if (conformance.tagName === "SECTION") {
     conformance.prepend(...content.childNodes);
   } else {
-    conformance.parentNode.append(...content.childNodes);
+    conformance.parentNode.parentNode.append(...content.childNodes);
   }
 }
 
