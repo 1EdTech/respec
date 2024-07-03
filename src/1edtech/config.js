@@ -4,7 +4,7 @@
  * check config and inform user if required ones are missing
  */
 
-import { humanDate, showError } from "../core/utils.js";
+import { ISODate, showError } from "../core/utils.js";
 
 export const name = "1edtech/config";
 
@@ -40,7 +40,7 @@ export async function run(conf) {
 
   if (!check(conf.specDate)) {
     if (conf.specStatus === "Base Document") {
-      conf.specDate = humanDate();
+      conf.specDate = ISODate.format(new Date());
     } else {
       showError(
         "head config must have the <code>specDate</code> property set, e.g. 'June 28, 2019'",
