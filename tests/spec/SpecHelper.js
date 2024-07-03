@@ -317,6 +317,6 @@ export function makeStandardImsOps(config = {}, body = makeDefaultBody()) {
     abstract,
     body,
     config: { ...makeBasicConfig("ims"), ...config },
-    profile: "ims-default",
+    profile: "1edtech",
   };
 }

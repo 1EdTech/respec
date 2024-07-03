@@ -9,7 +9,7 @@ bevy.json
 js/deps/builds
 !js/profile-w3c-common.js
 !js/profile-geonovum.js
-!js/profile-ims-default.js
+!js/profile-1edtech.js
 !js/profile-w3c.js
 .vscode/*
 !.vscode/tasks.json
