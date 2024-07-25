@@ -78,6 +78,8 @@ const modules = [
   import("../src/1edtech/scripts.js"),
   // Remove all comment nodes
   import("../src/1edtech/comments.js"),
+  // Make code keyboard accessible
+  import("../src/1edtech/focus-code.js"),
   // Add the 1EdTech footer
   import("../src/1edtech/footers.js"),
   /* Linters must be the last thing to run */
