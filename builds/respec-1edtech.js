@@ -229,7 +229,7 @@ body{-webkit-hyphens:auto;-ms-hyphens:auto;hyphens:auto;color:var(--fgclr1)}
       ${t.documentation.notes.map(sr)}
       ${function(e,t){if(e.showPrivacyAnnotations&&t)return Qe`<div class="advisement">Privacy implication: ${t}</div>`}(e,t.documentation.privacyDoc)}
     </td>
-    <td>${function(e){switch(e.cardinality.value){case"ONE":return"[1]";case"ZERO_OR_ONE":return"[0..1]";case"ZERO_OR_MANY":return"[0..*]";case"ONE_OR_MANY":return"[1..*]";case"TWO":return"[2]"}}(t)}</td>
+    <td>${function(e){switch(e.cardinality.value){case"ONE":return"[1]";case"ZERO_OR_ONE":return"[0..1]";case"ZERO_OR_MANY":return"[0..*]";case"ONE_OR_MANY":return"[1..*]";case"TWO":return"[2]";case"TWO_OR_MANY":return"[2..*]";case"THREE_OR_MANY":return"[3..*]"}}(t)}</td>
     ${e.showPrivacyAnnotations?function(e){return Qe`<td>
     <a href="#privacy-${e.privacyImplications.value.toLowerCase()}">
       ${function(e){return Qe`${e.privacyImplications.label}`}(e)}
