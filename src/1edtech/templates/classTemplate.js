@@ -97,6 +97,10 @@ function renderCardinality(property) {
       return "[1..*]";
     case "TWO":
       return "[2]";
+    case "TWO_OR_MANY":
+      return "[2..*]";
+    case "THREE_OR_MANY":
+      return "[3..*]";
     default:
       break;
   }
