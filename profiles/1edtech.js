@@ -11,9 +11,9 @@ const modules = [
   import("../src/1edtech/config.js"),
   // Compute common values
   import("../src/1edtech/compute.js"),
+  import("../src/core/github.js"),
   // Process transcludes
   import("../src/1edtech/transclude.js"),
-  import("../src/core/github.js"),
   import("../src/core/data-include.js"),
   // Model Processing Service plugin
   import("../src/1edtech/mps.js"),
@@ -24,7 +24,7 @@ const modules = [
   import("../src/core/reindent.js"),
   // import("../src/core/title.js"),
   import("../src/1edtech/headers.js"),
-  import("../src/core/id-headers.js"),
+  // import("../src/core/id-headers.js"),
   import("../src/1edtech/abstract.js"),
   import("../src/core/data-transform.js"),
   import("../src/core/data-abbr.js"),
@@ -49,6 +49,7 @@ const modules = [
   import("../src/core/render-biblio.js"),
   import("../src/core/dfn-index.js"),
   import("../src/1edtech/contrib.js"),
+  import("../src/core/sections.js"),
   import("../src/core/fix-headers.js"),
   import("../src/core/structure.js"),
   import("../src/core/informative.js"),
