@@ -301,18 +301,22 @@ dt > dfn {
 /** "Link here" for section headings  *****************************************/
 a[href].hidden-reveal::before {
   content: "›";
+  text-decoration: none;
 }
 
 /* w3c/respec change in how section headers are formed */
-h2 > a[href].self-link::before, h3 > a[href].self-link::before,
-h4 > a[href].self-link::before, h5 > a[href].self-link::before,
-h6 > a[href].self-link::before {
+:is(h2, h3, h4, h5, h6) + a.self-link::before {
   content: "›";
 }
 
-a[href].hidden-reveal, a[href].hidden-reveal:visited {
+a.self-link {
   text-decoration: none;
-  border-bottom: none;
+}
+
+a[href].hidden-reveal, a[href].hidden-reveal:visited,
+a[href].self-link:visited, a[href].self-link:hover {
+  opacity: 1;
+  text-decoration: none;
 }
 
 /** Admonitions for section headings  *****************************************/
