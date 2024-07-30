@@ -21,27 +21,24 @@ export const name = "1edtech/inlines";
  */
 function findConformanceSection(parent) {
   /** @type {NodeListOf<HTMLElement>} */
-  const sectionElements = parent.querySelectorAll(":scope > section");
-  for (const section of sectionElements) {
-    if (!section.children.length) {
-      continue;
-    }
-
-    if (!section.id) {
-      const header = section.children[0];
-      const title = header.textContent;
+  const headingElements = parent.querySelectorAll(
+    `:scope > h2, h3, h4, h5, h6`
+  );
+  for (const heading of headingElements) {
+    if (!heading.id) {
+      const title = heading.textContent;
       if (
         title.toLowerCase() == "conformance" ||
         title.toLowerCase() == "conformance statements"
       ) {
-        addId(section, null, "conformance");
-        return section;
+        addId(heading, null, "conformance");
+        return heading;
       }
     }
 
-    const foundSection = findConformanceSection(section);
-    if (foundSection) {
-      return foundSection;
+    const foundHeading = heading.id === "conformance";
+    if (foundHeading) {
+      return heading;
     }
   }
 

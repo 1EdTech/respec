@@ -132,7 +132,7 @@ function processConformance(conformance, conf) {
   if (conformance.tagName === "SECTION") {
     conformance.prepend(...content.childNodes);
   } else {
-    conformance.parentNode.parentNode.append(...content.childNodes);
+    conformance.after(...content.childNodes);
   }
 }
 
@@ -148,6 +148,10 @@ export function run(conf) {
   let conformance = document.querySelector("section#conformance");
   if (!conformance)
     conformance = document.querySelector("section#conformance-0");
+  if (!conformance)
+    conformance = document.querySelector("section #conformance");
+  if (!conformance)
+    conformance = document.querySelector("section #conformance-0");
   if (!conformance) {
     if (conf.specType === "doc") {
       // Conformance is optional for generic documents
