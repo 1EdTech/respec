@@ -24,7 +24,7 @@ const modules = [
   import("../src/core/reindent.js"),
   // import("../src/core/title.js"),
   import("../src/1edtech/headers.js"),
-  // import("../src/core/id-headers.js"),
+  import("../src/1edtech/id-headers.js"),
   import("../src/1edtech/abstract.js"),
   import("../src/core/data-transform.js"),
   import("../src/core/data-abbr.js"),
@@ -69,7 +69,7 @@ const modules = [
   import("../src/core/dfn-panel.js"),
   import("../src/core/data-type.js"),
   import("../src/core/algorithms.js"),
-  import("../src/core/anchor-expander.js"),
+  import("../src/1edtech/anchor-expander.js"),
   import("../src/core/custom-elements/index.js"),
   // Clean up the document
   import("../src/1edtech/cleanBody.js"),
