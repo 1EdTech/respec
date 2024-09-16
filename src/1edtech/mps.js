@@ -1124,14 +1124,24 @@ export async function run(config) {
     .map(section => {
       const modelId = section.getAttribute("data-model");
       const source = section.getAttribute("data-source") ?? config.mps.source;
-      return `${source}-${modelId}`;
+      return {
+        source: source,
+        modelId: modelId,
+      };
     })
-    .filter((value, index, self) => self.indexOf(value) === index);
+    // Remove duplicates
+    .filter(
+      (model, index, self) =>
+        index ===
+        self.findIndex(
+          t => t.source === model.source && t.modelId === model.modelId
+        )
+    );
+
   promises.push(
     ...Array.from(
       models.map(model => {
-        const params = model.split("-");
-        return getModel(config, params[0], params[1]);
+        return getModel(config, model.source, model.modelId);
       })
     )
   );
