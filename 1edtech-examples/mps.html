@@ -13,6 +13,7 @@
 
   <!-- Load the MPS configuration -->
   <script class="remove" src="mps-config.js"></script>
+  <script class="remove" src="mps-auth.js"></script>
 
   <!-- Load ajv2019 (Another JSON Schema Validator) if you want your examples validated -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.8.2/ajv2019.bundle.min.js"
@@ -20,6 +21,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <script class='remove'>
+
     var respecConfig = {
       specTitle: "Replace me with a real title",
       shortName: "example",
@@ -69,6 +71,7 @@
       //   window.respecVc.createVcExamples
       // ],
     };
+    respecConfig.mps.apikey = _mpsApiKey;
   </script>
 </head>
 
