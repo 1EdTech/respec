@@ -62,7 +62,7 @@
       github: "https://github.com/IMSGlobal/ComprehensiveLearnerRecord",
 
       // Add the MPS configuration to respecConfig
-      mps: _mps,
+      mps: {..._mps, apiKey: _mpsApiKey},
 
       showPrivacyAnnotations: true,
 
@@ -71,7 +71,7 @@
       //   window.respecVc.createVcExamples
       // ],
     };
-    respecConfig.mps.apikey = _mpsApiKey;
+    respecConfig.mps.apiKey = _mpsApiKey;
   </script>
 </head>
 
