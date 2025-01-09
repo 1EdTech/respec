@@ -1,0 +1,29 @@
+Model test01 "t:Model de prova 01" "Model de prova 01"
+
+Package DataClasses "Classes de dades"
+
+	Class Thing "Cosa"
+		Property id "identificador"
+		Property startDate "Data d'inici"
+		Property endDate "Data de finalització"
+
+	Class Thang "Thang"
+		Property id "identificador"
+		Property thingRef "referència a Cosa"
+		Property size "mida"
+
+
+Package BaseService "Servei Base"
+
+	Interface Things "t:Operacions sobre Cosa"  			"n:primera nota" "n:segona nota"
+
+		Operation getThingById "Obtenir una Cosa per ID"
+			Param id "ID de la cosa"
+
+		Operation getAllThings "Obtenir totes les coses"
+
+	Interface Thangs "t:Operacions sobre Thang"
+
+		Operation addThang "Afegir un Thang"
+
+		Operation addThangs "Afegir múltiples Thangs"

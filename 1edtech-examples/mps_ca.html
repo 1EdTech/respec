@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ca-ES">
+
+<head>
+  <meta charset='utf-8'>
+  <title>
+    Exemple d'especificació 1EdTech
+  </title>
+  <script src='../profiles/1edtech.js' type="module" class="remove"></script>
+
+  <!-- Load the MPS configuration -->
+  <script class="remove" src="mps-config.js"></script>
+  <script class="remove" src="mps-auth.js"></script>
+
+  <!-- Load ajv2019 (Another JSON Schema Validator) if you want your examples validated -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.8.2/ajv2019.bundle.min.js"
+    integrity="sha512-9CfeXrjdW9wxGntWtQ4wE0k9RD8avpYxoPEKAGu+EP87RyqXYVQjed0l872XkNtQeIyYavZeqY+jzm69pmjEDw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script class='remove'>
+
+    var respecConfig = {
+      specTitle: "Exemple d'especificació 1EdTech",
+      shortName: "example",
+      specStatus: "Base Document",
+      specVersion: "1.0",
+      docVersion: "1",
+      specNature: "normative",
+      specType: "spec",
+      skipCertGuideConformanceRef: true,
+      localBiblio: {
+        "DATA-INTEGRITY": {
+          title: "Data Integrity 1.0",
+          href: "https://w3c-ccg.github.io/data-integrity-spec/",
+          authors: [
+            "Manu Sporny",
+            "Dave Longley"
+          ],
+          status: "CG-DRAFT",
+          publisher: "Credentials Community Group"
+        },
+        "MULTIBASE": {
+          title: "Multibase"
+        },
+        "MULTICODEC": {
+          title: "Multicodec"
+        },
+        "CTDL-TERMS": {
+          title: "CTDL Terms",
+          publisher: "Credential Engine"
+        },
+        "CTDL-ASN-TERMS": {
+          title: "CTDL-ASN Terms",
+          publisher: "Credential Engine"
+        }
+      },
+
+      // Add the MPS configuration to respecConfig
+      mps: {..._mps, apiKey: _mpsApiKey},
+
+      showPrivacyAnnotations: true,
+
+      // Add VC proof examples
+      // postProcess: [
+      //   window.respecVc.createVcExamples
+      // ],
+    };
+    respecConfig.mps.apiKey = _mpsApiKey;
+  </script>
+</head>
+
+<body>
+  <section id='abstract'>
+    <h2>Resum</h2>
+    <p>Resum molt simple.</p>
+    <div class="note">
+      Per que aquest exemple funcioni correctament s'ha de carregar al MPS el model definit a
+      <code>model/model_with_localizations.lines</code>. Aquest model pressuposa que el servidor
+      respec està arrencat en el port 8000.
+    </div>
+    <div class="note">
+      In order to work properly, the model defined at  <code>model/model_with_localizations.lines</code>
+      must be sideloaded into MPS. This model assumes respec server is running on port 8000.
+    </div>
+  </section>
+  <section id="conformance" class="informative">
+    <h2>Conformitat</h2>
+  </section>
+  <section>
+    <h2>Terminologia</h2>
+    <dl>
+      <dt><dfn>Authorization Server</dfn></dt>
+      <dd>Un servidor d'autorització.</dd>
+      <dt><dfn>Resource Server</dfn></dt>
+      <dd>Un servidor de recursos.</dd>
+      <dt><dfn>credential equality and comparison</dfn></dt>
+      <dd>Un algoritme.</dd>
+    </dl>
+  </section>
+  <section id="data-integrity">
+    <h2>Integritat</h2>
+    <p>Aquesta especificació empra els termes definits a l'especificació [[DATA-INTEGRITY]].</p>
+    </section>
+  <section id="proofs-signatures">
+    <h2>Sigantures</h2>
+  </section>
+
+  <!-- Start a data model section-->
+  <section data-model="org.1edtech.test01.v0p1.model"
+    data-service-model="org.1edtech.test01.v0p1.servicemodel"
+    data-source="SANDBOX">
+  </section>
+
+  <section data-model="org.1edtech.test01.v0p1.model" data-package="DataClasses" class="appendix" data-source="SANDBOX"></section>
+  <section data-model="org.1edtech.test01.v0p1.model" data-stereotype="DerivedType" title="Derived Types" class="appendix" data-source="SANDBOX">
+    <p>Tipus derivats del Common Data Model.</p>
+  </section>
+  <section data-model="org.1edtech.test01.v0p1.model" data-stereotype="PrimitiveType" title="Primitive Types" class="appendix" data-source="SANDBOX"></section>
+
+
+</body>
+
+</html>

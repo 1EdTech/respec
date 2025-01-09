@@ -1,0 +1,67 @@
+Model test01 2022-03-24 v0p1 "s:Draft" "t:Test Model 01" "Test model 01" "l:en-US"
+
+Package DataClasses DataModel
+
+	Class Thing Unordered false []
+		Property id UUID 1
+		Property startDate DateZ 1
+		Property endDate DateZ 0..1
+
+	Class Thang Unordered false []
+		Property id UUID 1
+		Property thingRef UUIDRef 1
+		Property size Integer 0..1
+
+Package PrimitiveTypes DataModel
+	//some includes from the common data model
+	Includes [String, Date, NormalizedString, Integer]
+
+Package DerivedTypes DataModel
+	//some includes from the common data model
+	Includes [DateZ, UUID, UUIDRef, Identifier, Reference]
+
+
+Package BaseService ServiceModel REST /ims/test/v0p1
+
+	Interface Things "t:The Thing Endpoints"  			"n:note1" "n:note2"
+
+		Operation getThingById GET /thing/{id} 			"Get a Thing by ID"
+			Param id in Path NormalizedString 1			"The sourced ID of the thing"
+			Response 200 Thing
+			Responses errors
+
+		Operation getAllThings GET /things 				"Get all the Things"
+			Params commonQueryParams in
+			Response 200 Thing 0..* paging
+			Response Default String
+
+	Interface Thangs "t:The Thang Endpoints"
+
+		Operation addThang POST /thang Thang 			"Add a single Thang"
+			Response 202
+				Params commonResponseHeaders out
+			Response Default String
+
+		Operation addThangs POST /thangs Thang 1..*		"Add multiple Thangs"
+			Response 202
+				Params commonResponseHeaders out
+				Param X-Header-Baz out Header String 0..1
+			Responses errors
+
+	//a reusable group of query parameters
+	ParamList commonQueryParams
+		Param query1 in Query String 1
+		Param query2 in Query Integer 0..1
+
+	//a reusable group of response parameters
+	ParamList commonResponseHeaders
+		Param X-Header-Foo out Header String 0..1
+		Param X-Header-Bar out Header Integer 0..1
+
+	//a reusable group of responses
+	ResponseList errors
+		Response 404
+		Response 402
+		Response Default String 0..1
+
+Localizations ca-ES http://localhost:8000/1edtech-examples/model/model_with_localizations_ca_ES.lines
