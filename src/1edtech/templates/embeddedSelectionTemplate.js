@@ -1,6 +1,10 @@
 // @ts-check
 import { renderIssue, renderNote, renderType } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
+import { getIntlData } from "../../core/utils.js";
+
+import localizationStrings from "../translations/embeddedSelectionTemplate.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Render an EmbeddedSelection class.
@@ -15,12 +19,12 @@ export default (classData, title) => {
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
       ${classData.documentation.notes.map(renderNote)}
-      <p>The ultimate representation of this class is a choice of exactly one of the classes in the following set:</p>
+      <p>${l10n.intro}</p>
       <table class="simple">
         <thead>
           <tr>
-            <th>Type</th>
-            <th>Description</th>
+            <th>${l10n.Type}</th>
+            <th>${l10n.Description}</th>
           </tr>
         </thead>
         <tbody>
