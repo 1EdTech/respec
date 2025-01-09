@@ -1,6 +1,10 @@
 // @ts-check
 import { renderIssue, renderNote as renderNote } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
+import { getIntlData } from "../../core/utils.js";
+
+import localizationStrings from "../translations/operationTemplate.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Render the header, description, notes, and issues for a MPS RestOperation object.
@@ -30,7 +34,7 @@ export default (config, rootPath, operation, title) => {
  * @returns {HTMLElement[]} The rendered request as HTML elements.
  */
 function renderRequest(config, rootPath, operation) {
-  return html`<h5>Request</h5>
+  return html`<h5>${l10n.Request}</h5>
     ${renderUrl(rootPath, operation)}
     ${renderRequestParameters(config, operation)}
     ${renderRequestBodies(config, operation)}`;
@@ -68,16 +72,16 @@ function renderRequestParameters(config, operation) {
     return html`
       <table class="simple" style="caption-side:top">
         <caption style="display:table-caption;text-align:left">
-          Request header, path, and query parameters
+          ${l10n.request_parameter_header}
         </caption>
         <thead>
           <tr>
-            <th>Parameter</th>
-            <th>Parameter Type</th>
-            <th>Description</th>
-            <th>Required</th>
+            <th>${l10n.Parameter}</th>
+            <th>${l10n.Parameter_Type}</th>
+            <th>${l10n.Description}</th>
+            <th>${l10n.Required}</th>
             ${config.showPrivacyAnnotations
-              ? html`<th>Confidentiality Level</th>`
+              ? html`<th>${l10n.confidentiality_level}</th>`
               : null}
           </tr>
         </thead>
@@ -102,16 +106,16 @@ function renderRequestBodies(config, operation) {
     return html`
       <table class="simple" style="caption-side:top">
         <caption style="display:table-caption;text-align:left">
-          Allowed request content types
+          ${l10n.request_body_header}
         </caption>
         <thead>
           <tr>
-            <th>Content-Type Header</th>
-            <th>Content Type</th>
-            <th>Content Description</th>
-            <th>Content Required</th>
+            <th>${l10n.Content_Type_Header}</th>
+            <th>${l10n.Content_Type}</th>
+            <th>${l10n.Content_Description}</th>
+            <th>${l10n.Content_Required}</th>
             ${config.showPrivacyAnnotations
-              ? html`<th>Confidentiality Level</th>`
+              ? html`<th>${l10n.confidentiality_level}</th>`
               : null}
           </tr>
         </thead>
@@ -166,20 +170,20 @@ function renderParameter(config, parameter) {
 
 function renderResponses(config, operation) {
   const responses = operation.responses.flatMap(mergeResponseBodies);
-  return html`<h5>Responses</h5>
+  return html`<h5>${l10n.Responses}</h5>
     <table class="simple" style="caption-side:top">
       <caption style="display:table-caption;text-align:left">
-        Allowed response codes and content types
+        ${l10n.request_header}
       </caption>
       <thead>
         <tr>
           <th>Status Code</th>
-          <th>Content-Type Header</th>
-          <th>Content Type</th>
-          <th>Content Description</th>
-          <th>Content Required</th>
+          <th>${l10n.Content_Type_Header}</th>
+          <th>${l10n.Content_Type}</th>
+          <th>${l10n.Content_Description}</th>
+          <th>${l10n.Content_Required}</th>
           ${config.showPrivacyAnnotations
-            ? html`<th>Confidentiality Level</th>`
+            ? html`<th>${l10n.confidentiality_level}</th>`
             : null}
         </tr>
       </thead>
@@ -226,7 +230,7 @@ function mergeResponseBodies(response) {
 
 function renderRequired(value) {
   if (value?.cardinality)
-    return value.cardinality.value.includes("ZERO") ? "Optional" : "Required";
+    return value.cardinality.value.includes("ZERO") ? l10n.Optional : l10n.Required;
 }
 
 /**
@@ -258,7 +262,7 @@ function renderParmeterType(parameter) {
     parameter.value.stereoType === "Enumeration" ||
     parameter.value.stereoType === "EnumExt"
   ) {
-    name += " Enumeration";
+    name = l10n.enumeration_name.replace("{0}", name);
   }
   name = html`<a href="#${parameter.value.id}"><samp>${name}</samp></a>`;
   return name;
@@ -274,7 +278,7 @@ function renderBodyType(body) {
       body.type.stereoType === "Enumeration" ||
       body.type.stereoType === "EnumExt"
     ) {
-      name += " Enumeration";
+      name = l10n.enumeration_name.replace("{0}", name);
     }
     name = html`<a href="#${body.type.id}"><samp>${name}</samp></a>`;
     return name;
