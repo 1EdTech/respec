@@ -16,13 +16,16 @@ import jsonSchemasTemplate from "./templates/jsonSchemasTemplate.js";
 import openApiSchemaTemplate from "./templates/openApiSchemaTemplate.js";
 import operationTemplate from "./templates/operationTemplate.js";
 import serviceModelTemplate from "./templates/serviceModelTemplate.js";
-import { showError } from "../core/utils.js";
+import { getIntlData, showError } from "../core/utils.js";
 import stereoTypeTemplate from "./templates/stereoTypeTemplate.js";
 import { sub } from "../core/pubsubhub.js";
 import embeddedSelectionTemplate from "./templates/embeddedSelectionTemplate.js";
+import localizationStrings from "./translations/mps.js";
 
 export const name = "1edtech/mps";
 
+const l10n = getIntlData(localizationStrings);
+const locale = document.documentElement.lang;
 /**
  * Get the MPS API KEY from the configuration.
  *
@@ -175,7 +178,7 @@ async function getModel(config, source, id) {
   const query = JSON.stringify({
     query: `
     {
-      modelByID(id: "${id}", source: ${source ?? "CORE"}) {
+      modelByID(id: "${id}", source: ${source ?? "CORE"}, locale: "${locale}") {
         id
         id
         name
@@ -848,7 +851,7 @@ ${JSON.stringify(sampleData, null, 2)}
     parentElem.append(sample);
   } else {
     parentElem.append(
-      html`<p>Could not get sample data. See developer console for details.</p>`
+      html`<p>${l10n.error_sample_data}</p>`
     );
   }
 }
@@ -1028,14 +1031,14 @@ async function validateExample(config, ajv, pre) {
       pre.insertAdjacentElement(
         "beforebegin",
         html`<div class="issue" title="Invalid JSON">
-          <p>NOTE: This example contains invalid JSON for ${schemaId}.</p>
+          <p>${l10n.error_invalid_json.replace("{0}", schemaId)}.</p>
           <ul>
             ${validate.errors.map(error => {
               if (error.instancePath === "") error.instancePath = "class";
               let message = `${error.instancePath}: ${error.message}`;
               switch (error.keyword) {
                 case "additionalProperties":
-                  message += ` (additional property: "${error.params.additionalProperty})"`;
+                  message += `${l10n.error_json_additional_property.replace("{0}", error.params.additionalProperty)}`;
                   break;
               }
               return `<li>${message}</li>`;
@@ -1178,7 +1181,7 @@ export async function run(config) {
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing Model id</h2>`
+            html`<h2>${l10n.error_missing_model}</h2>`
           );
           showError(
             "Cannot process DataModel sections without the Model id",
@@ -1207,7 +1210,7 @@ export async function run(config) {
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing Model id</h2>`
+            html`<h2>${l10n.error_missing_model}</h2>`
           );
           showError(
             "Cannot process SteroType sections without the Model id",
@@ -1217,7 +1220,7 @@ export async function run(config) {
         } else if (stereoType === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing StereoType</h2>`
+            html`<h2>${l10n.error_missing_stereotype}</h2>`
           );
           showError(
             "Cannot process SteroType sections without the StereoType",
@@ -1250,7 +1253,7 @@ export async function run(config) {
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing Model id</h2>`
+            html`<h2>${l10n.error_missing_model}</h2>`
           );
           showError(
             "Cannot process Schema sections without the Model id",
@@ -1283,7 +1286,7 @@ export async function run(config) {
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing Model id</h2>`
+            html`<h2>${l10n.error_missing_model}</h2>`
           );
           showError(
             "Cannot process ServiceModel section without the Model id",
@@ -1293,7 +1296,7 @@ export async function run(config) {
         } else if (serviceModelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing ServiceModel id</h2>`
+            html`<h2>${l10n.error_missing_service_model}</h2>`
           );
           showError(
             "Cannot process ServiceModel section without the ServiceModel id",
@@ -1322,7 +1325,7 @@ export async function run(config) {
         if (modelId === "") {
           section.insertAdjacentElement(
             "afterbegin",
-            html`<h2>Missing Model id</h2>`
+            html`<h2>${l10n.error_missing_model}</h2>`
           );
           showError(
             "Cannot process ClassDiagram section without the Model id",
