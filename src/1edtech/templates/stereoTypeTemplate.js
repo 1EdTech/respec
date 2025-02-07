@@ -1,6 +1,10 @@
 // @ts-check
 import { renderIssue, renderNote } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
+import { getIntlData } from "../../core/utils.js";
+
+import localizationStrings from "../translations/stereoTypeTemplate.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Render a table of types with the same stereotype.
@@ -26,8 +30,8 @@ export default (dataModel, stereoType) => {
     return html` <table class="simple">
       <thead>
         <tr>
-          <th>Type</th>
-          <th>Description</th>
+          <th>${l10n.Type}</th>
+          <th>${l10n.Description}</th>
         </tr>
       </thead>
       <tbody>

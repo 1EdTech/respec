@@ -6,6 +6,10 @@ import {
   renderType
 } from "./templateUtils.js";
 import { html } from "../../core/import-maps.js";
+import { getIntlData } from "../../core/utils.js";
+
+import localizationStrings from "../translations/classTemplate.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Render the header, description, notes, and issues, and properties of an MPS Class object.
@@ -24,11 +28,11 @@ export default (config, classData, title) => {
       <table class="simple">
         <thead>
           <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Multiplicity</th>
-            ${config.showPrivacyAnnotations ? html`<th>Privacy</th>` : null}
+            <th>${l10n.Property}</th>
+            <th>${l10n.Type}</th>
+            <th>${l10n.Description}</th>
+            <th>${l10n.Multiplicity}</th>
+            ${config.showPrivacyAnnotations ? html`<th>${l10n.Privacy}</th>` : null}
           </tr>
         </thead>
         <tbody>
@@ -49,7 +53,7 @@ function renderExtensibility(config, classData) {
   if (classData.isExtensible) {
     return html` <tr>
       <td colspan="${config.showPrivacyAnnotations ? 5 : 4}">
-        This class can be extended with additional properties.
+        ${l10n.ClassExtensibility}
       </td>
     </tr>`;
   } else {

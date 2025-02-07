@@ -8,10 +8,12 @@
 // - Use slightly modified conformance text.
 //
 // Note: Run after inlines so the conformance section has an id and NormativeReferences is available.
-import { htmlJoinAnd, showError, showWarning } from "../core/utils.js";
+import { getIntlData, htmlJoinAnd, showError, showWarning } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
 import { renderInlineCitation } from "../core/render-biblio.js";
 import { rfc2119Usage } from "../core/inlines.js";
+import localizationStrings from "./translations/conformance.js";
+const l10n = getIntlData(localizationStrings);
 
 export const name = "1edtech/conformance";
 
@@ -53,28 +55,20 @@ function getNormativeText(conf) {
   const plural = terms.length > 1;
 
   const content = html`<p>
-      As well as sections marked as non-normative, all authoring guidelines,
-      diagrams, examples, and notes in this specification are non-normative.
-      Everything else in this specification is normative.
+      ${l10n.normative_text_paragraph_1}
     </p>
     ${terms.length
       ? html`
           <p>
-            The key word${plural ? "s" : ""} ${[keywords]} in this document
-            ${plural ? "are" : "is"} to be interpreted as described in
-            ${renderInlineCitation("RFC2119")}.
+          ${plural ? `${l10n.the_plural} ${l10n.key_words}` : `${l10n.the} ${l10n.key_word}`}
+          ${[keywords]}
+          ${l10n.keywords_paragraph
+            .replace("{0}", plural ? l10n.are : l10n.is)
+            .replace("{1}", renderInlineCitation("RFC2119"))}
           </p>
         `
       : null}
-    <p>
-      An implementation of this specification that fails to implement a
-      MUST/REQUIRED/SHALL requirement or fails to abide by a MUST NOT/SHALL NOT
-      prohibition is considered nonconformant. SHOULD/SHOULD NOT/RECOMMENDED
-      statements constitute a best practice. Ignoring a best practice does not
-      violate conformance but a decision to disregard such guidance should be
-      carefully considered. MAY/OPTIONAL statements indicate that implementers
-      are entirely free to choose whether or not to implement the option.
-    </p>`;
+    <p>${l10n.normative_text_implementation}</p>`;
 
   if (conf.skipCertGuideConformanceRef || conf.specType == "cert") {
     return content;
@@ -82,9 +76,7 @@ function getNormativeText(conf) {
 
   return html`${content}
     <p>
-      The <a href="#document-set">Conformance and Certification Guide</a>
-      for this specification may introduce greater normative constraints than
-      those defined here for specific service or implementation categories.
+      ${l10n.normative_text_certification_constraints}
     </p>`;
 }
 
@@ -101,14 +93,8 @@ function getInformativeText(conf) {
   }
 
   return html` <p>
-    This document is an informative resource in the Document Set of the
-    ${conf.mainSpecTitle ? conf.mainSpecTitle : ""} specification
-    ${conf.mainSpecBiblioKey
-      ? renderInlineCitation(conf.mainSpecBiblioKey)
-      : ""}.
-    As such, it does not include any normative requirements. Occurrences in this
-    document of terms such as MAY, MUST, MUST NOT, SHOULD or RECOMMENDED have no
-    impact on the conformance criteria for implementors of this specification.
+    ${l10n.informative_text_paragraph_1.replace("{0}", conf.mainSpecTitle ? conf.mainSpecTitle : "").replace("{1}", conf.mainSpecBiblioKey ? renderInlineCitation(conf.mainSpecBiblioKey) : "")}.
+    ${l10n.informative_text_paragraph_2}
   </p>`;
 }
 

@@ -2,8 +2,11 @@
 // Module 1edtech/abstract
 // Handle the abstract section properly.
 import { html } from "../core/import-maps.js";
-import { showWarning } from "../core/utils.js";
+import { getIntlData, showWarning } from "../core/utils.js";
 export const name = "1edtech/abstract";
+
+import localizationStrings from "./translations/abstract.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Handles checking for the abstract, and inserts a temp one if not present.
@@ -14,7 +17,7 @@ export async function run() {
     showWarning("Document should have one element with 'abstract'", name);
     // insert a temp abstract
     abstract = html`<section id="abstract" class="introductory remove">
-      <h2>To be removed</h2>
+      <h2>${l10n.to_be_removed}</h2>
     </section>`;
     document.body.prepend(abstract);
   }
@@ -35,6 +38,6 @@ export async function run() {
     return;
   }
   abstractHeading = document.createElement("h2");
-  abstractHeading.textContent = "Abstract";
+  abstractHeading.textContent = l10n.abstract;
   abstract.prepend(abstractHeading);
 }

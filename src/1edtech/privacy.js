@@ -4,7 +4,7 @@
 import confLevelTmpl from "./templates/confidentialityLevelTemplate.js";
 import { getIntlData } from "../core/utils.js";
 import { html } from "../core/import-maps.js";
-import localizationStrings from "./translations/1edtech.js";
+import localizationStrings from "./translations/privacy.js";
 import privacyTmpl from "./templates/privacyImplicationsTemplate.js";
 
 export const name = "1edtech/privacy";
@@ -78,7 +78,7 @@ export async function run(conf) {
 
   const confSection = createSection(
     l10n.confidentiality_level,
-    l10n.confidentiality_level_paragram
+    l10n.confidentiality_level_paragraph
   );
   confSection.appendChild(confLevelTmpl(confidentialityLevelKeys, l10n));
   privacySection.appendChild(confSection);

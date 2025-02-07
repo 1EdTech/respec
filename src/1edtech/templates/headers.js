@@ -1,7 +1,10 @@
 /* eslint-disable prettier/prettier */
 // @ts-check
 import { html } from "../../core/import-maps.js";
-import { showWarning } from "../../core/utils.js";
+import { getIntlData, showWarning } from "../../core/utils.js";
+
+import localizationStrings from "../translations/headers.js";
+const l10n = getIntlData(localizationStrings);
 
 const name = "1edtech/templates/headers";
 
@@ -15,26 +18,26 @@ function getStatusString(conf) {
   }
   // for generic docs, have a generic desc
   if (conf.specType === "doc") {
-    return "This is an informative 1EdTech document that may be revised at any time.";
+    return l10n.generic;
   }
   if (conf.specType === "proposal") {
-    return "This is a proposal that may be revised at any time.";
+    return l10n.proposal;
   }
   // specStatus: See 1edtech/config.js for known values
   switch (conf.specStatus) {
     case "Proposal":
-      return "This document is for review and comment by 1EdTech Contributing Members.";
+      return l10n.proposal_status;
     case "Base Document":
-      return "This document is for review and comment by 1EdTech Contributing Members.";
+      return l10n.base_doc_status;
     case "Candidate Final":
-      return "This document is for review and adoption by the 1EdTech membership.";
+      return l10n.candidate_final_status;
     case "Candidate Final Public":
-      return "This document is for review and adoption by the 1EdTech membership.";
+      return l10n.candidate_final_status;
     case "Final Release":
-      return "This document is made available for adoption by the public community at large.";
+      return l10n.final_status;
     default:
       // 1edtech/config.js will issue error for unknown values
-      return `Unknown <code>specStatus: "${conf.specStatus}"</code>`;
+      return l10n.unknown_status.replace("{0}", conf.specStatus);
   }
 }
 
@@ -70,7 +73,7 @@ function showLinkData(data) {
 function renderSpecVersion(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<div class="subtitle">
-        ${conf.specStatus}<br />Spec Version ${conf.specVersion}
+        ${conf.specStatus}<br />${l10n.spec_version.replace("{0}", conf.specVersion)}
       </div>`;
   }
 }
@@ -78,7 +81,7 @@ function renderSpecVersion(conf) {
 function renderSpecStatus(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<span
-      class="statusPD${conf.specStatus === "Final Release" ? " final" : ""}"
+      class="statusPD${conf.specStatus === "Final Release" ? ` ${l10n.final}` : ""}"
       data-content="${conf.specStatus}"
       >${conf.specStatus}</span
     >`;
@@ -89,31 +92,31 @@ function renderVersionTable(conf) {
   if (conf.specType !== "doc" && conf.specType !== "proposal") {
     return html`<table
   id="version-table"
-  title="Version/Release Details">
+  title="${l10n.version_table_title}">
     <tbody>
       <tr>
-        <td>Document Version:</td>
+        <td>${l10n.document_version}:</td>
         <td>${conf.docVersion}</td>
       </tr>
       <tr>
-        <td>Date Issued:</td>
+        <td>${l10n.date_issued}:</td>
         <td>${conf.specDate}</td>
       </tr>
       <tr>
-        <td>Status:</td>
+        <td>${l10n.status}:</td>
         <td>${getStatusString(conf)}</td>
       </tr>
       <tr>
-        <td>This version:</td>
+        <td>${l10n.this_version}:</td>
         <td><a href='${conf.thisURL}'>${conf.thisURL}</a></td>
       </tr>
       ${conf.specNature === "normative"
         ? html`<tr>
-                <td>Latest version:</td>
+                <td>${l10n.latest_version}:</td>
                 <td><a href="${conf.latestURI}">${conf.latestURI}</a></td>
               </tr>
               <tr>
-                <td>Errata:</td>
+                <td>${l10n.errata}:</td>
                 <td><a href="${conf.errataURL}">${conf.errataURL}</a></td>
               </tr>`
         : null
@@ -124,14 +127,14 @@ function renderVersionTable(conf) {
   } else {
     return html`<table
       id="version-table"
-      title="Version/Release Details">
+      title="${l10n.version_table_title}">
       <tbody>
         <tr>
-          <td>Date Issued:</td>
+          <td>${l10n.date_issued}:</td>
           <td>${conf.specDate}</td>
         </tr>
         <tr>
-          <td>Status:</td>
+          <td>${l10n.status}:</td>
           <td>${getStatusString(conf)}</td>
         </tr>
       </tbody>
@@ -142,12 +145,12 @@ function renderVersionTable(conf) {
 function renderCopyright() {
   return html`<div id="cpr">
     <p>
-      © ${new Date().getFullYear()} 1EdTech&trade; Consortium, Inc. All Rights Reserved.
+      © ${new Date().getFullYear()} 1EdTech&trade; Consortium, Inc. ${l10n.copyright_tag}
     </p>
     <p>
-      Trademark information:
-      <a href="http://www.imsglobal.org/copyright.html"
-        >http://www.imsglobal.org/copyright.html
+      ${l10n.trademark_information}:
+      <a href="https://www.1edtech.org/about/legal"
+        >https://www.1edtech.org/about/legal
       </a>
     </p>
   </div>`;
@@ -156,47 +159,31 @@ function renderCopyright() {
 function renderDisclosure(conf) {
   if (conf.specType === "proposal") {
     return html`<div id="disclosure">
-      <h2>Proposals</h2>
-      <p>
-        Proposals are made available for the purposes of Project Group / Task
-        Force only and should not be distributed outside of the 1EdTech Contributing
-        Membership without the express written consent of 1EdTech. Provision of
-        any work documents outside of the project group/ task force will revoke
-        all privileges as an Invited Guest. Any documents provided
-        non-participants will be done by 1EdTech only on the 1EdTech public
-        website when the documents become publicly available.
+      <h2>${l10n.proposals}</h2>
+      <p>${l10n.proposals_disclosure}
       </p>
     </div>`;
   } else {
     return html`<div id="disclosure">
       <p>
-        Use of this specification to develop products or services is governed by
-        the license with 1EdTech found on the 1EdTech website:
-        <a href="http://www.imsglobal.org/speclicense.html">
-          http://www.imsglobal.org/speclicense.html</a
+        ${l10n.disclosure_license_link_text}:
+        <a href="https://www.1edtech.org/standards/specification-license">
+          https://www.1edtech.org/standards/specification-license</a
         >.
       </p>
       <p>
-        Permission is granted to all parties to use excerpts from this document
-        as needed in producing requests for proposals.
+        ${l10n.disclosure_granted_permissions_text}
       </p>
       <p>
-        The limited permissions granted above are perpetual and will not be
-        revoked by 1EdTech or its successors or assigns.
+        ${l10n.disclosure_granted_permissions_time_text}
       </p>
       <p>
-        THIS SPECIFICATION IS BEING OFFERED WITHOUT ANY WARRANTY WHATSOEVER, AND
-        IN PARTICULAR, ANY WARRANTY OF NONINFRINGEMENT IS EXPRESSLY DISCLAIMED.
-        ANY USE OF THIS SPECIFICATION SHALL BE MADE ENTIRELY AT THE
-        IMPLEMENTER'S OWN RISK, AND NEITHER THE CONSORTIUM, NOR ANY OF ITS
-        MEMBERS OR SUBMITTERS, SHALL HAVE ANY LIABILITY WHATSOEVER TO ANY
-        IMPLEMENTER OR THIRD PARTY FOR ANY DAMAGES OF ANY NATURE WHATSOEVER,
-        DIRECTLY OR INDIRECTLY, ARISING FROM THE USE OF THIS SPECIFICATION.
+        ${l10n.disclosure_warranty_text}
       </p>
       <p>
-        Public contributions, comments and questions can be posted here:
-        <a href="http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources">
-          http://www.imsglobal.org/forums/ims-glc-public-forums-and-resources
+        ${l10n.disclosure_contributions_text}
+        <a href="mailto:support@1edtech.org">
+          support@1edtech.org
         </a>.
       </p>
     </div>`;
@@ -205,25 +192,14 @@ function renderDisclosure(conf) {
 
 function renderIpr(conf) {
   return html`<div id="ipr">
-      <h2>IPR and Distribution Notice</h2>
+      <h2>${l10n.ipr_header}</h2>
       <p>
-        Recipients of this document are requested to submit, with their
-        comments, notification of any relevant patent claims or other
-        intellectual property rights of which they may be aware that might be
-        infringed by any implementation of the specification set forth in this
-        document, and to provide supporting documentation.
+        ${l10n.ipr_intro}
       </p>
       <p>
-        1EdTech takes no position regarding the validity or scope of any
-        intellectual property or other rights that might be claimed to pertain
-        implementation or use of the technology described in this document or
-        the extent to which any license under such rights might or might not be
-        available; neither does it represent that it has made any effort to
-        identify any such rights. Information on 1EdTech's procedures with respect
-        to rights in 1EdTech specifications can be found at the 1EdTech Intellectual
-        Property Rights webpage:
-        <a href="http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf">
-          http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf </a
+        ${l10n.ipr_text}:
+        <a href="https://www.1edtech.org/sites/default/files/media/docs/2023/imsipr_policyFinal.pdf">
+          https://www.1edtech.org/sites/default/files/media/docs/2023/imsipr_policyFinal.pdf </a
         >.
       </p>
     </div>
@@ -233,16 +209,15 @@ function renderIpr(conf) {
 function renderIprTable(conf) {
   if (conf.iprs) {
     return html`<p>
-        The following participating organizations have made explicit license
-        commitments to this specification:
+        ${l10n.ipr_table_intro}
       </p>
       <table>
       <thead>
         <tr>
-          <th>Org name</th>
-          <th>Date election made</th>
-          <th>Necessary claims</th>
-          <th>Type</th>
+          <th>${l10n.org_name}</th>
+          <th>${l10n.date_election_made}</th>
+          <th>${l10n.necessary_claims}</th>
+          <th>${l10n.type}</th>
         </th>
       </thead>
       <tbody>
@@ -269,7 +244,7 @@ export default conf => {
         <img
           src="https://purl.imsglobal.org/respec/1edtech_logo_color_with_tagline.svg"
           width="300" height="105"
-          alt="1EdTech logo"
+          alt="${l10n.logo_alt}"
         />
       </a>
     </div>

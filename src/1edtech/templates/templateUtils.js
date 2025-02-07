@@ -1,5 +1,9 @@
 // @ts-check
 import { html } from "../../core/import-maps.js";
+import { getIntlData } from "../../core/utils.js";
+
+import localizationStrings from "../translations/templateUtils.js";
+const l10n = getIntlData(localizationStrings);
 
 /**
  * Render a MPS issue as a Respec issue.
@@ -27,7 +31,7 @@ export function renderNote(note) {
  */
 export function renderPrivacyImplicationDoc(config, doc) {
   if (config.showPrivacyAnnotations && doc) {
-    return html`<div class="advisement">Privacy implication: ${doc}</div>`;
+    return html`<div class="advisement">${l10n.privacy_implication}: ${doc}</div>`;
   }
 }
 /**
@@ -59,7 +63,7 @@ export function renderType(type) {
     type.stereoType === "Enumeration" ||
     type.stereoType === "EnumExt"
   ) {
-    name += " Enumeration";
+    name = l10n.enumeration_name.replace("{0}", name);
   }
   name = html`<a href="#${type.id}"><samp>${name}</samp></a>`;
   return name;

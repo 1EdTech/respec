@@ -1,6 +1,10 @@
 // @ts-check
 
 import { toHTMLNode } from "./utils.js";
+import { getIntlData } from "../core/utils.js";
+
+import localizationStrings from "./translations/contrib.js";
+const l10n = getIntlData(localizationStrings);
 
 export const name = "1edtech/contrib";
 
@@ -10,14 +14,14 @@ export async function run(conf) {
   if (conf.specType !== "errata") {
     const useRoles = hasRoles(conf.contributors);
     const contrib = toHTMLNode(`<section id='contributors' class="appendix">
-    <h2>List of Contributors</h2>
-    <p>The following individuals contributed to the development of this document:</p>
-    <table class="contributors" title="List of Contributors"
-      summary="The list of contributors to this work.">
+    <h2>${l10n.title}</h2>
+    <p>${l10n.intro}</p>
+    <table class="contributors" title="${l10n.title}"
+      summary="${l10n.summary}">
       <thead>
-        <th>Name</th>
-        <th>Organization</th>
-        ${useRoles ? `<th>Role</th>` : ``}
+        <th>${l10n.name}</th>
+        <th>${l10n.organization}</th>
+        ${useRoles ? `<th>${l10n.role}</th>` : ``}
       </thead>
       <tbody>
           ${personsToTableRows(conf.contributors, useRoles)}
