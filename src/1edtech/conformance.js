@@ -93,7 +93,8 @@ function getInformativeText(conf) {
   }
 
   return html` <p>
-    ${l10n.informative_text_paragraph_1.replace("{0}", conf.mainSpecTitle ? conf.mainSpecTitle : "").replace("{1}", conf.mainSpecBiblioKey ? renderInlineCitation(conf.mainSpecBiblioKey) : "")}.
+    ${l10n.informative_text_paragraph_1.replace("{0}", conf.mainSpecTitle ? conf.mainSpecTitle : "")}
+    ${conf.mainSpecBiblioKey ? renderInlineCitation(conf.mainSpecBiblioKey) : ""}.
     ${l10n.informative_text_paragraph_2}
   </p>`;
 }

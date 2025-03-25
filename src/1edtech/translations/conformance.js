@@ -1,6 +1,6 @@
 export default {
   en: {
-    informative_text_paragraph_1: "This document is an informative resource in the Document Set of the {0} specification {1}",
+    informative_text_paragraph_1: "This document is an informative resource in the Document Set of the {0} specification",
     informative_text_paragraph_2: "As such, it does not include any normative requirements. Occurrences in this document of terms such as MAY, MUST, MUST NOT, SHOULD or RECOMMENDED have no impact on the conformance criteria for implementors of this specification.",
     normative_text_paragraph_1: "As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.",
     key_word: "key word",
@@ -14,7 +14,7 @@ export default {
     normative_text_certification_constraints: "The <a href=\"#document-set\">Conformance and Certification Guide</a> for this specification may introduce greater normative constraints than those defined here for specific service or implementation categories."
   },
   es: {
-    informative_text_paragraph_1: "Este documento es un recurso informativo dentro del Set de Documentos de la especificación {0} {1}",
+    informative_text_paragraph_1: "Este documento es un recurso informativo dentro del Set de Documentos de la especificación {0}",
     informative_text_paragraph_2: "Como tal, no incluye ningún requisito normativo. Las ocurrencias en este documento de términos como PUEDE, DEBE, NO DEBE, DEBERÍA o RECOMENDADO no tienen ningún impacto en los criterios de conformidad para los implementadores de esta especificación.",
     normative_text_paragraph_1: "Así como las secciones marcadas como no normativas, todas las directrices de autoría, diagramas, ejemplos y notas en esta especificación no son normativas. Todo lo demás en esta especificación es normativo.",
     key_word: "palabra clave",
@@ -28,7 +28,7 @@ export default {
     normative_text_certification_constraints: "La <a href=\"#document-set\">Guía de Conformidad y Certificación</a> para esta especificación puede introducir restricciones normativas mayores que las definidas aquí para categorías específicas de servicio o implementación."
   },
   ca: {
-    informative_text_paragraph_1: "Aquest document és un recurs informatiu dins del Set de Documents de l'especificació {1}",
+    informative_text_paragraph_1: "Aquest document és un recurs informatiu dins del Set de Documents de l'especificació {0}",
     informative_text_paragraph_2: "Com a tal, no inclou cap requisit normatiu. Les ocurrències en aquest document de termes com POT, HA DE, NO HA DE, o RECOMENAT no tenen cap impacte en els criteris de conformitat per als implementadors d'aquesta especificació.",
     normative_text_paragraph_1: "A més de les seccions marcades com a no normatives, totes les directrius d'autoria, diagrames, exemples i notes en aquesta especificació són no normatives. Tota la resta en aquesta especificació és normativa.",
     key_word: "paraula clau",
