@@ -91,15 +91,16 @@ async function getDataSample(config, id, includeOptionalFields = false) {
  *
  * @param {object} config The respecConfig.
  * @param {string} id MPS Class id.
+ * @param {boolean} jsonLdEnabled If true, the generated schema will include a JSON-LD context.
  * @param {boolean} allowAdditionalProperties If true or omitted, the generated schema will reflect the MPS model. If false, the generated schema will never allow additional properties. Use false to check examples for typos.
  * @returns {object} The JSON Schema object.
  */
-async function getJsonSchema(config, id, allowAdditionalProperties = true) {
+async function getJsonSchema(config, id, jsonLdEnabled, allowAdditionalProperties = true) {
   try {
     const res = await fetch(
       `${getBaseUrl(
         config
-      )}/jsonschema/${id}?allowAdditionalProperties=${allowAdditionalProperties}`,
+      )}/jsonschema/${id}?jsonLd=${jsonLdEnabled}&allowAdditionalProperties=${allowAdditionalProperties}`,
       {
         method: "GET",
         headers: {
@@ -627,13 +628,15 @@ async function processInterface(config, section, serviceInterface) {
 /**
  * Process the JSON Schema for single MPS Class model.
  *
+ * @param {object} config The respecConfig.
  * @param {HTMLElement} section The class section element.
  * @param {object} classModel The MPS Class object.
+ * @param {boolean} jsonLdEnabled True if JSON-LD context should be generated.
  */
-async function processJsonSchema(config, section, classModel) {
+async function processJsonSchema(config, section, classModel, jsonLdEnabled) {
   section.setAttribute("id", `${classModel.id}-schema`);
   const title = section.getAttribute("title");
-  const schema = await getJsonSchema(config, classModel.id);
+  const schema = await getJsonSchema(config, classModel.id, jsonLdEnabled);
   const wrapper = jsonSchemaTemplate(classModel, schema, title);
   if (schema && wrapper) {
     let target = null;
@@ -663,8 +666,9 @@ async function processJsonSchema(config, section, classModel) {
  * @param {object} config The respecConfig.
  * @param {HTMLElement} section The schema section element.
  * @param {string} modelId The MPS Model id.
+ * @param {boolean} jsonLdEnabled True if JSON-LD context should be generated.
  */
-async function processJsonSchemas(config, section, modelId) {
+async function processJsonSchemas(config, section, modelId, jsonLdEnabled) {
   // The MPS/MPS source (CORE|SANDBOX)
   const source = section.getAttribute("data-source") ?? config.mps.source;
   if (source !== "CORE" && source !== "SANDBOX") {
@@ -720,11 +724,11 @@ async function processJsonSchemas(config, section, modelId) {
         `section[data-class="${classModel.id}"]`
       );
       if (classSection) {
-        processJsonSchema(config, classSection, classModel);
+        processJsonSchema(config, classSection, classModel, jsonLdEnabled);
       } else {
         // Auto-generate the class definition
         classSection = html`<section data-class="${classModel.id}"></section>`;
-        processJsonSchema(config, classSection, classModel);
+        processJsonSchema(config, classSection, classModel, jsonLdEnabled);
         section.insertAdjacentElement("beforeend", classSection);
       }
     });
@@ -1014,6 +1018,7 @@ async function validateExample(config, ajv, pre) {
   const schemaDef = await getJsonSchema(
     config,
     schemaId,
+    false,
     allowAdditionalProperties
   );
   if (schemaDef === null) return;
@@ -1264,8 +1269,10 @@ export async function run(config) {
           section.setAttribute("id", `${modelId}.${index}`);
           index++;
           try {
-            if (schemaFormat === "" || schemaFormat === "json") {
-              await processJsonSchemas(config, section, modelId);
+            if (schemaFormat === "" || schemaFormat === "json-ld") {
+              await processJsonSchemas(config, section, modelId, true);
+            } else if (schemaFormat === "" || schemaFormat === "json") {
+              await processJsonSchemas(config, section, modelId, false);
             } else {
               await processOpenApiSchema(config, section, modelId);
             }
