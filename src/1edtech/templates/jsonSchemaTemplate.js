@@ -16,6 +16,8 @@ export default (classData, schema, title) => {
       <p>${classData.documentation.description}</p>
       ${classData.documentation.issues.map(renderIssue)}
       ${classData.documentation.notes.map(renderNote)}
-      <pre class="nohighlight">${JSON.stringify(schema, null, 2)}</pre>`;
+      <pre class="nohighlight user-select">
+${JSON.stringify(schema, null, 2)}</pre
+      >`;
   }
 };

@@ -16,6 +16,6 @@ export default (modelData, schema, title) => {
       <p>${modelData.documentation.description}</p>
       ${modelData.documentation.issues.map(renderIssue)}
       ${modelData.documentation.notes.map(renderNote)}
-      <pre class="nohighlight">${schema}</pre>`;
+      <pre class="nohighlight user-select">${schema}</pre>`;
   }
 };

@@ -21,6 +21,7 @@ import stereoTypeTemplate from "./templates/stereoTypeTemplate.js";
 import { sub } from "../core/pubsubhub.js";
 import embeddedSelectionTemplate from "./templates/embeddedSelectionTemplate.js";
 import localizationStrings from "./translations/mps.js";
+import css from "../styles/mps.css.js";
 
 export const name = "1edtech/mps";
 
@@ -95,7 +96,12 @@ async function getDataSample(config, id, includeOptionalFields = false) {
  * @param {boolean} allowAdditionalProperties If true or omitted, the generated schema will reflect the MPS model. If false, the generated schema will never allow additional properties. Use false to check examples for typos.
  * @returns {object} The JSON Schema object.
  */
-async function getJsonSchema(config, id, jsonLdEnabled, allowAdditionalProperties = true) {
+async function getJsonSchema(
+  config,
+  id,
+  jsonLdEnabled,
+  allowAdditionalProperties = true
+) {
   try {
     const res = await fetch(
       `${getBaseUrl(
@@ -848,15 +854,12 @@ async function processSample(config, parentElem) {
   );
   if (sampleData) {
     // eslint-disable-next-line prettier/prettier
-    const sample = html`
-<pre class="nohighlight">
+    const sample = html` <pre class="nohighlight">
 ${JSON.stringify(sampleData, null, 2)}
 </pre>`;
     parentElem.append(sample);
   } else {
-    parentElem.append(
-      html`<p>${l10n.error_sample_data}</p>`
-    );
+    parentElem.append(html`<p>${l10n.error_sample_data}</p>`);
   }
 }
 
@@ -1406,4 +1409,8 @@ export async function run(config) {
       script.innerHTML = JSON.stringify(userConfig, null, 2);
     }
   });
+
+  const style = document.createElement("style");
+  style.textContent = css;
+  document.head.appendChild(style);
 }
