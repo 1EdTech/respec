@@ -64,7 +64,7 @@ function getNormativeText(conf) {
           ${[keywords]}
           ${l10n.keywords_paragraph
             .replace("{0}", plural ? l10n.are : l10n.is)
-            .replace("{1}", renderInlineCitation("RFC2119"))}
+            .replace("{1}", renderInlineCitation("RFC2119").toString())}
           </p>
         `
       : null}
