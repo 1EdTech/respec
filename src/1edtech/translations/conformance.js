@@ -9,7 +9,7 @@ export default {
     are: "are",
     the: "The",
     the_plural: "The",
-    keywords_paragraph: "in this document ${0} to be interpreted as described in ${1}.",
+    keywords_paragraph: "in this document {0} to be interpreted as described in {1}.",
     normative_text_implementation: "An implementation of this specification that fails to implement a MUST/REQUIRED/SHALL requirement or fails to abide by a MUST NOT/SHALL NOT prohibition is considered nonconformant. SHOULD/SHOULD NOT/RECOMMENDED statements constitute a best practice. Ignoring a best practice does not violate conformance but a decision to disregard such guidance should be carefully considered. MAY/OPTIONAL statements indicate that implementers are entirely free to choose whether or not to implement the option.",
     normative_text_certification_constraints: "The <a href=\"#document-set\">Conformance and Certification Guide</a> for this specification may introduce greater normative constraints than those defined here for specific service or implementation categories."
   },
