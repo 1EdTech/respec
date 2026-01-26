@@ -9,7 +9,7 @@ export default {
     are: "are",
     the: "The",
     the_plural: "The",
-    keywords_paragraph: "in this document {0} to be interpreted as described in {1}.",
+    keywords_paragraph: "in this document {0} to be interpreted as described in",
     normative_text_implementation: "An implementation of this specification that fails to implement a MUST/REQUIRED/SHALL requirement or fails to abide by a MUST NOT/SHALL NOT prohibition is considered nonconformant. SHOULD/SHOULD NOT/RECOMMENDED statements constitute a best practice. Ignoring a best practice does not violate conformance but a decision to disregard such guidance should be carefully considered. MAY/OPTIONAL statements indicate that implementers are entirely free to choose whether or not to implement the option.",
     normative_text_certification_constraints: "The <a href=\"#document-set\">Conformance and Certification Guide</a> for this specification may introduce greater normative constraints than those defined here for specific service or implementation categories."
   },
@@ -23,7 +23,7 @@ export default {
     are: "son",
     the: "La",
     the_plural: "Las",
-    keywords_paragraph: "en este documento ${0} interpretadas tal y como se describe en ${1}.",
+    keywords_paragraph: "en este documento ${0} interpretadas tal y como se describe en",
     normative_text_implementation: "Una implementación de esta especificación que no implementa un requisito de DEBE/REQUERIDO/DEBERIA o no cumple con una prohibición de DEBE/NO DEBE se considera no conforme. Las declaraciones DEBERÍA/NO DEBERÍA/RECOMENDADO constituyen una buena práctica. Ignorar una buena práctica no viola la conformidad, pero la decisión de ignorar dicha guía debe considerarse cuidadosamente. Las declaraciones MAY/OPCIONAL indican que los implementadores son completamente libres de elegir si implementar o no la opción.",
     normative_text_certification_constraints: "La <a href=\"#document-set\">Guía de Conformidad y Certificación</a> para esta especificación puede introducir restricciones normativas mayores que las definidas aquí para categorías específicas de servicio o implementación."
   },
@@ -37,7 +37,7 @@ export default {
     are: "són",
     the: "La",
     the_plural: "Les",
-    keywords_paragraph: "dins aquest document ${0} interpretades tal i com es descriu a ${1}.",
+    keywords_paragraph: "dins aquest document ${0} interpretades tal i com es descriu a",
     normative_text_implementation: "Una implementació d'aquesta especificació que no implementi un requisit HA DE/REQUERIT/HAURIA DE o que no compleixi amb una prohibició HA DE/NO HA DE es considera inconformant. Les declaracions HAURIA DE/NO HAURIA DE/RECOMENAT constitueixen una bona práctica. Ignorar una bona pràctica no viola la conformitat, però s'ha de tenir en compte amb cura la decisió d'ignorar aquesta orientació. Les declaracions POT/OPCIONAL indiquen que els implementadors són totalment lliures de triar si implementar o no l'opció.",
     normative_text_certification_constraints: "La <a href=\"#document-set\">Guia de Conformitat i Certificació</a> per a aquesta especificació pot introduir restriccions normatives més grans que les definides aquí per a categories específiques de serveis o d'implementació."
   }

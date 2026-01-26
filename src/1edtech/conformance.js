@@ -54,6 +54,7 @@ function getNormativeText(conf) {
   );
   const plural = terms.length > 1;
 
+  console.log(renderInlineCitation("RFC2119"))
   const content = html`<p>
       ${l10n.normative_text_paragraph_1}
     </p>
@@ -63,8 +64,8 @@ function getNormativeText(conf) {
           ${plural ? `${l10n.the_plural} ${l10n.key_words}` : `${l10n.the} ${l10n.key_word}`}
           ${[keywords]}
           ${l10n.keywords_paragraph
-            .replace("{0}", plural ? l10n.are : l10n.is)
-            .replace("{1}", renderInlineCitation("RFC2119").toString())}
+            .replace("{0}", plural ? l10n.are : l10n.is)}
+            ${renderInlineCitation("RFC2119")}.
           </p>
         `
       : null}
