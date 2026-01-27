@@ -8,7 +8,7 @@ const l10n = getIntlData(localizationStrings);
 export default conf => {
   return html`<footer>
     <div id="endWarranty">
-      <p>1EdTech&trade; Consortium, Inc. ("1EdTech") ${l10n.warranty_1}</p>
+      <p>1EdTech&reg; Consortium, Inc. ("1EdTech") ${l10n.warranty_1}</p>
       <p>${l10n.warranty_2}</p>
       <p>${l10n.warranty_3}</p>
       <p>${l10n.warranty_4}</p>

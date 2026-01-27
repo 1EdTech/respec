@@ -145,7 +145,7 @@ function renderVersionTable(conf) {
 function renderCopyright() {
   return html`<div id="cpr">
     <p>
-      © ${new Date().getFullYear()} 1EdTech&trade; Consortium, Inc. ${l10n.copyright_tag}
+      © ${new Date().getFullYear()} 1EdTech&reg; Consortium, Inc. ${l10n.copyright_tag}
     </p>
     <p>
       ${l10n.trademark_information}:
