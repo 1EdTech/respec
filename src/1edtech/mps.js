@@ -1369,8 +1369,10 @@ export async function run(config) {
     );
   }
 
-  if (typeof window.ajv2019 === "function") {
-    const ajv = new window.ajv2019({
+  if (typeof window.ajv2019 === "function" || typeof window.ajv2020 === "function") {
+    const ajv = typeof window.ajv2019 === "function" ? new window.ajv2019({
+      allErrors: true,
+    }) : new window.ajv2020({
       allErrors: true,
     });
     addFormats(ajv);
